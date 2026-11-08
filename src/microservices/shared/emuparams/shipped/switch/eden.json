@@ -1,7 +1,12 @@
 {
   "enabled": true,
   "name": "Nintendo Switch",
-  "description": "The settings given to Eden before every Switch game starts.",
+  "description": "Settings of Eden, a Nintendo Switch emulator, applied when a game starts.",
+  "translations": {
+    "fr": {
+      "description": "Les réglages d'Eden, un émulateur de la Nintendo Switch, appliqués au démarrage d'un jeu."
+    }
+  },
   "system": "Eden",
   "requirements": [
     "prod.keys"
@@ -21,17 +26,39 @@
         "4": "1.25×",
         "5": "1.5×",
         "6": "2×"
+      },
+      "translations": {
+        "fr": {
+          "label": "Résolution de rendu",
+          "description": "La taille à laquelle Eden dessine, en multiple de l'image de la console (1080p sur le socle, 720p en portable). « Suivre le flux » dessine à la résolution choisie pour la partie : 540p donne 0,5×, 720p donne 0,75×.",
+          "options": {
+            "auto": "Suivre le flux",
+            "1": "0,5× — 540p sur le socle",
+            "2": "0,75× — 810p sur le socle",
+            "3": "1× — la résolution de la console"
+          }
+        }
       }
     },
     "consoleMode": {
       "type": "select",
       "label": "Console mode",
-      "description": "Handheld draws at 720p instead of 1080p, and some games lower their detail too: lighter for a phone.",
+      "description": "Handheld draws at 720p instead of 1080p, and some games also lower their detail: lighter for a phone or a small processor.",
       "config": "System > use_docked_mode",
       "value": "1",
       "options": {
         "1": "Docked — 1080p",
         "0": "Handheld — 720p"
+      },
+      "translations": {
+        "fr": {
+          "label": "Mode de la console",
+          "description": "Le mode portable dessine en 720p au lieu de 1080p, et certains jeux baissent aussi leurs détails : plus léger pour un téléphone ou un petit processeur.",
+          "options": {
+            "1": "Sur le socle — 1080p",
+            "0": "Portable — 720p"
+          }
+        }
       }
     },
     "asyncShaders": {
@@ -39,7 +66,13 @@
       "label": "Asynchronous shaders",
       "description": "Shaders are built in the background instead of pausing the game. A few frames may miss an effect while one is being built.",
       "config": "Renderer > use_asynchronous_shaders",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Shaders asynchrones",
+          "description": "Les shaders sont préparés en arrière-plan au lieu de mettre le jeu en pause. Quelques images peuvent manquer un effet pendant qu'un shader se prépare."
+        }
+      }
     },
     "gpuAccuracy": {
       "type": "select",
@@ -50,6 +83,16 @@
       "options": {
         "0": "Low",
         "1": "High"
+      },
+      "translations": {
+        "fr": {
+          "label": "Précision du GPU",
+          "description": "Basse est la plus rapide et peut montrer des défauts ; Haute corrige certains jeux et coûte davantage.",
+          "options": {
+            "0": "Basse",
+            "1": "Haute"
+          }
+        }
       }
     },
     "cpuAccuracy": {
@@ -63,6 +106,18 @@
         "1": "Accurate",
         "2": "Unsafe",
         "3": "Paranoid"
+      },
+      "translations": {
+        "fr": {
+          "label": "Précision du processeur",
+          "description": "Non sûre saute certaines vérifications pour aller plus vite ; Précise et Paranoïaque corrigent de rares jeux et coûtent davantage.",
+          "options": {
+            "0": "Auto",
+            "1": "Précise",
+            "2": "Non sûre",
+            "3": "Paranoïaque"
+          }
+        }
       }
     },
     "vsync": {
@@ -76,14 +131,32 @@
         "1": "Mailbox",
         "2": "On",
         "3": "Relaxed"
+      },
+      "translations": {
+        "fr": {
+          "label": "Synchronisation verticale",
+          "description": "Désactivée, chaque image s'affiche dès qu'elle est prête : moins de latence, possible déchirement de l'image.",
+          "options": {
+            "0": "Désactivée",
+            "1": "Mailbox",
+            "2": "Activée",
+            "3": "Souple"
+          }
+        }
       }
     },
     "multiCore": {
       "type": "switch",
       "label": "Multi-core CPU emulation",
-      "description": "The Switch's cores run on separate threads. On an arm64 phone the recompiler always runs a single one: Eden breaks games at boot there with several (#358); native execution follows this switch. Elsewhere, Off only works around a game that misbehaves with it.",
+      "description": "Runs the Switch's processor cores on separate threads. On ARM devices, it applies to native execution only: the recompiler always runs a single thread there, because games can break at start with several. Elsewhere, turn it off only for a game that misbehaves with it.",
       "config": "Core > use_multi_core",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Émulation multicœur du processeur",
+          "description": "Les cœurs de la Switch tournent sur des fils séparés. Sur un appareil ARM, cela ne concerne que l'exécution native : le recompilateur y tourne toujours sur un seul fil, car des jeux peuvent sinon échouer au démarrage. Ailleurs, ne la désactivez que pour un jeu qui se comporte mal avec."
+        }
+      }
     },
     "antiAliasing": {
       "type": "select",
@@ -95,6 +168,15 @@
         "0": "None",
         "1": "FXAA",
         "2": "SMAA"
+      },
+      "translations": {
+        "fr": {
+          "label": "Anticrénelage",
+          "description": "Adoucit les contours crénelés une fois l'image dessinée ; Aucun ne coûte rien.",
+          "options": {
+            "0": "Aucun"
+          }
+        }
       }
     },
     "scalingFilter": {
@@ -108,6 +190,18 @@
         "1": "Bilinear",
         "2": "Bicubic",
         "6": "AMD FSR"
+      },
+      "translations": {
+        "fr": {
+          "label": "Filtre de mise à l'échelle",
+          "description": "La façon dont l'image est redimensionnée à l'écran. FSR affine une image agrandie et coûte un peu.",
+          "options": {
+            "0": "Plus proche voisin",
+            "1": "Bilinéaire",
+            "2": "Bicubique",
+            "6": "AMD FSR"
+          }
+        }
       }
     },
     "videoDecoding": {
@@ -120,6 +214,17 @@
         "0": "Off",
         "1": "Processor",
         "2": "Graphics processor"
+      },
+      "translations": {
+        "fr": {
+          "label": "Décodage des vidéos",
+          "description": "La façon dont les vidéos du jeu sont décodées. Désactivé les saute, ce qui aide un jeu qui se fige sur une vidéo.",
+          "options": {
+            "0": "Désactivé",
+            "1": "Processeur",
+            "2": "Processeur graphique"
+          }
+        }
       }
     },
     "reactiveFlushing": {
@@ -127,19 +232,31 @@
       "label": "Reactive flushing",
       "description": "Keeps what some games read back from the picture correct. Off is faster, and a few games show wrong shadows or lighting.",
       "config": "Renderer > use_reactive_flushing",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Vidage réactif",
+          "description": "Garde justes les données que certains jeux relisent dans l'image. Désactivé, c'est plus rapide, et quelques jeux montrent des ombres ou un éclairage faux."
+        }
+      }
     },
     "asyncPresentation": {
       "type": "switch",
       "label": "Asynchronous presentation",
-      "description": "Hands each finished frame to the screen from a separate thread, so the emulation does not wait for it. Eden turns it on for Android, off elsewhere.",
+      "description": "Hands each finished frame to the screen from a separate thread, so the emulation does not wait for it. Eden turns it on by default on Android, off elsewhere.",
       "config": "Renderer > async_presentation",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Présentation asynchrone",
+          "description": "Remet chaque image terminée à l'écran depuis un fil séparé, pour que l'émulation ne l'attende pas. Eden l'active par défaut sur Android, et la désactive ailleurs."
+        }
+      }
     },
     "dynamicState": {
       "type": "select",
       "label": "Extended dynamic state",
-      "description": "How much of the drawing state Eden leaves to the graphics driver instead of baking it into each pipeline: fewer pipelines to compile the higher it goes. Eden turns it off on Android, where some drivers handle it badly.",
+      "description": "How much of the drawing state is left to the graphics driver instead of being built into each pipeline: the higher, the fewer pipelines to compile. Eden turns it off by default on Android, where some drivers handle it badly.",
       "config": "Renderer > dyna_state",
       "value": "2",
       "options": {
@@ -147,30 +264,58 @@
         "1": "Level 1",
         "2": "Level 2",
         "3": "Level 3"
+      },
+      "translations": {
+        "fr": {
+          "label": "État dynamique étendu",
+          "description": "La part de l'état de dessin laissée au pilote graphique au lieu d'être intégrée à chaque pipeline : plus il y en a, moins il y a de pipelines à compiler. Eden le désactive par défaut sur Android, où certains pilotes le gèrent mal.",
+          "options": {
+            "0": "Désactivé",
+            "1": "Niveau 1",
+            "2": "Niveau 2",
+            "3": "Niveau 3"
+          }
+        }
       }
     },
     "vertexInputDynamicState": {
       "type": "switch",
       "label": "Dynamic vertex input",
-      "description": "Leaves the vertex layout to the driver too. Eden turns it off on Android.",
+      "description": "Also leaves the vertex layout to the graphics driver. Eden turns it off by default on Android.",
       "config": "Renderer > vertex_input_dynamic_state",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Entrée de sommets dynamique",
+          "description": "Laisse aussi la disposition des sommets au pilote graphique. Eden la désactive par défaut sur Android."
+        }
+      }
     },
     "nativeExecution": {
       "type": "select",
-      "label": "Native execution (phone)",
-      "description": "On an arm64 phone, Eden runs the game's code directly on the processor, on all the Switch's cores — fast, with GameFlex's own Eden keeping its memory maps under Android's limit. The recompiler is the fallback: one core and no fast memory access, safe but slow. A server ignores it.",
+      "label": "Native execution (ARM devices)",
+      "description": "On ARM devices, runs the game's code directly on the processor, on all the Switch's cores: fast. The recompiler is the fallback: one core and no fast memory access, safe but slow. Ignored on other processors.",
       "config": "Environment > GAMEFLEX_EDEN_NATIVE",
       "value": "auto",
       "options": {
         "auto": "Native, all cores",
         "0": "Recompiler, one core, without fast memory access (safe, slow)"
+      },
+      "translations": {
+        "fr": {
+          "label": "Exécution native (appareils ARM)",
+          "description": "Sur un appareil ARM, exécute le code du jeu directement sur le processeur, sur tous les cœurs de la Switch : rapide. Le recompilateur est la solution de repli : un seul cœur et pas d'accès mémoire rapide, sûr mais lent. Ignoré sur les autres processeurs.",
+          "options": {
+            "auto": "Natif, tous les cœurs",
+            "0": "Recompilateur, un cœur, sans accès mémoire rapide (sûr, lent)"
+          }
+        }
       }
     },
     "volume": {
       "type": "select",
       "label": "Volume",
-      "description": "Eden's own volume, before the stream's.",
+      "description": "The emulator's own volume, before the stream's.",
       "config": "Audio > volume",
       "value": "100",
       "options": {
@@ -178,12 +323,18 @@
         "75": "75 %",
         "50": "50 %",
         "25": "25 %"
+      },
+      "translations": {
+        "fr": {
+          "label": "Volume",
+          "description": "Le volume de l'émulateur lui-même, avant celui du flux."
+        }
       }
     },
     "turnipDebug": {
       "type": "select",
       "label": "Adreno driver workaround (Turnip)",
-      "description": "A debug option of Turnip, the graphics driver of Adreno phones: it changes how the driver renders, to work around its bugs. It has no effect on another graphics processor.",
+      "description": "Debug options of Turnip, the graphics driver of Adreno devices, which change how the driver renders to work around its bugs. They have no effect on other graphics processors.",
       "config": "Environment > TU_DEBUG",
       "value": "auto",
       "options": {
@@ -193,17 +344,41 @@
         "sysmem": "sysmem — never render in tiles",
         "nolrz": "nolrz — no early depth test",
         "syncdraw": "syncdraw — one draw at a time (slow)"
+      },
+      "translations": {
+        "fr": {
+          "label": "Contournement du pilote Adreno (Turnip)",
+          "description": "Des options de débogage de Turnip, le pilote graphique des appareils Adreno, qui changent sa façon de dessiner pour contourner ses défauts. Elles n'ont aucun effet sur les autres processeurs graphiques.",
+          "options": {
+            "auto": "Aucun",
+            "flushall": "flushall — vider les caches du GPU après chaque dessin (plus lent)",
+            "gmem": "gmem — toujours rendre en tuiles",
+            "sysmem": "sysmem — jamais de rendu en tuiles",
+            "nolrz": "nolrz — pas de test de profondeur anticipé",
+            "syncdraw": "syncdraw — un dessin à la fois (lent)"
+          }
+        }
       }
     },
     "ir3Debug": {
       "type": "select",
       "label": "Adreno shader compiler (Turnip)",
-      "description": "A debug option of ir3, the compiler of Turnip's shaders. “nopreamble” works around a known geometry bug of RPCS3 on Turnip (Mesa #14386). It has no effect on another graphics processor.",
+      "description": "A debug option of ir3, the shader compiler of Turnip. “nopreamble” works around a known geometry bug of some emulators on Turnip. It has no effect on other graphics processors.",
       "config": "Environment > IR3_SHADER_DEBUG",
       "value": "auto",
       "options": {
         "auto": "None",
         "nopreamble": "nopreamble — no shader preamble"
+      },
+      "translations": {
+        "fr": {
+          "label": "Compilateur de shaders Adreno (Turnip)",
+          "description": "Une option de débogage d'ir3, le compilateur de shaders de Turnip. « nopreamble » contourne un défaut de géométrie connu de certains émulateurs sur Turnip. Elle n'a aucun effet sur les autres processeurs graphiques.",
+          "options": {
+            "auto": "Aucun",
+            "nopreamble": "nopreamble — sans préambule de shader"
+          }
+        }
       }
     }
   }

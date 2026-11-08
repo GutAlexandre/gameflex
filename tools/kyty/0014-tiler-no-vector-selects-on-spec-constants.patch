@@ -1,5 +1,5 @@
 diff --git a/src/graphics/host_gpu/shaders/gpu_tiler_prt.comp b/src/graphics/host_gpu/shaders/gpu_tiler_prt.comp
-index e34dc79..55ecd8d 100644
+index e34dc798..55ecd8d5 100644
 --- a/src/graphics/host_gpu/shaders/gpu_tiler_prt.comp
 +++ b/src/graphics/host_gpu/shaders/gpu_tiler_prt.comp
 @@ -8,11 +8,18 @@ uvec3 block_extent() {
@@ -26,7 +26,7 @@ index e34dc79..55ecd8d 100644
  	             (((p.x >> s.z) & 1u) << 10) ^ (((p.y >> s.w) & 1u) << 11);
  	return standard64_offset(p.xy) ^ delta;
 diff --git a/src/graphics/host_gpu/shaders/gpu_tiler_prt_3d.comp b/src/graphics/host_gpu/shaders/gpu_tiler_prt_3d.comp
-index 6cb079d..85ba5ae 100644
+index 6cb079de..85ba5aea 100644
 --- a/src/graphics/host_gpu/shaders/gpu_tiler_prt_3d.comp
 +++ b/src/graphics/host_gpu/shaders/gpu_tiler_prt_3d.comp
 @@ -5,11 +5,18 @@ layout(constant_id = 1) const uint TILE = 0u;
@@ -53,7 +53,7 @@ index 6cb079d..85ba5ae 100644
  	             (((p.x >> s.z) & 1u) << 11) ^ (((p.z >> s.w) & 1u) << 11);
  	return standard64_3d_offset(p) ^ delta;
 diff --git a/src/graphics/host_gpu/shaders/gpu_tiler_standard64_3d.inc b/src/graphics/host_gpu/shaders/gpu_tiler_standard64_3d.inc
-index c35851c..de31043 100644
+index c35851cc..de310438 100644
 --- a/src/graphics/host_gpu/shaders/gpu_tiler_standard64_3d.inc
 +++ b/src/graphics/host_gpu/shaders/gpu_tiler_standard64_3d.inc
 @@ -6,11 +6,18 @@ uvec3 standard64_3d_extent() {

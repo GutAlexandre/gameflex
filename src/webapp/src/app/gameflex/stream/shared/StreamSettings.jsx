@@ -39,6 +39,8 @@ const Form = Skeleton.Form;
 /** L'échelle unique — les trois plateformes offrent exactement ceci. */
 export const STREAM_OPTIONS = {
     resolutions: [
+        // Revenu le 2026-11-06 (#636) : un jeu que l'émulateur rend en 360p.
+        { value: "360p", label: "360p" },
         { value: "540p", label: "540p" },
         { value: "720p", label: "720p" },
         { value: "1080p", label: "1080p" },

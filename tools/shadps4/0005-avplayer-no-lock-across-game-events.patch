@@ -1,5 +1,5 @@
 diff --git a/src/core/libraries/avplayer/avplayer_state.cpp b/src/core/libraries/avplayer/avplayer_state.cpp
-index c81f9e1..aa6ae37 100644
+index c81f9e1c..aa6ae376 100644
 --- a/src/core/libraries/avplayer/avplayer_state.cpp
 +++ b/src/core/libraries/avplayer/avplayer_state.cpp
 @@ -175,22 +175,31 @@ bool AvPlayerState::GetStreamInfo(u32 stream_index, AvPlayerStreamInfo& info) {

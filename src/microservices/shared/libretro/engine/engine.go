@@ -33,6 +33,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -252,6 +253,9 @@ type Engine struct {
 	// aspect — Frame.Aspect, en bits de float64 : SET_GEOMETRY peut venir d'un
 	// autre fil du cœur que celui des images.
 	aspect atomic.Uint64
+	// frameSize — la taille de la dernière image du cœur, largeur << 32 |
+	// hauteur, pour le panneau (FrameSize) ; lue d'un autre fil que le sien.
+	frameSize atomic.Uint64
 	// aspectRejected — un format absurde est dit une fois par partie.
 	aspectRejected atomic.Bool
 
@@ -379,6 +383,18 @@ func (e *Engine) FPS() float64 {
 	defer e.mu.Unlock()
 
 	return e.latestFPS
+}
+
+// FrameSize — la taille de la dernière image que le cœur a rendue, « 320x240 »,
+// vide avant la première. C'est la « Résolution du jeu » du panneau : celle de
+// l'émulation, pas celle du flux qui l'agrandit.
+func (e *Engine) FrameSize() string {
+	size := e.frameSize.Load()
+	if size == 0 {
+		return ""
+	}
+
+	return strconv.FormatUint(size>>32, 10) + "x" + strconv.FormatUint(size&0xffffffff, 10)
 }
 
 // CheatsSupported — le cœur sait-il appliquer des codes ?
@@ -1064,6 +1080,7 @@ func (e *Engine) video(data unsafe.Pointer, width, height, pitch uint32) {
 	}
 
 	w, h := int(width), int(height)
+	e.frameSize.Store(uint64(width)<<32 | uint64(height))
 	var pixels []byte
 	// Le rendu matériel n'a pas de tampon : `data` est la sentinelle
 	// RETRO_HW_FRAME_BUFFER_VALID, l'image est dans le FBO. Sans contexte

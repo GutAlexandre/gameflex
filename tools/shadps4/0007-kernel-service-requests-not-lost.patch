@@ -1,7 +1,8 @@
 diff --git a/src/core/libraries/kernel/kernel.cpp b/src/core/libraries/kernel/kernel.cpp
+index 735f7d70..15e9dde4 100644
 --- a/src/core/libraries/kernel/kernel.cpp
 +++ b/src/core/libraries/kernel/kernel.cpp
-@@ -67,6 +67,11 @@
+@@ -67,6 +67,11 @@ static void KernelServiceThread(std::stop_token stoken) {
          {
              std::unique_lock lock{m_asio_req};
              Common::CondvarWait(cv_asio_req, lock, stoken, [] { return asio_requests != 0; });
@@ -13,7 +14,7 @@ diff --git a/src/core/libraries/kernel/kernel.cpp b/src/core/libraries/kernel/ke
          }
          if (stoken.stop_requested()) {
              break;
-@@ -74,8 +79,6 @@
+@@ -74,8 +79,6 @@ static void KernelServiceThread(std::stop_token stoken) {
  
          io_context.run();
          io_context.restart();

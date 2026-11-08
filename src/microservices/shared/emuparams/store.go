@@ -35,6 +35,9 @@ type Store struct {
 	// SeedOnFirstRun — poser le fichier livré de chaque émulateur quand le
 	// dossier presets/ de sa console n'existe pas encore.
 	SeedOnFirstRun bool
+	// PatchDirs — les dossiers `patches/` des disques internes, où chercher le
+	// correctif d'un jeu après celui de la bibliothèque (gamepatch.go).
+	PatchDirs []string
 	// AfterWrite — appelé sur chaque dossier créé et chaque fichier écrit :
 	// le kernel du serveur tourne en root, et rend au propriétaire de la
 	// bibliothèque ce qu'il y pose.
@@ -373,6 +376,10 @@ type Settings struct {
 	Engine       string `json:"engine,omitempty"`
 	EnginePreset string `json:"enginePreset,omitempty"`
 	EngineError  string `json:"engineError,omitempty"`
+	// Game — le jeu dont le correctif est passé par-dessus le tout (SettingsFor,
+	// gamepatch.go) ; GameError — pourquoi il ne l'a pas été.
+	Game      string `json:"game,omitempty"`
+	GameError string `json:"gameError,omitempty"`
 }
 
 // Settings — lu dans params/<console>/<émulateur>.json.
@@ -410,28 +417,31 @@ type Option struct {
 	Label string `json:"label"`
 }
 
-// Param — un champ du formulaire.
+// Param — un champ du formulaire. Translations : ses textes dans d'autres
+// langues, que la page prend pour la sienne (ParamText).
 type Param struct {
-	ID          string   `json:"id"`
-	Type        string   `json:"type"`
-	Label       string   `json:"label"`
-	Description string   `json:"description,omitempty"`
-	Config      string   `json:"config"`
-	Value       any      `json:"value"`
-	Options     []Option `json:"options,omitempty"`
+	ID           string               `json:"id"`
+	Type         string               `json:"type"`
+	Label        string               `json:"label"`
+	Description  string               `json:"description,omitempty"`
+	Config       string               `json:"config"`
+	Value        any                  `json:"value"`
+	Options      []Option             `json:"options,omitempty"`
+	Translations map[string]ParamText `json:"translations,omitempty"`
 }
 
 // Preset — un préréglage tel que le formulaire le prend : ses valeurs déjà
 // passées par les paramètres qu'elles remplissent. Celles qui ne remplissent
 // rien sont dites, pas jetées en silence.
 type Preset struct {
-	ID          string         `json:"id"`
-	Name        string         `json:"name"`
-	Description string         `json:"description,omitempty"`
-	File        string         `json:"file"`
-	Values      map[string]any `json:"values"`
-	Ignored     []string       `json:"ignored,omitempty"`
-	Error       string         `json:"error,omitempty"`
+	ID           string          `json:"id"`
+	Name         string          `json:"name"`
+	Description  string          `json:"description,omitempty"`
+	Translations map[string]Text `json:"translations,omitempty"`
+	File         string          `json:"file"`
+	Values       map[string]any  `json:"values"`
+	Ignored      []string        `json:"ignored,omitempty"`
+	Error        string          `json:"error,omitempty"`
 	// Override — se remplace et se supprime depuis l'écran. Faux pour ceux
 	// que GameFlex livre : en lecture seule (décidé par le porteur le
 	// 2026-10-12), on en part pour en créer un sous un autre nom.
@@ -440,19 +450,20 @@ type Preset struct {
 
 // Emulator — un émulateur tel que l'écran le montre.
 type Emulator struct {
-	ConsoleID    string   `json:"consoleId"`
-	Console      string   `json:"console"`
-	Emulator     string   `json:"emulator"`
-	File         string   `json:"file"`
-	Exists       bool     `json:"exists"`
-	Enabled      bool     `json:"enabled"`
-	Name         string   `json:"name"`
-	Description  string   `json:"description,omitempty"`
-	System       string   `json:"system"`
-	Requirements []string `json:"requirements"`
-	Params       []Param  `json:"params"`
-	Presets      []Preset `json:"presets"`
-	Error        string   `json:"error,omitempty"`
+	ConsoleID    string          `json:"consoleId"`
+	Console      string          `json:"console"`
+	Emulator     string          `json:"emulator"`
+	File         string          `json:"file"`
+	Exists       bool            `json:"exists"`
+	Enabled      bool            `json:"enabled"`
+	Name         string          `json:"name"`
+	Description  string          `json:"description,omitempty"`
+	Translations map[string]Text `json:"translations,omitempty"`
+	System       string          `json:"system"`
+	Requirements []string        `json:"requirements"`
+	Params       []Param         `json:"params"`
+	Presets      []Preset        `json:"presets"`
+	Error        string          `json:"error,omitempty"`
 	// SavedPreset — le préréglage que cet enregistrement a écrit, s'il en a
 	// écrit un (« Save as preset »).
 	SavedPreset string `json:"savedPreset,omitempty"`
@@ -508,6 +519,7 @@ func (s Store) presetsLocked(ref Ref, definition file) []Preset {
 			item.Name = p.Name
 		}
 		item.Description = p.Description
+		item.Translations = p.Translations
 		item.Override = p.overridable() && !shippedIDs[item.ID]
 		ids := make([]string, 0, len(p.Values))
 		for id := range p.Values {
@@ -550,12 +562,14 @@ func withShippedTexts(definition file, ref Ref) file {
 		return definition
 	}
 	definition.Name, definition.Description = shippedFile.Name, shippedFile.Description
+	definition.Translations = shippedFile.Translations
 	params := orderedMap[param]{}
 	for _, id := range definition.Params.keys {
 		mine := definition.Params.values[id]
 		theirs, known := shippedFile.Params.get(id)
 		if known && theirs.Type == mine.Type && normalConfig(theirs.Config) == normalConfig(mine.Config) {
 			mine.Label, mine.Description = theirs.Label, theirs.Description
+			mine.Translations = theirs.Translations
 			if mine.Options != nil && theirs.Options != nil {
 				options := orderedMap[string]{}
 				for _, value := range mine.Options.keys {
@@ -588,6 +602,7 @@ func (s Store) describeLocked(ref Ref, consoleName string) Emulator {
 		Enabled:      exists && err == nil && definition.enabled(),
 		Name:         definition.Name,
 		Description:  definition.Description,
+		Translations: definition.Translations,
 		System:       definition.System,
 		Requirements: []string{},
 		Params:       []Param{},
@@ -604,7 +619,7 @@ func (s Store) describeLocked(ref Ref, consoleName string) Emulator {
 		p := definition.Params.values[id]
 		field := Param{
 			ID: id, Type: p.Type, Label: p.Label, Description: p.Description,
-			Config: normalConfig(p.Config), Value: p.Value,
+			Config: normalConfig(p.Config), Value: p.Value, Translations: p.Translations,
 		}
 		if p.Options != nil {
 			for _, value := range p.Options.keys {

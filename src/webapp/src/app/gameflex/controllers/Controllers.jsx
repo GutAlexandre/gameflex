@@ -226,6 +226,8 @@ export const RETRO_CONTROLLER_PRESET_MAP = {
     gc: "n64",
     nds: "snes",
     switch: "joycon",
+    // La Switch 2 (#644) : les mêmes boutons que la Switch.
+    switch2: "joycon",
     // LES CONSOLES DE BUREAU DU TÉLÉPHONE (2026-10-11). Sur le serveur, ce
     // sont des sessions streamex, et leur manette vient de
     // streamex/controllers (CONSOLE_PADS) ; sur le téléphone, une PS3 tourne
@@ -240,6 +242,9 @@ export const RETRO_CONTROLLER_PRESET_MAP = {
     xbox: "xbox",
     xbox360: "xbox",
     wiiu: "joycon",
+    // Les ports PC (chantier 40) lisent une manette SDL moderne : celle de
+    // la Xbox.
+    ports: "xbox",
 };
 
 // Exported so stream/shared/controller-layout.js (the single resolver

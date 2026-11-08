@@ -41,9 +41,14 @@ func missing(t *testing.T, path string) {
 	}
 }
 
-// sfo — un PARAM.SFO réduit à son TITLE.
+// sfo — un PARAM.SFO réduit à son TITLE : celui d'une sauvegarde PS3.
 func sfo(title string) string {
-	key := "TITLE\x00"
+	return sfoKey("TITLE", title)
+}
+
+// sfoKey — un PARAM.SFO réduit à une clé : « MAINTITLE » pour une sauvegarde PS4.
+func sfoKey(name, title string) string {
+	key := name + "\x00"
 	value := title + "\x00"
 	var out bytes.Buffer
 	out.WriteString("\x00PSF")
@@ -96,15 +101,15 @@ func TestTreesAndSourceNames(t *testing.T) {
 	}
 
 	for name, want := range map[string]string{
-		"S25 de Gino":  "S25 de Gino",
-		"local":        "local_",
-		"Local":        "Local_",
-		"..nas":        "nas",
-		"nas/salon":    "nas_salon",
-		"  prod  ":     "prod",
-		"a:b*c":        "a_b_c",
-		"":             "",
-		"192.0.2.11": "192.0.2.11",
+		"S25 de Gino": "S25 de Gino",
+		"local":       "local_",
+		"Local":       "Local_",
+		"..nas":       "nas",
+		"nas/salon":   "nas_salon",
+		"  prod  ":    "prod",
+		"a:b*c":       "a_b_c",
+		"":            "",
+		"192.0.2.11":  "192.0.2.11",
 	} {
 		if got := SourceName(name); got != want {
 			t.Errorf("SourceName(%q) = %q, attendu %q", name, got, want)
@@ -135,7 +140,7 @@ func fakeConsoles(t *testing.T, tree string) {
 	write(t, filepath.Join(streamex, "ps3", "config", "config.yml"), "renderer", monday)
 
 	ps4 := filepath.Join(streamex, "ps4", "data", "home", "1000", "savedata")
-	write(t, filepath.Join(ps4, "CUSA07010", "SAVEDATA00", "sce_sys", "param.sfo"), sfo("Kingdom Hearts III"), monday)
+	write(t, filepath.Join(ps4, "CUSA07010", "SAVEDATA00", "sce_sys", "param.sfo"), sfoKey("MAINTITLE", "Kingdom Hearts III"), monday)
 	write(t, filepath.Join(ps4, "CUSA07010", "SAVEDATA00", "data.bin"), "kh3", tuesday)
 
 	write(t, filepath.Join(streamex, "ps5", "savedata", "PPSA01911", "ff7remake", "save.dat"), "ff7", monday)
@@ -187,6 +192,30 @@ func TestGamesListsEachGameOnce(t *testing.T) {
 	}
 	if len(Games(t.TempDir())) != 0 {
 		t.Fatal("un rangement vide a des jeux")
+	}
+}
+
+// UNE SAUVEGARDE PS4 NOMME SON JEU PAR « MAINTITLE » : des CUSA seuls ne
+// disent rien (le porteur, 2026-10-30). Les données communes d'un jeu
+// (« System Saved Data », celles de *FF7 Remake*) ne le nomment pas : on prend
+// une autre sauvegarde, et sans autre, le jeu reste nommé par son CUSA.
+func TestPS4SavesAreNamedByTheirMainTitle(t *testing.T) {
+	tree := t.TempDir()
+	ps4 := filepath.Join(tree, "streamex", "ps4", "data", "home", "1000", "savedata")
+	write(t, filepath.Join(ps4, "CUSA12025", "kh3sv", "sce_sys", "param.sfo"), sfoKey("MAINTITLE", "KINGDOM HEARTS III"), monday)
+	write(t, filepath.Join(ps4, "CUSA07187", "ff7remakecommon", "sce_sys", "param.sfo"), sfoKey("MAINTITLE", "System Saved Data"), monday)
+	write(t, filepath.Join(ps4, "CUSA07188", "ff7remakecommon", "sce_sys", "param.sfo"), sfoKey("MAINTITLE", "System Saved Data"), monday)
+	write(t, filepath.Join(ps4, "CUSA07188", "ff7remakesave", "sce_sys", "param.sfo"), sfoKey("MAINTITLE", "FINAL FANTASY VII REMAKE"), monday)
+
+	games := Games(tree)
+	for id, want := range map[string]string{
+		"CUSA12025": "KINGDOM HEARTS III",
+		"CUSA07187": "",
+		"CUSA07188": "FINAL FANTASY VII REMAKE",
+	} {
+		if game := find(games, "ps4", id); game == nil || game.Title != want {
+			t.Errorf("%s : %+v, attendu « %s »", id, game, want)
+		}
 	}
 }
 

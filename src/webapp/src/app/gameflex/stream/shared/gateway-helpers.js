@@ -4,6 +4,14 @@ import { streamHostOrigin } from "../../libs/serverBase.js";
 import { gatewayViewerSignalUrl } from "../../api/gateway.js";
 import { optimizeSdpForLowLatency } from "./webrtc-low-latency-sdp.js";
 
+// NO_POSTER — l'affiche de TOUTE vidéo de flux : une image transparente d'un
+// pixel. Sans affiche, la WebView d'Android dessine la sienne tant qu'aucune
+// image n'est arrivée — un gris uni et un grand triangle de lecture, étiré par
+// « cover » —, là où la page voulait montrer ce qu'il y a derrière (le fond de
+// l'écran de lancement, LAUNCH_BACKGROUND). Vu sur le téléphone le
+// 2026-11-06, un lancement refusé avant la première image.
+export const NO_POSTER = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
 // buildIceServers — the TURN-best-effort-plus-STUN recipe every local
 // RTCPeerConnection in the app builds (GatewayWebRTC, the viewer hook, the
 // legacy preview paths): fetch the operator's TURN config, map it to

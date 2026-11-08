@@ -106,9 +106,7 @@ func main() {
 		if console.Method != consoles.MethodStreamex {
 			continue
 		}
-		sessionCatalogs[console.ID] = catalog.New(
-			console.ID, filepath.Join(config.StorageDir, "roms", console.ID),
-		)
+		sessionCatalogs[console.ID] = catalog.For(console.ID, filepath.Join(config.StorageDir, "roms"))
 	}
 
 	sessionManager := manager.New(dockerHandler, sessionCatalogs, cfg)

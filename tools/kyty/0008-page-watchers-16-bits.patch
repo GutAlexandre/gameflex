@@ -1,6 +1,8 @@
+diff --git a/src/graphics/host_gpu/pageManager.cpp b/src/graphics/host_gpu/pageManager.cpp
+index bde427d0..a9b6f386 100644
 --- a/src/graphics/host_gpu/pageManager.cpp
 +++ b/src/graphics/host_gpu/pageManager.cpp
-@@ -93,9 +93,11 @@
+@@ -77,9 +77,11 @@ void ValidateRange(uint64_t vaddr, uint64_t size) {
  } // namespace
  
  struct PageManager::Impl {
@@ -14,7 +16,7 @@
  
  		[[nodiscard]] Common::VirtualMemory::Mode Perms() const noexcept {
  			if (access_watchers != 0) {
-@@ -126,7 +128,7 @@
+@@ -110,7 +112,7 @@ struct PageManager::Impl {
  				}
  			} else {
  				if constexpr (delta == 1) {
@@ -23,7 +25,7 @@
  						Fatal("write-watcher overflow at 0x%016" PRIx64, address);
  					}
  					return ++write_watchers;
-@@ -141,7 +143,7 @@
+@@ -125,7 +127,7 @@ struct PageManager::Impl {
  			}
  		}
  	};

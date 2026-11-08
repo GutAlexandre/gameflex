@@ -57,20 +57,27 @@ emulator_file() {
     case "$1" in
         switch) echo "citron_nightly-0237a9b88-linux-x86_64_v3.AppImage" ;;
         switch-eden) echo "Eden-Linux-de7e6e01d4-amd64-clang-pgo.AppImage" ;;
+        # Eglantine publie, comme Xenia, un nom SANS version : celui rangé ici la
+        # porte (sa construction quotidienne).
+        switch2) echo "Eglantine-daily-20261105-x86_64-pgo.AppImage" ;;
         xbox)   echo "xemu-0.8.139-x86_64.AppImage" ;;
         wiiu)   echo "Cemu-2.6-x86_64.AppImage" ;;
-        ps3)    echo "rpcs3-v0.0.43-20404-e8979d31_linux64.AppImage" ;;
+        ps3)    echo "rpcs3-v0.0.43-20508-8e26652c_linux64.AppImage" ;;
         # La PS4 publie un ZIP qui CONTIENT l'AppImage : le fichier gardé est
         # donc le zip, et le déballage fait les deux étages (unzip, puis
         # --appimage-extract). Le pkgextract, lui, est un outil et non
         # l'émulateur : il reste dans l'image.
         ps4)    echo "shadps4-linux-sdl-0.20.0.zip" ;;
         # Kyty publie une archive ordinaire, pas une AppImage.
-        ps5)    echo "KytyPS5-2026-10-26-597137e-Linux-x86_64.tar.gz" ;;
+        ps5)    echo "KytyPS5-2026-11-04-91c5820-Linux-x86_64.tar.gz" ;;
         # Xenia publie une AppImage par commit, sous un nom SANS version :
         # celui rangé ici la porte, pour qu'une montée de version ne
         # retrouve pas l'ancienne sous le même nom.
-        xbox360) echo "xenia_canary_linux-291f0c9.AppImage" ;;
+        xbox360) echo "xenia_canary_linux-57cddf7.AppImage" ;;
+        # Les ports PC (chantier 40) : un port par image, tous rangés sous
+        # cores/ports/ (emulator_console). Zelda 64: Recompiled publie un zip
+        # qui porte une archive tar.gz.
+        ports-zelda64recomp) echo "Zelda64Recompiled-v1.2.2-Linux-X64.zip" ;;
         *)      echo "" ;;
     esac
 }
@@ -83,12 +90,16 @@ emulator_url() {
         # La nocturne officielle d'Eden, épinglée par son étiquette (chantier 25) :
         # la seule qui lit les jeux du firmware 22 (ZBIC).
         switch-eden) echo "https://nightly.eden-emu.dev/v1792353251.de7e6e01d4/Eden-Linux-de7e6e01d4-amd64-clang-pgo.AppImage" ;;
+        # Eglantine (#644), l'émulateur de la Switch 2 : sa construction quotidienne
+        # du 2026-11-05, épinglée par son étiquette.
+        switch2) echo "https://github.com/Djihads80/Eglantine/releases/download/daily-20261105/eglantine-linux-x86_64-pgo.AppImage" ;;
         xbox)   echo "https://github.com/xemu-project/xemu/releases/download/v0.8.139/xemu-0.8.139-x86_64.AppImage" ;;
         wiiu)   echo "https://github.com/cemu-project/Cemu/releases/download/v2.6/Cemu-2.6-x86_64.AppImage" ;;
-        ps3)    echo "https://github.com/RPCS3/rpcs3-binaries-linux/releases/download/build-e8979d31b3a22c8bc9a6eae6bdc31756eac8ee89/rpcs3-v0.0.43-20404-e8979d31_linux64.AppImage" ;;
+        ps3)    echo "https://github.com/RPCS3/rpcs3-binaries-linux/releases/download/build-8e26652c85bb5658965fa5731d9a0309ca10b42b/rpcs3-v0.0.43-20508-8e26652c_linux64.AppImage" ;;
         ps4)    echo "https://github.com/shadps4-emu/shadPS4/releases/download/v.0.20.0/shadps4-linux-sdl-0.20.0.zip" ;;
-        ps5)    echo "https://github.com/KytyPS5/KytyPS5/releases/download/KytyPS5-2026-10-26-597137e/KytyPS5-2026-10-26-597137e-Linux-x86_64.tar.gz" ;;
-        xbox360) echo "https://github.com/xenia-canary/xenia-canary/releases/download/291f0c9/xenia_canary_linux.AppImage" ;;
+        ps5)    echo "https://github.com/KytyPS5/KytyPS5/releases/download/KytyPS5-2026-11-04-91c5820/KytyPS5-2026-11-04-91c5820-Linux-x86_64.tar.gz" ;;
+        xbox360) echo "https://github.com/xenia-canary/xenia-canary/releases/download/57cddf7/xenia_canary_linux.AppImage" ;;
+        ports-zelda64recomp) echo "https://github.com/Zelda64Recomp/Zelda64Recomp/releases/download/v1.2.2/Zelda64Recompiled-v1.2.2-Linux-X64.zip" ;;
         *)      echo "" ;;
     esac
 }
@@ -116,7 +127,7 @@ emulator_tested() {
 # consoles rétro n'en ont pas : leur « émulateur » est un cœur libretro, que
 # l'admin télécharge depuis Réglages → Émulateurs.
 emulator_consoles() {
-    echo "switch switch-eden xbox wiiu ps3 ps4 ps5 xbox360"
+    echo "switch switch-eden switch2 xbox wiiu ps3 ps4 ps5 xbox360 ports-zelda64recomp"
 }
 
 # emulator_console <image> — la console d'une image : le dossier cores/<console>/
@@ -124,6 +135,7 @@ emulator_consoles() {
 emulator_console() {
     case "$1" in
         switch-eden) echo "switch" ;;
+        ports-*) echo "ports" ;;
         *) echo "$1" ;;
     esac
 }

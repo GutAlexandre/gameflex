@@ -1,8 +1,8 @@
 diff --git a/src/main.cpp b/src/main.cpp
-index a2cc5c0..60541e2 100644
+index 6d7729a8..dbadc213 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
-@@ -12,6 +12,7 @@
+@@ -9,6 +9,7 @@
  #include <algorithm>
  #include <charconv>
  #include <cstdio>
@@ -10,7 +10,7 @@ index a2cc5c0..60541e2 100644
  #include <filesystem>
  #include <string_view>
  #include <vector>
-@@ -223,6 +224,12 @@ static constexpr Flag FLAGS[] = {
+@@ -215,6 +216,12 @@ static constexpr Flag FLAGS[] = {
  static bool ParseArgs(int argc, char* argv[], RunOptions& options, bool& show_help) {
  	show_help = false;
  

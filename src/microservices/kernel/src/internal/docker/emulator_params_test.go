@@ -17,7 +17,7 @@ import (
 func TestTheSessionGetsTheEmulatorParams(t *testing.T) {
 	root := t.TempDir()
 	settings := func() emuparams.Settings {
-		entry, ok := emulatorParamsEnv(root, "ps3", "", "")
+		entry, ok := emulatorParamsEnv(root, nil, "ps3", "", "", "")
 		if !ok || !strings.HasPrefix(entry, "GAMEFLEX_EMULATOR_PARAMS=") {
 			t.Fatalf("pas de variable pour la PS3 : %q", entry)
 		}
@@ -54,7 +54,7 @@ func TestTheSessionGetsTheEmulatorParams(t *testing.T) {
 
 	// UNE CONSOLE SANS PARAMÈTRES LIVRÉS : la NES (la PS5 en a depuis le
 	// 2026-10-14, les réglages de Box64 du téléphone, #371).
-	if entry, ok := emulatorParamsEnv(root, "nes", "", ""); ok {
+	if entry, ok := emulatorParamsEnv(root, nil, "nes", "", "", ""); ok {
 		t.Fatalf("une console sans paramètres livrés : %q", entry)
 	}
 }

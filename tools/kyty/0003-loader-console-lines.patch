@@ -1,8 +1,8 @@
 diff --git a/src/loader/runtimeLinker.cpp b/src/loader/runtimeLinker.cpp
-index 10557ae..88beffe 100644
+index 03a5f2ac..c6951025 100644
 --- a/src/loader/runtimeLinker.cpp
 +++ b/src/loader/runtimeLinker.cpp
-@@ -26,6 +26,7 @@
+@@ -27,6 +27,7 @@
  
  #include <algorithm>
  #include <atomic>
@@ -10,7 +10,7 @@ index 10557ae..88beffe 100644
  #include <cstddef>
  #include <cstdio>
  #include <cstdlib>
-@@ -1177,7 +1178,8 @@ Program* RuntimeLinker::LoadProgram(const std::filesystem::path& elf_name) {
+@@ -1187,7 +1188,8 @@ Program* RuntimeLinker::LoadProgram(const std::filesystem::path& elf_name) {
  
  	static int32_t id_seq = 0;
  
@@ -20,7 +20,7 @@ index 10557ae..88beffe 100644
  
  	auto  program_owner = std::make_unique<Program>();
  	auto* program       = program_owner.get();
-@@ -1262,7 +1264,16 @@ void RuntimeLinker::Execute(const std::filesystem::path& game_patch) {
+@@ -1271,7 +1273,16 @@ void RuntimeLinker::Execute(const std::filesystem::path& game_patch) {
  
  	// The runtime automatically loads libc; other PRXs are requested by the application.
  	const auto libc_path = Libs::LibKernel::FileSystem::GetRealFilename("/app0/sce_module/libc.prx");

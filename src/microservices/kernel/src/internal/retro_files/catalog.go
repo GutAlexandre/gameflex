@@ -83,6 +83,10 @@ type catalogEntry struct {
 	IsDir bool
 	// Engine — le moteur du jeu (storage.GameEngine, chantier 36).
 	Engine string
+	// From — la console dont le DOSSIER porte ce jeu, quand ce n'est pas la
+	// sienne : un jeu des ports PC est une ROM de `roms/n64` (chantier 40).
+	// Vide pour tous les autres.
+	From string
 }
 
 type catalogState struct {
@@ -171,6 +175,11 @@ func (catalog *catalogState) rebuild() error {
 	stampDir(stamps, root)
 
 	for _, cs := range consoleSummaries {
+		// Les ports PC n'ont pas de dossier : un `roms/ports` n'est pas le
+		// leur (leurs jeux se trouvent plus bas, chez les autres consoles).
+		if cs.ID == consoles.PortsID {
+			continue
+		}
 		entries, err := scanConsoleEntries(root, cs.ID)
 		if err != nil {
 			continue
@@ -194,6 +203,7 @@ func (catalog *catalogState) rebuild() error {
 		}
 		byConsole[cs.ID] = ids
 	}
+	addPortGames(root, byID, byConsole)
 
 	catalog.mu.Lock()
 	catalog.byID = byID
@@ -203,6 +213,41 @@ func (catalog *catalogState) rebuild() error {
 	catalog.lastScan = time.Now()
 	catalog.mu.Unlock()
 	return nil
+}
+
+// addPortGames — LES JEUX DES PORTS PC (chantier 40) : les ROM des consoles
+// qu'un port lit, qu'il accepte (storage.PortOf). Chacune devient un jeu de
+// `ports`, sous un identifiant à elle : ses sauvegardes, son temps de jeu et
+// son statut ne sont pas ceux du jeu N64. Pas de date à relever en plus :
+// celle du dossier de la console source l'est déjà, et c'est lui qui bouge
+// quand une ROM arrive.
+func addPortGames(root string, byID map[string]catalogEntry, byConsole map[string][]string) {
+	ids := []string{}
+	for _, from := range consoles.PortSources() {
+		for _, sourceID := range byConsole[from] {
+			source := byID[sourceID]
+			if source.IsDir || len(source.Files) != 1 {
+				continue
+			}
+			path, err := safeJoin(root, from, source.Path)
+			if err != nil {
+				continue
+			}
+			if _, ok := storage.PortOf(from, path); !ok {
+				continue
+			}
+			game := source
+			game.ID = deriveRomID(consoles.PortsID, source.Path)
+			game.ConsoleID = consoles.PortsID
+			game.From = from
+			byID[game.ID] = game
+			ids = append(ids, game.ID)
+		}
+	}
+	if len(ids) > 0 {
+		sort.Slice(ids, func(left, right int) bool { return byID[ids[left]].Title < byID[ids[right]].Title })
+		byConsole[consoles.PortsID] = ids
+	}
 }
 
 // stampDir relève la date d'un dossier. Un dossier illisible ou absent est
@@ -365,7 +410,13 @@ func ResolveCatalogRom(root, consoleID, id string) (path string, isDir bool, err
 		return "", false, os.ErrNotExist
 	}
 
-	consoleDir, err := safeJoin(root, consoleID)
+	// Le dossier qui porte le jeu : le sien, ou celui de la console dont un
+	// port lit la ROM.
+	folder := consoleID
+	if e.From != "" {
+		folder = e.From
+	}
+	consoleDir, err := safeJoin(root, folder)
 	if err != nil {
 		return "", false, err
 	}
@@ -373,7 +424,7 @@ func ResolveCatalogRom(root, consoleID, id string) (path string, isDir bool, err
 	if e.IsDir {
 		// Folder-based game (one file or several) — Title IS the folder
 		// name (see scanConsoleEntries), Files live inside it.
-		folderPath, err := safeJoin(root, consoleID, e.Title)
+		folderPath, err := safeJoin(root, folder, e.Title)
 		if err != nil {
 			return "", false, err
 		}

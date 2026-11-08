@@ -52,17 +52,17 @@ func TestAnEngineLaysItsPresetOverTheEmulatorFile(t *testing.T) {
 		t.Fatalf("unity = %+v, attendu interpreter et actif", unity)
 	}
 
-	if got := valueAt(store.SettingsFor(shadps4, ""), dynarec); got != "true" {
+	if got := valueAt(store.SettingsFor(shadps4, "", ""), dynarec); got != "true" {
 		t.Fatalf("sans moteur : %s = %q, attendu la valeur du fichier, true", dynarec, got)
 	}
-	unity := store.SettingsFor(shadps4, "unity")
+	unity := store.SettingsFor(shadps4, "unity", "")
 	if got := valueAt(unity, dynarec); got != "false" {
 		t.Fatalf("Unity : %s = %q, attendu celle du préréglage interpreter, false", dynarec, got)
 	}
 	if unity.Engine != "unity" || unity.EnginePreset != "interpreter" {
 		t.Fatalf("Unity : %+v, le moteur et son préréglage ne sont pas dits", unity)
 	}
-	if got := valueAt(store.SettingsFor(shadps4, "unreal"), dynarec); got != "true" {
+	if got := valueAt(store.SettingsFor(shadps4, "unreal", ""), dynarec); got != "true" {
 		t.Fatalf("Unreal, sans préréglage : %s = %q, attendu true", dynarec, got)
 	}
 
@@ -70,7 +70,7 @@ func TestAnEngineLaysItsPresetOverTheEmulatorFile(t *testing.T) {
 		[]EngineSetting{{Engine: "unity", Preset: "interpreter", Enabled: false}}); err != nil {
 		t.Fatalf("Save (coupé) : %v", err)
 	}
-	if got := valueAt(store.SettingsFor(shadps4, "unity"), dynarec); got != "true" {
+	if got := valueAt(store.SettingsFor(shadps4, "unity", ""), dynarec); got != "true" {
 		t.Fatalf("Unity coupé : %s = %q, attendu true", dynarec, got)
 	}
 }
@@ -100,7 +100,7 @@ func TestAnEngineSettingIsCheckedBeforeAnythingIsWritten(t *testing.T) {
 		[]EngineSetting{{Engine: "unity", Preset: "unity-s25", Enabled: true}}); err != nil {
 		t.Fatalf("le préréglage créé par le même enregistrement : %v", err)
 	}
-	if got := valueAt(store.SettingsFor(shadps4, "unity"), dynarec); got != "false" {
+	if got := valueAt(store.SettingsFor(shadps4, "unity", ""), dynarec); got != "false" {
 		t.Fatalf("Unity S25 : %s = %q, attendu false", dynarec, got)
 	}
 }
@@ -121,13 +121,13 @@ func TestAnEngineAppliesWithoutTheEmulatorFile(t *testing.T) {
 		}
 	}
 	write(`{"system": "shadPS4", "preset": "interpreter"}`)
-	settings := store.SettingsFor(shadps4, "unity")
+	settings := store.SettingsFor(shadps4, "unity", "")
 	if settings.State != "absent" || valueAt(settings, dynarec) != "false" {
 		t.Fatalf("sans fichier : %+v, attendu absent et %s = false", settings, dynarec)
 	}
 
 	write(`{"system": "shadPS4", "preset": "gone"}`)
-	if settings := store.SettingsFor(shadps4, "unity"); settings.EngineError == "" || len(settings.Entries) != 0 {
+	if settings := store.SettingsFor(shadps4, "unity", ""); settings.EngineError == "" || len(settings.Entries) != 0 {
 		t.Fatalf("préréglage disparu : %+v, attendu l'erreur dite et rien d'écrit", settings)
 	}
 }

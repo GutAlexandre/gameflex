@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../profile/auth/AuthContext.jsx";
 import { listButtonPositioning } from "../../profile/api.js";
 import { streamAuthToken } from "../../libs/serverBase.js";
@@ -342,14 +342,38 @@ function PlaceButton({
 // s'aligne dessus en paysage (use-streaming-menu.js).
 export const PAD_COLUMN_WIDTH = 160;
 
-// LA MANETTE ET LE BOUTON DU MENU, REMONTÉS EN PORTRAIT (le porteur,
-// 2026-10-23 : « remonter les boutons et le menu d'au moins 60 px ; les sticks
-// sont trop collés au bord du bas du téléphone ») — le geste de retour et la
-// barre de navigation d'Android sont là. Pas en paysage : la bande de la
-// manette y fait 300 px sur un écran d'environ 400, et ses gâchettes du haut
-// sortiraient. Écrit une fois, pour la manette et pour le bouton du menu
-// (use-streaming-menu.js).
+// LE BOUTON DU MENU, REMONTÉ EN PORTRAIT (le porteur, 2026-10-23 : « remonter
+// les boutons et le menu d'au moins 60 px ; les sticks sont trop collés au bord
+// du bas du téléphone ») — le geste de retour et la barre de navigation
+// d'Android sont là. Pas en paysage : la bande de la manette y fait 300 px sur
+// un écran d'environ 400, et ses gâchettes du haut sortiraient.
 export const PORTRAIT_LIFT = 60;
+
+// LA MANETTE, AU-DESSUS DE LA RANGÉE DU MENU (le porteur, 2026-11-03 : « les
+// boutons menus sont intercalés »). Le bouton et ses pastilles font 48 px : à
+// 64 px de plus, le bas des sticks passe au-dessus d'eux.
+const PORTRAIT_PAD_LIFT = PORTRAIT_LIFT + 64;
+
+// LE PAVÉ TACTILE RESTE QUAND UNE VRAIE MANETTE CACHE CELLE DE L'ÉCRAN (le
+// porteur, 2026-11-03 : « en transparence et un peu plus grand »). La page dit
+// comment sa surface est tournée : `portrait`, `landscape`, ou rien pour la
+// manette entière. Sans pavé dans le gabarit, ou sans plateforme qui sache le
+// servir, rien ne s'affiche.
+export const TouchpadOnlyContext = createContext(null);
+
+const TOUCHPAD_ALONE_SCALE = 1.2;
+// En portrait, sous la vidéo et la ligne qui la suit : il n'y a qu'un demi-écran
+// sous une manette clipsée (#410). La rangée du menu y remonte à sa hauteur :
+// app.css décale alors le pavé à droite de ses pastilles. En paysage, là où la
+// manette entière le met.
+const TOUCHPAD_ALONE_PLACE = {
+	portrait: (size) => ({
+		left: "var(--gameflex-touchpad-left, 50%)",
+		bottom: `calc(var(--gameflex-visible-height) - 56.25vw - ${size + 32}px)`,
+		transform: "translateX(-50%)",
+	}),
+	landscape: (size) => ({ left: "50%", bottom: 110 - size / 2, transform: "translateX(-50%)" }),
+};
 
 function ColumnZone({
 	column,
@@ -456,6 +480,7 @@ export default function ControllerLayout({
 	// case, so an editor-controlled opacity always just passes straight
 	// through via the `opacity` prop itself, no separate override needed.
 	const [fetchedOpacity, setFetchedOpacity] = useState(null);
+	const touchpadOnly = useContext(TouchpadOnlyContext);
 	const [isLandscape, setIsLandscape] = useState(
 		window.innerWidth > window.innerHeight,
 	);
@@ -674,6 +699,19 @@ export default function ControllerLayout({
 	};
 	const height = 300;
 
+	if (touchpadOnly) {
+		const touchpad = drawn.find((b) => b.name === "TOUCHPAD");
+
+		return touchpad && callbacks[touchpad.name]?.ontouch ? (
+			<TouchpadSurface
+				button={touchpad}
+				callback={callbacks[touchpad.name]}
+				isLandscape={touchpadOnly === "landscape"}
+				alone={{ scale: TOUCHPAD_ALONE_SCALE, place: TOUCHPAD_ALONE_PLACE[touchpadOnly] }}
+			/>
+		) : null;
+	}
+
 	return (
 		<div
 			className="position-absolute"
@@ -689,7 +727,7 @@ export default function ControllerLayout({
 			// `pointer-events` s'hérite : seuls les boutons et le pavé tactile
 			// le rallument. Le balayage d'un bouton à l'autre ne change pas —
 			// l'appui part d'un bouton et remonte jusqu'au calque qui le suit.
-			style={{ bottom: 20 + (isLandscape ? 0 : PORTRAIT_LIFT), left: 0, width: "100%", pointerEvents: "none" }}
+			style={{ bottom: 20 + (isLandscape ? 0 : PORTRAIT_PAD_LIFT), left: 0, width: "100%", pointerEvents: "none" }}
 		>
 			<div className="d-flex flex-column">
 				<div

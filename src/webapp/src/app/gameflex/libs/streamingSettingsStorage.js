@@ -18,13 +18,13 @@ const STORAGE_PREFIX = "remoteplay-streaming-settings:";
 // valeur absente de la liste, et un simple « Enregistrer » l'aurait réécrite
 // côté serveur. Une préférence périmée est donc OUBLIÉE — l'appelant retombe
 // alors sur son propre défaut, ce qu'il sait déjà faire (`|| { … }`). Même
-// chose pour « 360p », retiré le 2026-10-26 (le porteur : « de nos jours 540p
-// est assez bien partout »).
+// chose pour « 360p » entre son retrait du 2026-10-26 et son retour du
+// 2026-11-06 (#636).
 //
 // Cette liste doit suivre celle de `STREAM_OPTIONS`. Elle est recopiée plutôt
 // qu'importée pour qu'un module de stockage ne dépende pas d'un composant React
 // — le prix est cette ligne à tenir à jour, et ce commentaire le dit.
-const KNOWN_RESOLUTIONS = ["540p", "720p", "1080p"];
+const KNOWN_RESOLUTIONS = ["360p", "540p", "720p", "1080p"];
 
 export function loadStreamingSettings(hostType) {
     try {

@@ -231,9 +231,17 @@ func treeSize(path string) int64 {
 	return total
 }
 
-// SFOTitle — le TITLE d'un PARAM.SFO (PS3, et le param.sfo d'une sauvegarde PS4), vide s'il
+// SFOTitle — le TITLE d'un PARAM.SFO : celui d'un jeu, ou d'une sauvegarde PS3. Vide s'il
 // n'y en a pas.
 func SFOTitle(path string) string {
+	return SFOString(path, "TITLE")
+}
+
+// SFOString — la valeur d'une clé d'un PARAM.SFO, vide si elle n'y est pas. UNE SAUVEGARDE PS4
+// NOMME SON JEU PAR « MAINTITLE », pas par TITLE (relevé le 2026-10-30 sur celles du porteur :
+// *Kingdom Hearts III*, *FFXV Pocket Edition HD*) : lire TITLE n'y trouvait rien, et Mes
+// sauvegardes ne montrait que des CUSA.
+func SFOString(path, wanted string) string {
 	data, err := os.ReadFile(path)
 	if err != nil || len(data) < 20 || !bytes.Equal(data[:4], []byte("\x00PSF")) {
 		return ""
@@ -254,7 +262,7 @@ func SFOTitle(path string) string {
 			continue
 		}
 		end := bytes.IndexByte(data[start:], 0)
-		if end < 0 || string(data[start:start+uint32(end)]) != "TITLE" {
+		if end < 0 || string(data[start:start+uint32(end)]) != wanted {
 			continue
 		}
 		from, to := values+valueOffset, values+valueOffset+length

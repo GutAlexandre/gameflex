@@ -61,13 +61,17 @@ type Config struct {
 	// SwitchEdenImage — Eden, le second émulateur de la Switch (chantier 26) ;
 	// SwitchImage porte Citron, le premier.
 	SwitchEdenImage string
-	PS3Image        string
+	// Switch2Image — Eglantine, l'émulateur de la Nintendo Switch 2 (#644).
+	Switch2Image string
+	PS3Image     string
 	XboxImage       string
 	PS4Image        string
 	PS5Image        string
 	WiiUImage       string
 	Xbox360Image    string
-	KeyTestImage    string
+	// Les ports PC (chantier 40) : une image par port.
+	PortsZelda64RecompImage string
+	KeyTestImage            string
 	// Retro sessions — the retrogaming image runs its own binary in
 	// standalone child mode (GAMEFLEX_CHILD_PORT), one container per session,
 	// with the sections it reads bind-mounted under StorageDir.
@@ -176,16 +180,18 @@ func Load() (Config, error) {
 	}
 
 	return Config{
-		StorageHostDir:  getenv("GAMEFLEX_STORAGE_PATH", ""),
-		ProfilesHostDir: getenv("GAMEFLEX_PROFILES_HOST_DIR", ""),
-		SwitchImage:     getenv("GAMEFLEX_SWITCH_IMAGE", "streamex-switch:latest"),
-		SwitchEdenImage: getenv("GAMEFLEX_SWITCH_EDEN_IMAGE", "streamex-switch-eden:latest"),
-		PS3Image:        getenv("GAMEFLEX_PS3_IMAGE", "streamex-ps3:latest"),
-		XboxImage:       getenv("GAMEFLEX_XBOX_IMAGE", "streamex-xbox:latest"),
-		PS4Image:        getenv("GAMEFLEX_PS4_IMAGE", "streamex-ps4:latest"),
-		PS5Image:        getenv("GAMEFLEX_PS5_IMAGE", "streamex-ps5:latest"),
-		WiiUImage:       getenv("GAMEFLEX_WIIU_IMAGE", "streamex-wiiu:latest"),
-		Xbox360Image:    getenv("GAMEFLEX_XBOX360_IMAGE", "streamex-xbox360:latest"),
+		StorageHostDir:          getenv("GAMEFLEX_STORAGE_PATH", ""),
+		ProfilesHostDir:         getenv("GAMEFLEX_PROFILES_HOST_DIR", ""),
+		SwitchImage:             getenv("GAMEFLEX_SWITCH_IMAGE", "streamex-switch:latest"),
+		SwitchEdenImage:         getenv("GAMEFLEX_SWITCH_EDEN_IMAGE", "streamex-switch-eden:latest"),
+		Switch2Image:            getenv("GAMEFLEX_SWITCH2_IMAGE", "streamex-switch2:latest"),
+		PS3Image:                getenv("GAMEFLEX_PS3_IMAGE", "streamex-ps3:latest"),
+		XboxImage:               getenv("GAMEFLEX_XBOX_IMAGE", "streamex-xbox:latest"),
+		PS4Image:                getenv("GAMEFLEX_PS4_IMAGE", "streamex-ps4:latest"),
+		PS5Image:                getenv("GAMEFLEX_PS5_IMAGE", "streamex-ps5:latest"),
+		WiiUImage:               getenv("GAMEFLEX_WIIU_IMAGE", "streamex-wiiu:latest"),
+		Xbox360Image:            getenv("GAMEFLEX_XBOX360_IMAGE", "streamex-xbox360:latest"),
+		PortsZelda64RecompImage: getenv("GAMEFLEX_PORTS_ZELDA64RECOMP_IMAGE", "streamex-ports-zelda64recomp:latest"),
 		// Vide par défaut : keytest ne part pas dans une installation publique,
 		// et une console sans image configurée n'est pas installée (#136).
 		KeyTestImage:         getenv("GAMEFLEX_KEYTEST_IMAGE", ""),

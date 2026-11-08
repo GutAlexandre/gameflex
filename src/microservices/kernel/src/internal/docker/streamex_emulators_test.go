@@ -59,7 +59,7 @@ func TestTheSwitchRunsEdenFirstAndCitronOnRequest(t *testing.T) {
 		if image := sessionImage(cfg, "switch", c.core); image != c.image {
 			t.Errorf("« %s » : image %q, attendu %q", c.core, image, c.image)
 		}
-		if data := switchDataTarget(c.core); data != c.data {
+		if data := switchDataTarget("switch", c.core); data != c.data {
 			t.Errorf("« %s » : données sur %q, attendu %q", c.core, data, c.data)
 		}
 	}
@@ -89,5 +89,25 @@ func TestAnImageSaysWhichEmulatorFileItWants(t *testing.T) {
 	}
 	if need, ok := requiredFromLabels("keytest", "", map[string]string{"gameflex.prune": "keep"}); ok {
 		t.Fatalf("une image sans étiquette n'attend rien : %+v", need)
+	}
+}
+
+// LA SWITCH 2 (#644) : Eglantine, son image, ses paramètres, et les dossiers
+// d'Eden qu'il garde ; ses sauvegardes à elle, pas celles de la Switch.
+func TestTheSwitch2RunsEglantine(t *testing.T) {
+	cfg := config.Config{SwitchImage: "streamex-switch:latest", Switch2Image: "streamex-switch2:latest"}
+	for _, core := range []string{"", "Eglantine (streamex)"} {
+		if params, _ := StreamexParams("switch2", core); params != "eglantine" {
+			t.Errorf("« %s » : paramètres %q", core, params)
+		}
+		if image := sessionImage(cfg, "switch2", core); image != cfg.Switch2Image {
+			t.Errorf("« %s » : image %q", core, image)
+		}
+		if data := switchDataTarget("switch2", core); data != "/root/.local/share/eden" {
+			t.Errorf("« %s » : données sur %q", core, data)
+		}
+	}
+	if cores := StreamexCores("switch2"); len(cores) != 1 || cores[0] != "Eglantine (streamex)" {
+		t.Errorf("cœurs de la Switch 2 : %v", cores)
 	}
 }

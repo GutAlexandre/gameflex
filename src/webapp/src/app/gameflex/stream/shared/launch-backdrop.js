@@ -1,7 +1,7 @@
 import { gatewayViewerOffer, gatewayViewerDelete } from "../../api/gateway.js";
 import { applyReceiverLatencyHints } from "../../libs/webrtcLatencyHints.js";
 import { streamHostOrigin } from "../../libs/serverBase.js";
-import { answerGatewayOffer, buildIceServers } from "./gateway-helpers.js";
+import { NO_POSTER, answerGatewayOffer, buildIceServers } from "./gateway-helpers.js";
 
 // LE FOND DE L'ÉCRAN DE LANCEMENT — chantier 35.
 //
@@ -27,6 +27,23 @@ import { answerGatewayOffer, buildIceServers } from "./gateway-helpers.js";
 //
 // MUET : le son est celui de la page de jeu.
 
+// L'IMAGE DU FOND QUAND LA VIDÉO N'EN A PAS ENCORE (le porteur, 2026-11-06 :
+// « le background de GameFlex ») : la première image de l'intro, celle-là même
+// que la passerelle tient pendant le lancement — extraite de son hd.h264, que
+// gatewaystreams/intro/build.sh refait avec elle. L'écran de lancement la pose
+// en fond (LaunchScreen) ; la vidéo, transparente tant qu'elle n'a rien
+// (NO_POSTER), la laisse voir, puis la recouvre de la même image. Un lancement
+// refusé avant toute image, ou un serveur sans intro, montre donc le même fond.
+export const LAUNCH_BACKGROUND = "/images/launch-backdrop.webp";
+
+// Le même fond, en propriété CSS `background` : l'écran de lancement, et
+// l'écran de chargement ou d'erreur d'une partie (LoadingScreen `launch`).
+export const LAUNCH_SCREEN_BACKGROUND = `#0d1117 url(${LAUNCH_BACKGROUND}) center / cover no-repeat`;
+
+// Le dégradé sous la ligne du bas : il la garde lisible quelle que soit
+// l'image derrière. Le haut de l'écran est au logo de l'intro.
+export const LAUNCH_BAR_GRADIENT = "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.75) 100%)";
+
 const RELEASE_GRACE_MS = 3000;
 // Un lancement annoncé est là dès la première étape ; ce qui ne répond pas
 // vient d'un serveur d'avant le chantier 35 — l'écran garde son fond noir.
@@ -43,6 +60,7 @@ function createVideo() {
     // Un fond ne se « caste » pas : sans cela, le navigateur du téléphone
     // propose de l'envoyer sur un téléviseur.
     video.disableRemotePlayback = true;
+    video.poster = NO_POSTER;
     Object.assign(video.style, {
         position: "absolute",
         inset: "0",

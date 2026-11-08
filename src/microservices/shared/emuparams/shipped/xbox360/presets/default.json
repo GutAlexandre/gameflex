@@ -1,6 +1,12 @@
 {
   "name": "Default",
-  "description": "The values shipped with GameFlex: Xenia's own.",
+  "description": "The values GameFlex recommends: Xenia's own.",
+  "translations": {
+    "fr": {
+      "name": "Par défaut",
+      "description": "Les valeurs que recommande GameFlex : celles de Xenia."
+    }
+  },
   "override": false,
   "system": "Xenia",
   "values": {

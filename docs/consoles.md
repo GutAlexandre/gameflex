@@ -96,6 +96,19 @@ copies and lets you delete them.
 **Wii U graphic packs.** Some games need a graphic pack to run well. Put each pack in its own
 folder, in `patches/wiiu/<pack name>/` (the folder holds a `rules.txt`).
 
+## PC Ports
+
+Some Nintendo 64 games have been remade for the PC by their community: widescreen, 60 frames per
+second, high definition. A port reads only its data from your own ROM, which stays in `roms/n64/`
+(the console has no folder of its own): GameFlex lists the game under **PC Ports** as soon as the
+ROM matches the one the port accepts. The port itself is a file from its authors, in
+`cores/ports/`; the download button in **Settings › Emulators** gets it. Its image is `ports` in
+`COMPOSE_PROFILES` ([Install](install.md)).
+
+| Game | Port | The ROM it accepts |
+|---|---|---|
+| *The Legend of Zelda: Majora's Mask* | [Zelda 64: Recompiled](https://github.com/Zelda64Recomp/Zelda64Recomp) | the US version 1.0, as a `.z64` file (big-endian byte order) |
+
 ## Remote Play
 
 Remote Play brings **your own PlayStation 4 or PlayStation 5** to GameFlex. It plays the console's

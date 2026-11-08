@@ -20,6 +20,7 @@ import (
 	"sync"
 	"time"
 
+	"gameflex/consoles"
 	"gameflex/logfile"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
@@ -213,6 +214,9 @@ type SpawnSpec struct {
 	// Engine — le moteur du jeu (storage.GameEngine, chantier 36) : ses
 	// réglages passent par-dessus les paramètres de l'émulateur. Vide : aucun.
 	Engine string
+	// GameID — l'identifiant du jeu (storage.GameTitleID) : ses réglages passent
+	// par-dessus ceux de son moteur. Vide : aucun.
+	GameID string
 }
 
 // gamesDir — le dossier de jeux monté sur /opt/game : celui du disque interne
@@ -320,17 +324,19 @@ func New(dockerClient *client.Client, cfg config.Config) (*Client, error) {
 // error surfaced in the UI.
 func (dockerClient *Client) CheckImages(ctx context.Context) {
 	images := map[string]string{
-		"GAMEFLEX_RETRO_IMAGE":       dockerClient.config.RetroImage,
-		"GAMEFLEX_REMOTEPLAY_IMAGE":  dockerClient.config.RemoteplayImage,
-		"GAMEFLEX_SWITCH_IMAGE":      dockerClient.config.SwitchImage,
-		"GAMEFLEX_SWITCH_EDEN_IMAGE": dockerClient.config.SwitchEdenImage,
-		"GAMEFLEX_PS3_IMAGE":         dockerClient.config.PS3Image,
-		"GAMEFLEX_XBOX_IMAGE":        dockerClient.config.XboxImage,
-		"GAMEFLEX_PS4_IMAGE":         dockerClient.config.PS4Image,
-		"GAMEFLEX_PS5_IMAGE":         dockerClient.config.PS5Image,
-		"GAMEFLEX_WIIU_IMAGE":        dockerClient.config.WiiUImage,
-		"GAMEFLEX_XBOX360_IMAGE":     dockerClient.config.Xbox360Image,
-		"GAMEFLEX_KEYTEST_IMAGE":     dockerClient.config.KeyTestImage,
+		"GAMEFLEX_RETRO_IMAGE":               dockerClient.config.RetroImage,
+		"GAMEFLEX_REMOTEPLAY_IMAGE":          dockerClient.config.RemoteplayImage,
+		"GAMEFLEX_SWITCH_IMAGE":              dockerClient.config.SwitchImage,
+		"GAMEFLEX_SWITCH_EDEN_IMAGE":         dockerClient.config.SwitchEdenImage,
+		"GAMEFLEX_SWITCH2_IMAGE":             dockerClient.config.Switch2Image,
+		"GAMEFLEX_PS3_IMAGE":                 dockerClient.config.PS3Image,
+		"GAMEFLEX_XBOX_IMAGE":                dockerClient.config.XboxImage,
+		"GAMEFLEX_PS4_IMAGE":                 dockerClient.config.PS4Image,
+		"GAMEFLEX_PS5_IMAGE":                 dockerClient.config.PS5Image,
+		"GAMEFLEX_WIIU_IMAGE":                dockerClient.config.WiiUImage,
+		"GAMEFLEX_XBOX360_IMAGE":             dockerClient.config.Xbox360Image,
+		"GAMEFLEX_PORTS_ZELDA64RECOMP_IMAGE": dockerClient.config.PortsZelda64RecompImage,
+		"GAMEFLEX_KEYTEST_IMAGE":             dockerClient.config.KeyTestImage,
 	}
 
 	for variable, name := range images {
@@ -399,6 +405,25 @@ func sessionGPUDevices(wanted string) []container.DeviceMapping {
 	return devices
 }
 
+// sessionDmaHeapDevices — LE TAS DE MÉMOIRE DU NOYAU que la mémoire unique de
+// Kyty demande (`KYTY_UNIFIED_MEMORY`, chantier 41) : la mémoire du jeu y est
+// allouée pour que le GPU l'importe, ce que RADV refuse à la mémoire de Kyty
+// d'ordinaire. Donné à la PS5 seulement si la machine l'a (/sys/class/dma_heap,
+// que le conteneur du kernel voit, comme le GPU) : un périphérique absent de
+// l'hôte empêcherait le conteneur de démarrer. Sans lui, Kyty garde son ancien
+// modèle même si le paramètre est allumé.
+func sessionDmaHeapDevices(sysRoot string) []container.DeviceMapping {
+	if _, err := os.Stat(filepath.Join(sysRoot, "class", "dma_heap", "system")); err != nil {
+		return nil
+	}
+
+	return []container.DeviceMapping{{
+		PathOnHost:        "/dev/dma_heap/system",
+		PathInContainer:   "/dev/dma_heap/system",
+		CgroupPermissions: "rwm",
+	}}
+}
+
 // streamexSaveDir — le dossier de sauvegarde d'une console streamex.
 //
 // SOUS `streamex/`, par symétrie avec le `cores/` du côté rétro : ce sont
@@ -462,16 +487,24 @@ func (dockerClient *Client) EnsureSaveDir(username, console string) error {
 			installsDir(config.StorageDir, "ps4"),
 		)
 	}
+	if console == consoles.PortsID {
+		// Un dossier par port : deux ports ne rangent rien de la même façon.
+		for _, emulator := range streamexEmulators[consoles.PortsID] {
+			dirs = append(dirs, streamexSaveDir(config.SavesDir, username, consoles.PortsID, emulator.params))
+		}
+	}
 	if console == "ps5" {
 		// Kyty écrit dans son dossier de travail, pas sous ~/.local/share :
-		// "savedata" reçoit `_SaveData` (les sauvegardes de jeu) et "shaders"
-		// son `_PipelineCache`. Les JOURNAUX ne sont pas ici — ils vont dans
-		// logs/<jour>/<session>/, où FollowLogs les écrit déjà pour tous les
-		// conteneurs de session et où l'interface d'administration les lit.
+		// "savedata" reçoit `_SaveData` (les sauvegardes de jeu), "shaders"
+		// son `_PipelineCache` et "downloaddata" son `_DownloadData`. Les
+		// JOURNAUX ne sont pas ici — ils vont dans logs/<jour>/<session>/, où
+		// FollowLogs les écrit déjà pour tous les conteneurs de session et où
+		// l'interface d'administration les lit.
 		base := streamexSaveDir(config.SavesDir, username, "ps5")
 		dirs = append(dirs,
 			filepath.Join(base, "savedata"),
 			filepath.Join(base, "shaders"),
+			filepath.Join(base, "downloaddata"),
 		)
 	}
 
@@ -503,6 +536,26 @@ func consoleWantsPads(console string) bool {
 	return console != "keytest"
 }
 
+// sessionMemoryLimit — le plafond mémoire d'une session streamex (memory.max
+// du cgroup : rien n'est réservé). 12 Go, sauf la PS5 : 20 Go. Kyty tient toute
+// la mémoire du jeu dans un seul bloc partagé, et un jeu PS5 en dispose de
+// 12,5 Go ; le conteneur porte en plus Kyty lui-même, la capture et
+// l'encodage de l'image, le son, et le cache des fichiers du jeu. Mesuré le
+// 2026-10-30 sur *Clair Obscur : Expedition 33* :
+//   - plafonné à 12 Go comme les autres : 12,06 Go au bout de 7 minutes, dont
+//     10,3 Go de ce bloc, et la courbe montait encore ;
+//   - sans plafond : 15 Go au bout de 7 minutes, dont 3,7 Go de cache.
+//
+// Au plafond, le noyau pousse la mémoire du jeu en swap, et la partie fige.
+// 16 Go le même soir, puis 20 : « sur la console c'est 16 Go, mais il n'y a
+// pas de docker, d'encodage d'images » (le porteur).
+func sessionMemoryLimit(console string) int64 {
+	if console == "ps5" {
+		return 20 * 1024 * 1024 * 1024
+	}
+	return 12 * 1024 * 1024 * 1024
+}
+
 // sessionImage — l'image d'une session : celle de l'émulateur choisi (le
 // premier de la console sans choix) ; vide pour un émulateur qu'aucune image
 // ne porte, ou une console sans image configurée.
@@ -517,6 +570,9 @@ func sessionImage(cfg config.Config, console, core string) string {
 		}
 
 		return cfg.SwitchImage
+	}
+	if console == "switch2" {
+		return cfg.Switch2Image
 	}
 	if console == "ps3" {
 		return cfg.PS3Image
@@ -536,6 +592,17 @@ func sessionImage(cfg config.Config, console, core string) string {
 	if console == "xbox360" {
 		return cfg.Xbox360Image
 	}
+	if console == consoles.PortsID {
+		emulator, ok := streamexEmulatorFor(console, core)
+		if !ok {
+			return ""
+		}
+		if emulator.image == "streamex-ports-zelda64recomp" {
+			return cfg.PortsZelda64RecompImage
+		}
+
+		return ""
+	}
 	if console == "keytest" {
 		return cfg.KeyTestImage
 	}
@@ -552,9 +619,10 @@ func sessionService(console, core string) string {
 	return "streamex-" + console
 }
 
-// switchDataTarget — où l'émulateur Switch choisi cherche ses données.
-func switchDataTarget(core string) string {
-	if emulator, ok := streamexEmulatorFor("switch", core); ok && emulator.data != "" {
+// switchDataTarget — où l'émulateur choisi de la Switch, ou de la Switch 2,
+// cherche ses données.
+func switchDataTarget(console, core string) string {
+	if emulator, ok := streamexEmulatorFor(console, core); ok && emulator.data != "" {
 		return emulator.data
 	}
 
@@ -671,9 +739,10 @@ func (dockerClient *Client) CreateAndStart(ctx context.Context, spec SpawnSpec) 
 	resolution, fps, bitrate := streamDefaultResolution, streamDefaultFPS, streamDefaultBitrate
 	if spec.Console == "ps3" {
 		bitrate = streamPS3DefaultBitrate
-	} else if spec.Console == "xbox" || spec.Console == "xbox360" || spec.Console == "ps4" || spec.Console == "ps5" {
+	} else if spec.Console == "xbox" || spec.Console == "xbox360" || spec.Console == "ps4" || spec.Console == "ps5" || spec.Console == consoles.PortsID {
 		// La Xbox 360, la PS4 et la PS5 émulées partagent le débit par défaut
-		// de la Xbox : même famille de rendu 3D, même besoin.
+		// de la Xbox : même famille de rendu 3D, même besoin. Les ports PC
+		// aussi : ils rendent en 720p ce que la console rendait en 240p.
 		bitrate = streamXboxDefaultBitrate
 	}
 	if spec.Resolution != "" {
@@ -736,7 +805,11 @@ func (dockerClient *Client) CreateAndStart(ctx context.Context, spec SpawnSpec) 
 	// encore avec des pads homonymes.
 	environment = append(environment, "STREAMEX_CONSOLE="+spec.Console)
 	// Les paramètres de l'émulateur, s'il en a (emulator_params.go, #347).
-	if entry, ok := emulatorParamsEnv(config.StorageDir, spec.Console, spec.Core, spec.Engine); ok {
+	var patchDirs []string
+	for _, disk := range dockerClient.InternalDisks(ctx) {
+		patchDirs = append(patchDirs, disk.Section("patches"))
+	}
+	if entry, ok := emulatorParamsEnv(config.StorageDir, patchDirs, spec.Console, spec.Core, spec.Engine, spec.GameID); ok {
 		environment = append(environment, entry)
 	}
 
@@ -771,12 +844,14 @@ func (dockerClient *Client) CreateAndStart(ctx context.Context, spec SpawnSpec) 
 		},
 		{
 			Type:   mount.TypeBind,
-			Source: streamexSaveDir(cfg.SavesHostDir(), spec.Username, "switch"),
+			// Le dossier de la console : la Switch 2 (#644) range ses
+			// sauvegardes à part, sous saves/<compte>/streamex/switch2.
+			Source: streamexSaveDir(cfg.SavesHostDir(), spec.Username, gamesConsole),
 			// Citron et Eden rangent leurs données de la même façon (héritage
 			// yuzu) : le MÊME dossier de l'hôte, monté là où l'émulateur de
 			// l'image les cherche — une partie sauvée sous l'un se continue
 			// sous l'autre (chantier 26).
-			Target: switchDataTarget(spec.Core),
+			Target: switchDataTarget(gamesConsole, spec.Core),
 		},
 	}
 	// Les clés de la Switch (`/gameflex/bios/switch`) : l'entrypoint de
@@ -926,6 +1001,16 @@ func (dockerClient *Client) CreateAndStart(ctx context.Context, spec SpawnSpec) 
 				Source: streamexSaveDir(cfg.SavesHostDir(), spec.Username, "ps5", "shaders"),
 				Target: "/opt/kyty/_PipelineCache",
 			},
+			{
+				// Le /download0 de la console, même raison : un jeu Unreal y
+				// garde ses réglages (saved/ps5/gameusersettings.ini). Sans ce
+				// montage, Wukong repose sa configuration initiale et sa
+				// politique de confidentialité à chaque partie, et revient en
+				// mode Qualité.
+				Type:   mount.TypeBind,
+				Source: streamexSaveDir(cfg.SavesHostDir(), spec.Username, "ps5", "downloaddata"),
+				Target: "/opt/kyty/_DownloadData",
+			},
 		}
 	}
 	if spec.Console == "keytest" {
@@ -975,6 +1060,37 @@ func (dockerClient *Client) CreateAndStart(ctx context.Context, spec SpawnSpec) 
 				Type:   mount.TypeBind,
 				Source: streamexSaveDir(cfg.SavesHostDir(), spec.Username, "xbox360"),
 				Target: "/root/.local/share/Xenia",
+			},
+		}
+	}
+
+	if spec.Console == consoles.PortsID {
+		emulator, _ := streamexEmulatorFor(consoles.PortsID, spec.Core)
+		port, _ := consoles.PortByCore(emulator.core)
+		// LE DOSSIER DE LA CONSOLE QUE LE PORT LIT, et lui seul : le jeu est
+		// une ROM de `roms/n64`, son chemin part de `roms/` (catalog.For), et
+		// il se monte donc à sa place sous /opt/game. Sur un disque interne,
+		// GamesHostDir est le `roms/` du disque.
+		romsHostDir := gamesHostDir(cfg.StorageHostDir, port.From)
+		if spec.GamesHostDir != "" {
+			romsHostDir = filepath.Join(spec.GamesHostDir, port.From)
+		}
+		mounts = []mount.Mount{
+			{
+				// La ROM : le port n'en lit que les données. Il la veut dans
+				// son dossier, où run-zelda64.sh la relie.
+				Type:     mount.TypeBind,
+				Source:   romsHostDir,
+				Target:   filepath.Join("/opt/game", port.From),
+				ReadOnly: true,
+			},
+			{
+				// LE DOSSIER DU PORT, PAR COMPTE ET PAR PORT : sa
+				// configuration, ses sauvegardes et ses mods. Deux ports ne
+				// rangent rien de la même façon : chacun a le sien.
+				Type:   mount.TypeBind,
+				Source: streamexSaveDir(cfg.SavesHostDir(), spec.Username, "ports", emulator.params),
+				Target: emulator.data,
 			},
 		}
 	}
@@ -1068,6 +1184,9 @@ func (dockerClient *Client) CreateAndStart(ctx context.Context, spec SpawnSpec) 
 		}
 
 		devices := sessionGPUDevices(cfg.GPU)
+		if spec.Console == "ps5" {
+			devices = append(devices, sessionDmaHeapDevices("/sys")...)
+		}
 		if consoleWantsPads(spec.Console) {
 			// uinput virtual gamepad — Eden and Cemu feed their cemuhook
 			// (DSU) pads from streamex's own pad state, RPCS3/xemu/shadPS4/Kyty
@@ -1123,7 +1242,8 @@ func (dockerClient *Client) CreateAndStart(ctx context.Context, spec SpawnSpec) 
 				// laisse ~5,6 Go de marge au-dessus, et deux sessions lourdes
 				// tiennent encore dans l'hôte. Ne pas lire `memory.current` seul :
 				// il compte le cache, et gonfle le besoin réel de moitié.
-				Memory:    12 * 1024 * 1024 * 1024,
+				// La PS5 a le sien : sessionMemoryLimit.
+				Memory:    sessionMemoryLimit(spec.Console),
 				PidsLimit: &sessionPidsLimit,
 				// PAS DE MemorySwap : Docker autorise alors autant de swap que de
 				// mémoire.
@@ -1524,6 +1644,8 @@ type RetroContainerStatus struct {
 	GPU        *RetroGPUStatus `json:"gpu"`
 	// Emulator — le cœur libretro de la partie et sa version.
 	Emulator string `json:"emulator"`
+	// Resolution — la taille de la dernière image du cœur, « 320x240 ».
+	Resolution string `json:"resolution"`
 }
 
 // RetroGPUStatus is the child's sysfs GPU sampling (see readGPUStatus in

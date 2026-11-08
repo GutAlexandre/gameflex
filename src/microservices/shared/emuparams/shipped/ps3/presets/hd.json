@@ -1,6 +1,12 @@
 {
   "name": "HD",
   "description": "The game's resolution (100 %), whatever the stream's. Sharper, slower.",
+  "translations": {
+    "fr": {
+      "name": "HD",
+      "description": "La résolution du jeu (100 %), quelle que soit celle du flux. Plus net, plus lent."
+    }
+  },
   "override": false,
   "system": "RPCS3",
   "values": {

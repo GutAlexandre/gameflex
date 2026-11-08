@@ -1,6 +1,12 @@
 {
   "name": "Default",
-  "description": "The values shipped with GameFlex: xemu's own, and the resolution of the stream.",
+  "description": "The values GameFlex recommends: xemu's own, and the resolution of the stream.",
+  "translations": {
+    "fr": {
+      "name": "Par défaut",
+      "description": "Les valeurs que recommande GameFlex : celles de xemu, et la résolution du flux."
+    }
+  },
   "override": false,
   "system": "xemu",
   "values": {

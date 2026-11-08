@@ -1,6 +1,8 @@
+diff --git a/src/graphics/guest_gpu/command_processor/pm4Handlers.cpp b/src/graphics/guest_gpu/command_processor/pm4Handlers.cpp
+index 2c7498ea..462695e5 100644
 --- a/src/graphics/guest_gpu/command_processor/pm4Handlers.cpp
 +++ b/src/graphics/guest_gpu/command_processor/pm4Handlers.cpp
-@@ -2682,7 +2682,9 @@
+@@ -1466,7 +1466,9 @@ static constexpr auto MakeContextIndirectTable() {
  			    KYTY_PM4_GET(value, CB_COLOR0_DCC_CONTROL, INDEPENDENT_64B_BLOCKS) != 0;
  			const bool independent_128b =
  			    KYTY_PM4_GET(value, CB_COLOR0_DCC_CONTROL, INDEPENDENT_128B_BLOCKS) != 0;

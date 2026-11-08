@@ -34,6 +34,10 @@ Les deux premiers :
 | `0006-phone-pads-from-dsu.patch` | `GAMEFLEX_DSU_SERVER=<ip>:<port>` : les quatre manettes d'un serveur DSU (cemuhook) en manettes virtuelles de SDL, joueurs 1 à 4 — celles du téléphone (`#509`) ; sans la variable, rien ne change |
 | `0007-kernel-service-requests-not-lost.patch` | le fil de service du noyau ne perd plus une minuterie programmée au moment où `io_context.run()` finissait — FIFA 22 et FC 27 attendaient sans fin au démarrage (`#512`) ; défaut de l'amont |
 | `0009-ajm-job-on-destroyed-instance.patch` | une tâche audio pour une instance détruite échoue au lieu d'arrêter l'émulateur (`ajm_context.cpp`, FIFA 22, `#513`) ; défaut de l'amont |
+| `0010-depth-copy-buffer-fits-the-image.patch` | le tampon d'une copie couleur/profondeur a la taille de l'image, et non 128 Mo fixes : le GPU n'écrit plus au-delà de sa fin (`vk_runtime.cpp`, FF7 Remake, `#613`) ; défaut de l'amont |
+| `0011-empty-iovec-is-not-an-error.patch` | `readv`, `writev`, `preadv` et `pwritev` acceptent une liste vide, comme le noyau FreeBSD dont descend celui de la console (`file_system.cpp`, FC 27, `#622`) ; défaut de l'amont depuis le 2026-10-28 |
+| `0012-backport-jump-tables-pr-5580.patch` | repris de la [demande de fusion #5580](https://github.com/shadps4-emu/shadPS4/pull/5580) de l'amont, sans ses tests : un saut indirect par une table, bornée par `s_min_u32`, devient une suite de comparaisons (FC 27, `#512`) ; à retirer quand `main` l'aura |
+| `0013-unreal-render-height.patch` | `GAMEFLEX_UE_RENDER_HEIGHT` (720, 540, 360) : la hauteur de rendu d'un jeu Unreal. Sa ligne de commande (`ue4commandline.txt`) n'a aucun effet sur PS4 ; il lit en revanche `<projet>/saved/config/ps4/engine.ini` s'il existe. Ce dossier est en lecture seule : `<projet>/saved` est monté dans le dossier de shadPS4, le plus long préfixe l'emporte (`emulator.cpp`, `#617`). *FF7 Remake*, même scène à 30 images/s : GPU 69 → 37 % à 540p |
 | `COMMIT` | le commit de l'amont construit (`main`) ; absent, l'étiquette du serveur |
 | `build.sh` | construit shadPS4 depuis `COMMIT` (ou la version du serveur), avec les patchs, dans un conteneur trixie gardé |
 | `bench.sh`, `bench/` | l'essai sur x86_64 dans l'image PS4 du serveur : plage du téléphone (320 Gio) contre témoin, ou les plages de `RUNS` ; le jeu déballé, ou son `.pkg` |
@@ -56,8 +60,8 @@ shadPS4 change souvent ; la version se change à **un seul endroit**, et le rest
    celui de l'éditeur s'il est là (`consoles/unpack-emulator.sh`), et le journal de la partie le
    dit. Aucune reconstruction (chantier 29).
 5. **Sa source** : une ligne dans `tools/gpl-sources/manifest.tsv` (le commit amont, celui de ce
-   dépôt qui l'a construit), puis `tools/gpl-sources/assemble.py <bibliothèque>` une fois livré dans
-   la release, que le miroir sert (chantier 34). Sans sa ligne, le script refuse.
+   dépôt qui l'a construit). Le registre et ces correctifs partent dans le dépôt public `gameflex`,
+   le seul endroit de leur code : pas de `src/` dans les bibliothèques (chantier 34, `#640`).
 
 **Le passage à la 0.20.0** (2026-10-26, `#487`) : 0001 est rebasé — `shad_net_enabled` a quitté
 `GeneralSettings` pour une section réseau, ce qui déplaçait trois contextes de `emulator_settings.h` ;

@@ -1,8 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 9797d88..179a725 100644
+index 2629c180..009a52e5 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1266,6 +1266,8 @@ set(IMGUI src/imgui/imgui_config.h
+@@ -1286,6 +1286,8 @@ set(IMGUI src/imgui/imgui_config.h
  
  set(INPUT src/input/controller.cpp
            src/input/controller.h
@@ -13,7 +13,7 @@ index 9797d88..179a725 100644
            src/input/input_handler.h
 diff --git a/src/input/gameflex_dsu.cpp b/src/input/gameflex_dsu.cpp
 new file mode 100644
-index 0000000..25a4b78
+index 00000000..25a4b780
 --- /dev/null
 +++ b/src/input/gameflex_dsu.cpp
 @@ -0,0 +1,186 @@
@@ -205,7 +205,7 @@ index 0000000..25a4b78
 +} // namespace Input::GameflexDsu
 diff --git a/src/input/gameflex_dsu.h b/src/input/gameflex_dsu.h
 new file mode 100644
-index 0000000..cf70276
+index 00000000..cf702765
 --- /dev/null
 +++ b/src/input/gameflex_dsu.h
 @@ -0,0 +1,14 @@
@@ -224,7 +224,7 @@ index 0000000..cf70276
 +
 +} // namespace Input::GameflexDsu
 diff --git a/src/sdl_window.cpp b/src/sdl_window.cpp
-index a7d3650..3c7b06d 100644
+index a7d36502..3c7b06d2 100644
 --- a/src/sdl_window.cpp
 +++ b/src/sdl_window.cpp
 @@ -25,6 +25,7 @@

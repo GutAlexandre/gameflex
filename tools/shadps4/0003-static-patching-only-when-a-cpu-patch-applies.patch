@@ -1,8 +1,8 @@
 diff --git a/src/core/cpu_patches.cpp b/src/core/cpu_patches.cpp
-index 605fcf3..d03ecee 100644
+index dc7b02cd..08b59b11 100644
 --- a/src/core/cpu_patches.cpp
 +++ b/src/core/cpu_patches.cpp
-@@ -270,6 +270,18 @@ static bool FilterIntelCPU(const ZydisDecodedOperand*) {
+@@ -275,6 +275,18 @@ static bool FilterIntelCPU(const ZydisDecodedOperand*) {
      return cpu.has(Cpu::tINTEL);
  }
  
@@ -22,7 +22,7 @@ index 605fcf3..d03ecee 100644
                                            const ZydisDecodedOperand* operands,
                                            Xbyak::CodeGenerator& c, bool rsqrt, bool vex) {
 diff --git a/src/core/cpu_patches.h b/src/core/cpu_patches.h
-index 1af2eab..8f955c6 100644
+index 1af2eab0..8f955c6d 100644
 --- a/src/core/cpu_patches.h
 +++ b/src/core/cpu_patches.h
 @@ -90,4 +90,10 @@ RedZonePatchResult PatchRedZoneMemoryInstructions(u64 segment_addr, u64 segment_
@@ -37,7 +37,7 @@ index 1af2eab..8f955c6 100644
 +
  } // namespace Core
 diff --git a/src/core/module.cpp b/src/core/module.cpp
-index cd226a1..7374585 100644
+index c721f5ba..abc166ef 100644
 --- a/src/core/module.cpp
 +++ b/src/core/module.cpp
 @@ -186,7 +186,8 @@ void Module::LoadModuleToMemory(u32& max_tls_index) {

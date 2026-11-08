@@ -75,13 +75,18 @@ var layouts = map[string]layout{
 		},
 		title: func(dir string) string { return installs.SFOTitle(filepath.Join(dir, "PARAM.SFO")) },
 	},
+	// LE NOM DU JEU EST LE « MAINTITLE » DE SES SAUVEGARDES (installs.SFOString).
+	// Sauf les données communes d'un jeu, qui s'intitulent « System Saved Data »
+	// (`ff7remakecommon` de *FF7 Remake*) : ce n'est pas un nom de jeu. Sans
+	// autre sauvegarde, le jeu reste nommé par son CUSA.
 	"ps4": {
 		parents: []string{"data/home/*/savedata"},
 		idOf:    plainID,
 		title: func(dir string) string {
 			entries, _ := os.ReadDir(dir)
 			for _, entry := range entries {
-				if title := installs.SFOTitle(filepath.Join(dir, entry.Name(), "sce_sys", "param.sfo")); title != "" {
+				title := installs.SFOString(filepath.Join(dir, entry.Name(), "sce_sys", "param.sfo"), "MAINTITLE")
+				if title != "" && !strings.EqualFold(title, "System Saved Data") {
 					return title
 				}
 			}

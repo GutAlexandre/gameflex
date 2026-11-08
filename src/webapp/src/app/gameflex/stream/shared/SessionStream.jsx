@@ -1,7 +1,8 @@
 import React, { useEffect, useImperativeHandle, useLayoutEffect, useRef } from "react";
 import * as bs from "react-bootstrap";
 import { GatewayWebRTC } from "./GatewayWebRTC.jsx";
-import { acquireBackdrop, releaseBackdrop } from "./launch-backdrop.js";
+import { LAUNCH_BAR_GRADIENT, LAUNCH_SCREEN_BACKGROUND, acquireBackdrop, releaseBackdrop } from "./launch-backdrop.js";
+import { NO_POSTER } from "./gateway-helpers.js";
 import { ProgressBar } from "../../shared/templates/Essentials.jsx";
 import { ROUND_BUTTON_LOOK } from "./hooks/use-streaming-menu.js";
 
@@ -81,6 +82,7 @@ export function LaunchBackdrop({ launch = null, stream = null }) {
                 autoPlay
                 playsInline
                 disableRemotePlayback
+                poster={NO_POSTER}
                 className="position-absolute top-0 start-0 w-100 h-100"
                 style={{ objectFit: "cover", pointerEvents: "none" }}
             />
@@ -160,12 +162,13 @@ function LaunchLine({ t, label, steps, failed, error, action }) {
 // (le porteur : « il n'y a pas besoin de retourner à l'accueil quand il y a
 // une erreur »). « Signaler l'erreur » (#191) prend la place du spinner.
 //
-// TOUJOURS SOMBRE, dans les deux thèmes : son fond est une vidéo (ou le noir
-// qui l'attend), et le texte se lit dessus.
+// TOUJOURS SOMBRE, dans les deux thèmes : son fond est une vidéo, ou l'image
+// qui l'attend — la première de l'intro, le fond GameFlex (LAUNCH_SCREEN_BACKGROUND,
+// le porteur, 2026-11-06) —, et le texte se lit dessus.
 //
 // `fixed` — par-dessus l'application entière (la page des jeux, sa barre de
 // navigation) plutôt que dans le cadre de la page de jeu. `backdrop` — les
-// props de LaunchBackdrop ; absent, le fond reste noir.
+// props de LaunchBackdrop ; absent, le fond GameFlex reste seul.
 export function LaunchScreen({
     t,
     label,
@@ -182,7 +185,7 @@ export function LaunchScreen({
     return (
         <div
             className={`${fixed ? "position-fixed" : "position-absolute"} top-0 start-0 w-100 h-100 overflow-hidden`}
-            style={{ backgroundColor: "#000", zIndex }}
+            style={{ background: LAUNCH_SCREEN_BACKGROUND, zIndex }}
         >
             {backdrop && <LaunchBackdrop {...backdrop} />}
             {/* UNE CROIX DANS UN CERCLE EN HAUT À DROITE (le porteur,
@@ -236,7 +239,7 @@ export function LaunchBar({ t, label, steps = null, failed = false, error = null
     return (
         <div
             className="position-absolute bottom-0 start-0 w-100 px-3 pb-3 pt-5 d-flex flex-column align-items-center gap-2 text-white"
-            style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.75) 100%)" }}
+            style={{ background: LAUNCH_BAR_GRADIENT }}
         >
             <LaunchLine t={t} label={label} steps={steps} failed={failed} error={error} action={action} />
             {children}

@@ -7,6 +7,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-08
+
+### Added
+
+- **PC Ports, a new console**: Nintendo 64 games remade for the PC by their community, which read
+  only their data from your own ROM — widescreen, 60 frames per second, high definition. The first
+  is *The Legend of Zelda: Majora's Mask*, through Zelda 64: Recompiled: keep its US 1.0 ROM in
+  `roms/n64/`, download the port in **Settings › Emulators**, and add `ports` to
+  `COMPOSE_PROFILES`. See *PC Ports* in [Consoles](docs/consoles.md).
+- **New PlayStation 5 settings**, in the emulator panel: *Render height (Unreal Engine)*, the
+  height an Unreal Engine game draws its 3D scene at, its menus and text staying sharp (540p by
+  default; 720p, 360p, or the game's own); *Frame rate limit*, which follows the stream by
+  default, so that a faster game does not give its pictures unevenly; and *Console resolution*,
+  1080p by default instead of 4K. The PlayStation 4 gets *Render height* too.
+- **A game's own settings**, for PlayStation 4 and 5 games: `patches/<console>/<game ID>/settings.json`,
+  in the library or on an internal disk, applied at launch over the console's settings and those
+  of the game's engine. The [mirror](README.md#the-mirror) has the ones we use.
+- **The Performance panel in sections** (session, gateway, emulator, machine), with the game's
+  resolution and the emulator's, and the emulator's frame rate next to the gateway's.
+- **The game page in portrait**: GameFlex under the video, the controller above the menu, and a
+  smaller touchpad that stays next to a real controller.
+- **A small spinner while a PlayStation 5 game compiles its shaders**, at the top left, with their
+  number inside, instead of a line of text.
+- **360p is back** among the stream sizes.
+- **The emulator settings in French**, when the page is in French.
+
+### Changed
+
+- **Emulators updated**: KytyPS5 2026-11-04 (`91c5820`), shadPS4 0.20.0, RPCS3 0.0.43-20508 and
+  Xenia Canary `57cddf7`, on the server and in the Android app (Xenia: the server only). Download
+  them from **Settings › Emulators**. GameFlex's own builds of KytyPS5 and shadPS4, with the
+  patches this version relies on (the PlayStation 5 settings above among them), are on the
+  [mirror](README.md#the-mirror).
+- **PlayStation 5 games run much faster** with GameFlex's build of KytyPS5: the game's memory is
+  shared with the graphics card, which also writes the occlusion counters the game waits for.
+  *Final Fantasy VII Remake* goes from about 11 to 22 frames per second, on the same picture. A
+  PlayStation 5 game gets up to 20 GB of memory, instead of 12.
+- **The sound is 60 ms behind the picture instead of 120**, in the browser and in the Android app.
+- **The launch screen** keeps GameFlex's backdrop until the game's first picture.
+- **The French interface says « vous »**.
+
+### Fixed
+
+- **Jumps in the picture of the recent consoles**, in the browser and in the Android app. Three
+  causes: the page showed each frame as soon as it was decoded, so two frames arriving together
+  fell into the same screen refresh; the server's capture took one picture twice every second;
+  and it could read a picture the emulator had not finished drawing, so an older picture came back
+  for a moment. The page now plays the video 50 ms behind (about 20 ms more latency), and the
+  capture takes each picture when the emulator has finished it.
+- **PlayStation 5 games**: *Kingdom Hearts III* no longer stops at its first video; *Final Fantasy
+  VII Rebirth* no longer crashes when it reads its cache again; *Final Fantasy VII Remake*'s
+  opening video is no longer pink, and its lighting and its sound are right; *Black Myth: Wukong*
+  has its sound, keeps running past its memory clean-up and runs in its performance mode; *Tekken
+  8* starts. With GameFlex's build of KytyPS5.
+- **PlayStation 4 games**: *Final Fantasy VII Remake* passes its title screen, and *EA Sports FC 27*
+  saves and reaches its menu. With GameFlex's build of shadPS4.
+- **The PlayStation 5 sticks, L2 and R2 in the Android app.**
+- ***My saves* names the PlayStation 4 games**: it showed their `CUSA…` code only.
+
 ## [0.9.0] - 2026-10-29
 
 ### Added

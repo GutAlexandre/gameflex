@@ -34,7 +34,19 @@
 #   0009 une tâche audio (AJM) pour une instance que le jeu vient de détruire
 #        échoue (paramètre invalide) au lieu d'arrêter l'émulateur : un lot lancé
 #        avant la destruction arrivait après — FIFA 22, quand un menu coupe ses
-#        sons (#513). Encore sur main le 2026-10-27.
+#        sons (#513). Encore sur main le 2026-10-27 ;
+#   0010 le tampon d'une copie couleur/profondeur a la taille de l'image, et non 128 Mo
+#        fixes : FF7 Remake y copie 256 Mio après son écran-titre, le GPU écrivait au-delà
+#        de la fin et se bloquait (#613). Défaut de l'amont, encore sur main le 2026-11-04 ;
+#   0011 readv et writev acceptent une liste vide, comme le noyau FreeBSD de la console : l'amont
+#        la refuse depuis le 2026-10-28 (EINVAL), et FC 27 ne pouvait plus sauvegarder ses
+#        réglages (#622). Encore sur main le 2026-11-05 ;
+#   0012 (repris de la demande de fusion #5580 de l'amont, encore ouverte le 2026-11-05) un
+#        saut indirect par une table, un `switch` compilé, au lieu de l'assertion qui
+#        arrêtait FC 27 (#512). À retirer quand main l'aura.
+#   0013 GAMEFLEX_UE_RENDER_HEIGHT (720, 540, 360) : la hauteur de rendu d'un jeu Unreal, par
+#        un engine.ini dans son dossier saved/, monté ailleurs : le jeu le lit, sa ligne de
+#        commande n'a pas d'effet sur PS4 (#617).
 #
 #   tools/shadps4/build.sh [dossier de sortie]     (défaut : ./shadps4-out)
 #

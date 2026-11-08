@@ -52,16 +52,18 @@ var buildTargets = map[string]buildTarget{
 	// every console Dockerfile below builds on top of via `FROM
 	// streamex-bin` — see docs/streamex/README.md. It never runs as a
 	// container itself, only ever exists to be a build stage.
-	"streamex-bin:latest":         {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/src/Dockerfile"},
-	"streamex-switch:latest":      {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/switch/Dockerfile", dependsOn: "streamex-bin:latest"},
-	"streamex-switch-eden:latest": {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/switch-eden/Dockerfile", dependsOn: "streamex-bin:latest"},
-	"streamex-ps3:latest":         {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/ps3/Dockerfile", dependsOn: "streamex-bin:latest"},
-	"streamex-xbox:latest":        {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/xbox/Dockerfile", dependsOn: "streamex-bin:latest"},
-	"streamex-ps4:latest":         {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/ps4/Dockerfile", dependsOn: "streamex-bin:latest"},
-	"streamex-ps5:latest":         {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/ps5/Dockerfile", dependsOn: "streamex-bin:latest"},
-	"streamex-wiiu:latest":        {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/wiiu/Dockerfile", dependsOn: "streamex-bin:latest"},
-	"streamex-xbox360:latest":     {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/xbox360/Dockerfile", dependsOn: "streamex-bin:latest"},
-	"streamex-keytest:latest":     {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/keytest/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-bin:latest":                 {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/src/Dockerfile"},
+	"streamex-switch:latest":              {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/switch/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-switch-eden:latest":         {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/switch-eden/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-switch2:latest":             {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/switch2/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-ps3:latest":                 {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/ps3/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-xbox:latest":                {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/xbox/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-ps4:latest":                 {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/ps4/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-ps5:latest":                 {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/ps5/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-wiiu:latest":                {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/wiiu/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-xbox360:latest":             {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/xbox360/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-ports-zelda64recomp:latest": {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/ports-zelda64recomp/Dockerfile", dependsOn: "streamex-bin:latest"},
+	"streamex-keytest:latest":             {context: "/build-context/root", dockerfile: "src/microservices/runtimes/streamex/consoles/keytest/Dockerfile", dependsOn: "streamex-bin:latest"},
 }
 
 // buildState is one image's in-flight (or just-finished) build — the value

@@ -1,8 +1,8 @@
 diff --git a/src/graphics/host_gpu/renderer/pipeline/pipelineCache.cpp b/src/graphics/host_gpu/renderer/pipeline/pipelineCache.cpp
-index fb5d337..36cc055 100644
+index a4916bd8..abeb6a4b 100644
 --- a/src/graphics/host_gpu/renderer/pipeline/pipelineCache.cpp
 +++ b/src/graphics/host_gpu/renderer/pipeline/pipelineCache.cpp
-@@ -654,7 +654,10 @@ void PipelineCache::GetGraphicsPrograms(const CommandBuffer& command, DrawRender
+@@ -655,7 +655,10 @@ void PipelineCache::GetGraphicsPrograms(const CommandBuffer& command, DrawRender
  		if (slot >= RENDER_COLOR_ATTACHMENTS_MAX) {
  			break;
  		}

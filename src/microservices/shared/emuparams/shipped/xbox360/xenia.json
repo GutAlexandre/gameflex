@@ -1,15 +1,26 @@
 {
   "enabled": true,
   "name": "Xbox 360",
-  "description": "The settings given to Xenia before every Xbox 360 game starts.",
+  "description": "Settings of Xenia, the Xbox 360 emulator, applied when a game starts.",
+  "translations": {
+    "fr": {
+      "description": "Les réglages de Xenia, l'émulateur de la Xbox 360, appliqués au démarrage d'un jeu."
+    }
+  },
   "system": "Xenia",
   "params": {
     "vsync": {
       "type": "switch",
       "label": "Vertical sync",
-      "description": "Holds the game to the console's 60 Hz. Off, some games run faster than they should — Halo 3 among them.",
+      "description": "Holds games to the console's 60 Hz. When off, some games run faster than they should.",
       "config": "GPU > vsync",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Synchronisation verticale",
+          "description": "Tient les jeux aux 60 Hz de la console. Désactivée, certains jeux tournent plus vite qu'ils ne le devraient."
+        }
+      }
     },
     "readbackResolve": {
       "type": "select",
@@ -21,6 +32,17 @@
         "none": "Off",
         "fast": "Fast — one frame late",
         "full": "Exact — slow"
+      },
+      "translations": {
+        "fr": {
+          "label": "Relecture du GPU",
+          "description": "Permet au processeur de relire ce que la puce graphique a dessiné. Quelques jeux en ont besoin pour l'exposition automatique ou les miniatures de sauvegarde ; Exacte attend la puce graphique et saccade.",
+          "options": {
+            "none": "Désactivée",
+            "fast": "Rapide — une image de retard",
+            "full": "Exacte — lente"
+          }
+        }
       }
     },
     "occlusionQuery": {
@@ -33,6 +55,17 @@
         "fake": "Fake — fastest",
         "fast": "Fast",
         "strict": "Strict — exact"
+      },
+      "translations": {
+        "fr": {
+          "label": "Requêtes d'occlusion",
+          "description": "La façon dont le jeu apprend ce qui est caché derrière quoi : reflets d'objectif, élimination des objets cachés, exposition automatique. Simulées est le plus rapide et convient à la plupart des jeux.",
+          "options": {
+            "fake": "Simulées — le plus rapide",
+            "fast": "Rapides",
+            "strict": "Strictes — exactes"
+          }
+        }
       }
     },
     "renderTargetPath": {
@@ -45,14 +78,31 @@
         "any": "Automatic",
         "fbo": "Framebuffers — fast",
         "fsi": "Pixel shader interlock — exact"
+      },
+      "translations": {
+        "fr": {
+          "label": "Méthode des cibles de rendu",
+          "description": "La façon dont les cibles de rendu de la console sont émulées. L'interverrouillage des pixel shaders est plus exact et plus lent.",
+          "options": {
+            "any": "Automatique",
+            "fbo": "Framebuffers — rapide",
+            "fsi": "Interverrouillage des pixel shaders — exact"
+          }
+        }
       }
     },
     "decalDepthFix": {
       "type": "switch",
       "label": "Decal depth fix",
-      "description": "Stops decals flickering in games that offset them by a tiny depth — Halo 3 among them. Costs a little graphics time.",
+      "description": "Stops decals from flickering in games that place them a tiny depth above a surface. Costs a little graphics time.",
       "config": "GPU > depth_bias_shader_offset",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Correction de la profondeur des décalcomanies",
+          "description": "Empêche le clignotement des décalcomanies dans les jeux qui les placent juste au-dessus d'une surface. Coûte un peu de temps graphique."
+        }
+      }
     },
     "antialiasing": {
       "type": "select",
@@ -64,6 +114,16 @@
         "none": "Off",
         "fxaa": "FXAA",
         "fxaa_extreme": "FXAA, strong"
+      },
+      "translations": {
+        "fr": {
+          "label": "Anticrénelage",
+          "description": "Adoucit les contours crénelés une fois l'image dessinée par le jeu.",
+          "options": {
+            "none": "Désactivé",
+            "fxaa_extreme": "FXAA, fort"
+          }
+        }
       }
     },
     "vibration": {
@@ -71,7 +131,13 @@
       "label": "Vibration",
       "description": "Lets games make the controller vibrate.",
       "config": "HID > vibration",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Vibration",
+          "description": "Permet aux jeux de faire vibrer la manette."
+        }
+      }
     }
   }
 }

@@ -39,6 +39,12 @@ type streamexChildStatus struct {
 		// — voir StatusStreamex.
 		EmulatorWindow *float64 `json:"emulator_window"`
 	} `json:"fps"`
+	// Resolution — on n'en lit que ce que l'émulateur dit de lui-même ;
+	// `encoded`/`capture` sont le flux, que le navigateur mesure déjà.
+	Resolution struct {
+		EmulatorRender string `json:"emulator_render"`
+		EmulatorOutput string `json:"emulator_output"`
+	} `json:"resolution"`
 	GPU struct {
 		BusyPercent    *float64 `json:"busy_percent"`
 		VRAMUsedBytes  int64    `json:"vram_used_bytes"`
@@ -94,6 +100,7 @@ func (dockerClient *Client) StatusStreamex(host string, port int) (sessionstatus
 	if child.FPS.EmulatorWindow != nil {
 		out.EmulationFPS = *child.FPS.EmulatorWindow
 	}
+	out.SetEmulatorSize(child.Resolution.EmulatorRender, child.Resolution.EmulatorOutput)
 	out.GPUBusyPercent = child.GPU.BusyPercent
 	out.VRAMUsedBytes = child.GPU.VRAMUsedBytes
 	out.VRAMTotalBytes = child.GPU.VRAMTotalBytes

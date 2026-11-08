@@ -9,6 +9,9 @@ import XboxPad from "./Xbox.jsx";
 // it without reaching into Player.jsx itself.
 export const CONSOLE_PADS = {
 	switch: NintendoSwitchPad,
+	// La Switch 2 (#644) : les mêmes boutons que la Switch, et le même profil
+	// (profiles.go range toute console inconnue sous celui de la Switch).
+	switch2: NintendoSwitchPad,
 	ps3: PlayStation3Pad,
 	// La PS4 a SA manette depuis le 2026-09-08 : elle empruntait celle de la
 	// PS3, qui n'a ni SHARE ni OPTIONS — le joueur voyait donc SELECT et
@@ -35,6 +38,10 @@ export const CONSOLE_PADS = {
 	// mêmes identifiants, profiles.go les range sous la même manette) — et
 	// le dessin est déjà celui d'une manette de 360.
 	xbox360: XboxPad,
+	// Les ports PC (chantier 40) : tous lisent une manette SDL moderne, que
+	// leur image mappe comme celle de la Xbox 360 (profiles.go les range
+	// sous la même manette).
+	ports: XboxPad,
 	// La Wii U emprunte la manette de la Switch, et ce n'est pas un
 	// à-peu-près : son GamePad porte les MÊMES boutons (A/B/X/Y aux mêmes
 	// positions, L/R, ZL/ZR, +/-, deux sticks cliquables), et surtout
@@ -51,11 +58,13 @@ export const CONSOLE_PADS = {
 // via controllerLabel/resolveControllerLayout's own overrideLabel instead.
 export const CONSOLE_PAD_LABELS = {
 	switch: "Nintendo Switch",
+	switch2: "Nintendo Switch 2",
 	ps3: "PS3 (DualShock 3)",
 	ps4: "PS4 (DualShock 4)",
 	ps5: "PS5 (DualSense)",
 	xbox: "Xbox (360)",
 	xbox360: "Xbox 360",
+	ports: "Xbox",
 	wiiu: "Wii U (GamePad)",
 };
 
@@ -98,10 +107,12 @@ const ABXY_ORDER = [
 
 export const CONSOLE_GAMEPAD_ORDER = {
 	switch: ABXY_ORDER,
+	switch2: ABXY_ORDER,
 	ps3: DUALSHOCK_ORDER,
 	ps4: DUALSHOCK_ORDER,
 	ps5: DUALSHOCK_ORDER,
 	xbox: ABXY_ORDER,
 	xbox360: ABXY_ORDER,
+	ports: ABXY_ORDER,
 	wiiu: ABXY_ORDER,
 };

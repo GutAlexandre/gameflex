@@ -56,7 +56,7 @@ export function useMenuButtonStyle(padVisible) {
     }, []);
 
     if (!landscape) {
-        // En portrait, remonté avec la manette (PORTRAIT_LIFT).
+        // En portrait, remonté (PORTRAIT_LIFT) ; la manette passe au-dessus.
         return {
             ...MENU_BUTTON_STYLE,
             bottom: `max(${12 + PORTRAIT_LIFT}px, calc(env(safe-area-inset-bottom) + ${PORTRAIT_LIFT}px))`,

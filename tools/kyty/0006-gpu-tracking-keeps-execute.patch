@@ -1,8 +1,8 @@
 diff --git a/src/graphics/host_gpu/pageManager.cpp b/src/graphics/host_gpu/pageManager.cpp
-index 6df3941..817bfde 100644
+index 5b1e3a78..b0d62176 100644
 --- a/src/graphics/host_gpu/pageManager.cpp
 +++ b/src/graphics/host_gpu/pageManager.cpp
-@@ -304,6 +304,17 @@ bool PageManager::IsReadWatched(uint64_t vaddr) const {
+@@ -286,6 +286,17 @@ bool PageManager::IsReadWatched(uint64_t vaddr) const {
  	return region->pages[page].access_watchers != 0;
  }
  
@@ -21,20 +21,20 @@ index 6df3941..817bfde 100644
  void PageManager::UpdatePageWatchers(uint64_t vaddr, uint64_t size) {
  	m_impl->UpdatePageWatchers<track, false>(vaddr, size);
 diff --git a/src/graphics/host_gpu/pageManager.h b/src/graphics/host_gpu/pageManager.h
-index 581b9a7..b791dcd 100644
+index 5cf10e4c..23a63083 100644
 --- a/src/graphics/host_gpu/pageManager.h
 +++ b/src/graphics/host_gpu/pageManager.h
-@@ -22,6 +22,8 @@ public:
+@@ -21,6 +21,8 @@ public:
  	// Whether reads of this page fault (a read watcher made it inaccessible). Elsewhere a
  	// watched page stays readable: only a write can fault on it.
  	[[nodiscard]] bool IsReadWatched(uint64_t vaddr) const;
-+	// For diagnostics: (read watchers << 8) | write watchers of this page.
++	// For diagnostics: (read watchers << 16) | write watchers of this page.
 +	[[nodiscard]] uint32_t WatcherCounts(uint64_t vaddr) const;
  
  	template <bool track>
  	void UpdatePageWatchers(uint64_t vaddr, uint64_t size);
 diff --git a/src/graphics/host_gpu/renderer/renderContext.cpp b/src/graphics/host_gpu/renderer/renderContext.cpp
-index e402c18..2bd93e0 100644
+index ebede3b2..1c7f8a11 100644
 --- a/src/graphics/host_gpu/renderer/renderContext.cpp
 +++ b/src/graphics/host_gpu/renderer/renderContext.cpp
 @@ -81,8 +81,16 @@ bool RenderContext::HandleFault(PageFaultAccess access, uint64_t fault_vaddr) no
@@ -57,13 +57,13 @@ index e402c18..2bd93e0 100644
  	if (access == PageFaultAccess::Write) {
  		m_buffer_cache.InvalidateMemory(fault_vaddr, fault_size);
 diff --git a/src/kernel/memoryAddressSpace.inc b/src/kernel/memoryAddressSpace.inc
-index 025d78c..1afdcca 100644
+index 7c63837f..b335f991 100644
 --- a/src/kernel/memoryAddressSpace.inc
 +++ b/src/kernel/memoryAddressSpace.inc
-@@ -830,6 +830,15 @@ public:
- 		if (size == 0 || UINT64_MAX - vaddr < size) {
- 			return false;
- 		}
+@@ -794,6 +794,14 @@ public:
+ 
+ 	// Tracker protections only read m_mapped; the page tracker orders them per page.
+ 	bool ProtectTransient(uint64_t vaddr, uint64_t size, VirtualMemory::Mode mode) {
 +		// Watching a page for the GPU never takes execution away: guest code can share a page
 +		// with GPU data, and a host that checks it (Box64 before translating x86 code) stopped
 +		// on code that ran a moment before. Only an inaccessible page stays so.
@@ -72,7 +72,6 @@ index 025d78c..1afdcca 100644
 +		} else if (mode == VirtualMemory::Mode::ReadWrite) {
 +			mode = VirtualMemory::Mode::ExecuteReadWrite;
 +		}
-+
  		std::shared_lock lock(m_mutex);
  		return ProtectMappedUnlocked(vaddr, size, mode);
  	}

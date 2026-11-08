@@ -765,12 +765,13 @@
             "reportFailed": "Could not save the report."
         },
         "page": {
+            "brand": "GameFlex",
             "stats": {
-                "emulator": "Emulator",
-                "host": "Machine",
+                "emulator": "Version",
+                "host": "Hardware",
                 "uptime": "Running for",
-                "resolution": "Resolution",
-                "fps": "FPS",
+                "resolution": "Gateway resolution",
+                "fps": "Gateway FPS",
                 "bitrate": "Bitrate",
                 "downloadRate": "Download rate",
                 "uploadRate": "Upload rate",
@@ -778,7 +779,9 @@
                 "cpuEmulator": "Emulator CPU",
                 "ram": "Emulator RAM",
                 "containerRam": "Container RAM",
-                "emulationFps": "Emulation FPS",
+                "emulationFps": "Emulator FPS",
+                "gameResolution": "Game resolution",
+                "emulatorResolution": "Emulator resolution",
                 "gpuBusyPercent": "GPU load",
                 "vramUsedBytes": "VRAM used",
                 "diskRead": "Disk read",
@@ -786,7 +789,14 @@
                 "battery": "Battery",
                 "phoneTemperature": "Phone temperature",
                 "phoneBattery": "Phone battery",
-                "slot": "Controller"
+                "slot": "Controller",
+                "sections": {
+                    "phone": "Phone",
+                    "session": "Session",
+                    "gateway": "Gateway",
+                    "emulator": "Emulator",
+                    "host": "Machine"
+                }
             }
         },
         "controller": {

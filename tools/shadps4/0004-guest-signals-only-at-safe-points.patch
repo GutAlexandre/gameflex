@@ -1,5 +1,5 @@
 diff --git a/src/core/libraries/kernel/equeue.cpp b/src/core/libraries/kernel/equeue.cpp
-index 1fc7a54..2a9b9ed 100644
+index 1fc7a54f..2a9b9ed2 100644
 --- a/src/core/libraries/kernel/equeue.cpp
 +++ b/src/core/libraries/kernel/equeue.cpp
 @@ -206,6 +206,7 @@ int EqueueInternal::WaitForEvents(OrbisKernelEvent* ev, int num, const OrbisKern
@@ -11,7 +11,7 @@ index 1fc7a54..2a9b9ed 100644
          // Wait indefinitely for events
          if (HasPendingIoEvents()) {
 diff --git a/src/core/libraries/kernel/threads/event_flag.cpp b/src/core/libraries/kernel/threads/event_flag.cpp
-index 2ac4b20..672b538 100644
+index 2ac4b201..672b5385 100644
 --- a/src/core/libraries/kernel/threads/event_flag.cpp
 +++ b/src/core/libraries/kernel/threads/event_flag.cpp
 @@ -143,8 +143,10 @@ public:
@@ -26,7 +26,7 @@ index 2ac4b20..672b538 100644
  
                  RemoveWaiter(waiter);
 diff --git a/src/core/libraries/kernel/threads/exception.cpp b/src/core/libraries/kernel/threads/exception.cpp
-index 73d588f..0149e36 100644
+index 73d588fe..0149e360 100644
 --- a/src/core/libraries/kernel/threads/exception.cpp
 +++ b/src/core/libraries/kernel/threads/exception.cpp
 @@ -18,6 +18,18 @@
@@ -208,7 +208,7 @@ index 73d588f..0149e36 100644
      return ORBIS_OK;
  }
 diff --git a/src/core/libraries/kernel/threads/exception.h b/src/core/libraries/kernel/threads/exception.h
-index b7e9bef..e1fcf36 100644
+index b7e9bef1..e1fcf363 100644
 --- a/src/core/libraries/kernel/threads/exception.h
 +++ b/src/core/libraries/kernel/threads/exception.h
 @@ -164,4 +164,10 @@ bool PS4_SYSV_ABI posix_sigisemptyset(Sigset* s);
@@ -223,7 +223,7 @@ index b7e9bef..e1fcf36 100644
 +
  } // namespace Libraries::Kernel
 diff --git a/src/core/libraries/kernel/threads/pthread.cpp b/src/core/libraries/kernel/threads/pthread.cpp
-index 8ed90d2..c9f504f 100644
+index 8ed90d25..c9f504f2 100644
 --- a/src/core/libraries/kernel/threads/pthread.cpp
 +++ b/src/core/libraries/kernel/threads/pthread.cpp
 @@ -965,7 +965,16 @@ void Pthread::WakeForSignal() {
@@ -244,7 +244,7 @@ index 8ed90d2..c9f504f 100644
  }
  
 diff --git a/src/core/libraries/kernel/threads/pthread.h b/src/core/libraries/kernel/threads/pthread.h
-index 6f400c3..3100fa7 100644
+index 6f400c33..3100fa79 100644
 --- a/src/core/libraries/kernel/threads/pthread.h
 +++ b/src/core/libraries/kernel/threads/pthread.h
 @@ -28,6 +28,11 @@ class SymbolsResolver;
@@ -314,7 +314,7 @@ index 6f400c3..3100fa7 100644
  void PthreadCancelInterrupt() noexcept;
  #ifndef _WIN32
 diff --git a/src/core/libraries/kernel/threads/semaphore.cpp b/src/core/libraries/kernel/threads/semaphore.cpp
-index d5d18b8..aa21ef4 100644
+index d5d18b82..aa21ef4a 100644
 --- a/src/core/libraries/kernel/threads/semaphore.cpp
 +++ b/src/core/libraries/kernel/threads/semaphore.cpp
 @@ -265,12 +265,19 @@ public:
@@ -340,7 +340,7 @@ index d5d18b8..aa21ef4 100644
                  const auto time =
                      std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 diff --git a/src/core/signals.cpp b/src/core/signals.cpp
-index d79829e..b265d8f 100644
+index d79829e6..b265d8ff 100644
 --- a/src/core/signals.cpp
 +++ b/src/core/signals.cpp
 @@ -314,7 +314,10 @@ void SignalHandler(int sig, siginfo_t* info, void* raw_context) {

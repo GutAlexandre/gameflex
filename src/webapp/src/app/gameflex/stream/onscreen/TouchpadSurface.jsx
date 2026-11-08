@@ -21,6 +21,10 @@ import { getHapticFeedback } from "../../libs/gamepadPreferences.js";
 //
 // Pas de `data-btn-name` : la couche de balayage de ControllerLayout ne doit
 // pas prendre la surface pour un bouton qu'un doigt traverse.
+//
+// `alone` — le pavé seul, à côté d'une vraie manette (ControllerLayout) : son
+// agrandissement et sa place, à la place de ceux de la disposition, et la
+// surface en transparence.
 
 const DEFAULT_VIBRATION_DURATION = 15; // milliseconds
 const FINGERS = [0, 1];
@@ -32,7 +36,7 @@ const TAP_MAX_TRAVEL = 0.05;
 // enfoncé ce temps-là.
 const CLICK_HOLD_MS = 80;
 
-export default function TouchpadSurface({ button, callback, isLandscape = false }) {
+export default function TouchpadSurface({ button, callback, isLandscape = false, alone = null }) {
 	// Les callbacks sont reconstruits à chaque rendu du pad ; les gestes, eux,
 	// durent plus longtemps qu'un rendu. On lit toujours les plus récents.
 	const callbackRef = useRef(callback);
@@ -148,20 +152,23 @@ export default function TouchpadSurface({ button, callback, isLandscape = false 
 		clicksRef.current.set(timer, finish);
 	};
 
-	const size = isLandscape ? button.xl.size : button.size;
+	const size = (isLandscape ? button.xl.size : button.size) * (alone?.scale ?? 1);
 
 	return (
 		<div
 			title={button.text || button.name}
 			style={{
 				position: "absolute",
-				left: `${(isLandscape ? button.xl.x : button.x) * 100}%`,
-				top: `${(isLandscape ? button.xl.y : button.y) * 100}%`,
+				...(alone?.place(size) ?? {
+					left: `${(isLandscape ? button.xl.x : button.x) * 100}%`,
+					top: `${(isLandscape ? button.xl.y : button.y) * 100}%`,
+					transform: "translate(-50%, -50%)",
+				}),
+				opacity: alone ? 0.5 : 1,
 				// Plus large que haut, comme le vrai pavé : le doigt y a de la
 				// place pour glisser de gauche à droite.
 				width: size * 2,
 				height: size,
-				transform: "translate(-50%, -50%)",
 				borderRadius: 12,
 				border: "1px solid rgba(255, 255, 255, 0.5)",
 				boxShadow: "1px 1px 5px rgba(0, 0, 0, 0.5)",

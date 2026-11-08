@@ -96,7 +96,8 @@ COMPOSE_PROFILES=ps3,switch
 docker compose pull
 ```
 
-The names are `ps3`, `ps4`, `ps5`, `switch`, `wiiu`, `xbox` and `xbox360`. The images hold no
+The names are `ps3`, `ps4`, `ps5`, `switch`, `wiiu`, `xbox`, `xbox360`, and `ports` for the
+PC Ports ([Consoles](consoles.md#pc-ports)). The images hold no
 emulator: once signed in, download each console's emulator from **Settings › Emulators** (see
 [Organize your library](library.md#3-get-the-emulators)). Retro consoles need no extra image; their cores also come from **Settings › Emulators**.
 
@@ -148,7 +149,7 @@ All settings live in `.env`.
 | `GAMEFLEX_GPU` | no | the first one | The graphics card games run on, when the machine has several (a chip in the processor and a card added over OCuLink, for example): its PCI address, such as `0000:03:00.0`. `ls /dev/dri/by-path` lists them, and the kernel log says at start-up which one games use. |
 | `GAMEFLEX_MIRROR_URL` | no | | A mirror for emulators and BIOS files. When set, the settings screens show a link to it. It must be a full `http://` or `https://` address, or GameFlex does not start. |
 | `GAMEFLEX_STAGING` | no | | `1` marks a test server: GameFlex writes *staging* next to its name, and **Settings › Download the GameFlex app** gives the APK this server builds (in `/downloads`) instead of the GitHub Release. Leave empty for a normal server. |
-| `COMPOSE_PROFILES` | no | none | The recent consoles whose images you want, separated by commas: `ps3`, `ps4`, `ps5`, `switch`, `wiiu`, `xbox`, `xbox360`. Add `wireguard` for the optional VPN (see [Play away from home](remote-access.md)). |
+| `COMPOSE_PROFILES` | no | none | The recent consoles whose images you want, separated by commas: `ps3`, `ps4`, `ps5`, `switch`, `wiiu`, `xbox`, `xbox360`, `ports`. Add `wireguard` for the optional VPN (see [Play away from home](remote-access.md)). |
 | `GAMEFLEX_NAME` | no | `gameflex` | The name of the containers (`gameflex-kernel`…). Change it only to run a second GameFlex on the same computer, which then also needs other ports: `GAMEFLEX_PORT`, and the fixed ports in `docker-compose.yml`. |
 
 ### Volumes
@@ -249,6 +250,7 @@ services:
             - GAMEFLEX_WIIU_IMAGE=zinosaure/gameflex-wiiu:${GAMEFLEX_VERSION:-latest}
             - GAMEFLEX_XBOX_IMAGE=zinosaure/gameflex-xbox:${GAMEFLEX_VERSION:-latest}
             - GAMEFLEX_XBOX360_IMAGE=zinosaure/gameflex-xbox360:${GAMEFLEX_VERSION:-latest}
+            - GAMEFLEX_PORTS_ZELDA64RECOMP_IMAGE=zinosaure/gameflex-ports-zelda64recomp:${GAMEFLEX_VERSION:-latest}
         volumes:
             # GameFlex starts the games in their own containers.
             - /var/run/docker.sock:/var/run/docker.sock
@@ -310,7 +312,7 @@ services:
     gameflex-retrogaming:
         image: zinosaure/gameflex-retrogaming:${GAMEFLEX_VERSION:-latest}
         container_name: ${GAMEFLEX_NAME:-gameflex}-retrogaming
-        restart: "no"
+        restart: unless-stopped
 
     # Recent consoles: one image each, downloaded only when you ask for it,
     # for example `docker compose --profile ps3 pull`. These never run on their
@@ -354,6 +356,13 @@ services:
     gameflex-xbox360:
         image: zinosaure/gameflex-xbox360:${GAMEFLEX_VERSION:-latest}
         profiles: [ "xbox360" ]
+        entrypoint: [ "true" ]
+        restart: "no"
+    # PC Ports: games remade for the PC by their community, that read your
+    # Nintendo 64 ROM (in roms/n64). One image per port.
+    gameflex-ports-zelda64recomp:
+        image: zinosaure/gameflex-ports-zelda64recomp:${GAMEFLEX_VERSION:-latest}
+        profiles: [ "ports" ]
         entrypoint: [ "true" ]
         restart: "no"
 
@@ -471,9 +480,9 @@ GAMEFLEX_GPU=
 GAMEFLEX_STAGING=
 
 # The recent consoles whose images you want, separated by commas: ps3, ps4,
-# ps5, switch, wiiu, xbox, xbox360. Add wireguard for the optional VPN that lets
-# you play away from home (docs/remote-access.md). Docker Compose reads this
-# setting itself.
+# ps5, switch, wiiu, xbox, xbox360, and ports for the PC Ports. Add wireguard for
+# the optional VPN that lets you play away from home (docs/remote-access.md).
+# Docker Compose reads this setting itself.
 COMPOSE_PROFILES=
 
 # The name of this installation's containers (gameflex-kernel…). Change it only

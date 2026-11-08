@@ -1,7 +1,12 @@
 {
   "enabled": true,
   "name": "Nintendo Wii U",
-  "description": "The settings given to Cemu before every Wii U game starts.",
+  "description": "Settings of Cemu, the Wii U emulator, applied when a game starts.",
+  "translations": {
+    "fr": {
+      "description": "Les réglages de Cemu, l'émulateur de la Wii U, appliqués au démarrage d'un jeu."
+    }
+  },
   "system": "Cemu",
   "requirements": [
     "keys.txt"
@@ -12,14 +17,26 @@
       "label": "Asynchronous shaders",
       "description": "Shaders are built in the background instead of pausing the game. A few frames may miss an object while one is being built.",
       "config": "Graphic > AsyncCompile",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Shaders asynchrones",
+          "description": "Les shaders sont préparés en arrière-plan au lieu de mettre le jeu en pause. Quelques images peuvent manquer un objet pendant qu'un shader se prépare."
+        }
+      }
     },
     "accurateBarriers": {
       "type": "switch",
       "label": "Accurate barriers",
       "description": "Keeps the order of the graphics work exact. Off is faster, and a few games flicker.",
       "config": "Graphic > vkAccurateBarriers",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Barrières exactes",
+          "description": "Garde exact l'ordre du travail graphique. Désactivé, c'est plus rapide, et quelques jeux clignotent."
+        }
+      }
     },
     "vsync": {
       "type": "select",
@@ -31,6 +48,17 @@
         "0": "Off",
         "1": "Double buffering",
         "2": "Triple buffering"
+      },
+      "translations": {
+        "fr": {
+          "label": "Synchronisation verticale",
+          "description": "Désactivée, chaque image s'affiche dès qu'elle est prête : moins de latence, possible déchirement de l'image.",
+          "options": {
+            "0": "Désactivée",
+            "1": "Double tampon",
+            "2": "Triple tampon"
+          }
+        }
       }
     },
     "upscaleFilter": {
@@ -44,6 +72,18 @@
         "1": "Bicubic",
         "2": "Bicubic Hermite",
         "3": "Nearest neighbour"
+      },
+      "translations": {
+        "fr": {
+          "label": "Filtre d'agrandissement",
+          "description": "La façon dont une image plus petite que l'écran est agrandie.",
+          "options": {
+            "0": "Bilinéaire",
+            "1": "Bicubique",
+            "2": "Bicubique Hermite",
+            "3": "Plus proche voisin"
+          }
+        }
       }
     },
     "downscaleFilter": {
@@ -57,6 +97,18 @@
         "1": "Bicubic",
         "2": "Bicubic Hermite",
         "3": "Nearest neighbour"
+      },
+      "translations": {
+        "fr": {
+          "label": "Filtre de réduction",
+          "description": "La façon dont une image plus grande que l'écran est réduite.",
+          "options": {
+            "0": "Bilinéaire",
+            "1": "Bicubique",
+            "2": "Bicubique Hermite",
+            "3": "Plus proche voisin"
+          }
+        }
       }
     },
     "fullscreenScaling": {
@@ -68,6 +120,16 @@
       "options": {
         "0": "Keep the aspect ratio",
         "1": "Stretch"
+      },
+      "translations": {
+        "fr": {
+          "label": "Ajustement de l'image",
+          "description": "Garder les proportions du jeu, ou l'étirer à tout l'écran.",
+          "options": {
+            "0": "Garder les proportions",
+            "1": "Étirer"
+          }
+        }
       }
     },
     "audioDelay": {
@@ -81,12 +143,18 @@
         "2": "2",
         "3": "3",
         "4": "4"
+      },
+      "translations": {
+        "fr": {
+          "label": "Tampon audio",
+          "description": "Plus de tampons, moins de craquements quand le jeu ralentit — et un peu plus de retard."
+        }
       }
     },
     "volume": {
       "type": "select",
       "label": "Volume",
-      "description": "Cemu's own volume for the TV picture, before the stream's.",
+      "description": "The emulator's own volume for the TV picture, before the stream's.",
       "config": "Audio > TVVolume",
       "value": "100",
       "options": {
@@ -94,6 +162,12 @@
         "75": "75 %",
         "50": "50 %",
         "25": "25 %"
+      },
+      "translations": {
+        "fr": {
+          "label": "Volume",
+          "description": "Le volume de l'émulateur lui-même pour l'image de la télé, avant celui du flux."
+        }
       }
     }
   }

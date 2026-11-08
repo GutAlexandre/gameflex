@@ -1,10 +1,17 @@
 {
   "name": "Default",
-  "description": "The values shipped with GameFlex: what the phone app imposed on RPCS3 before this file, and RPCS3's own for the rest.",
+  "description": "The values GameFlex recommends, starting from RPCS3's own.",
+  "translations": {
+    "fr": {
+      "name": "Par défaut",
+      "description": "Les valeurs que recommande GameFlex, à partir de celles de RPCS3."
+    }
+  },
   "override": false,
   "system": "RPCS3",
   "values": {
     "resolutionScale": "auto",
+    "consoleResolution": "1280x720",
     "frameLimit": "Auto",
     "msaa": "Auto",
     "shaderMode": "Async Recompiler with Shader Interpreter",

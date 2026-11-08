@@ -1,7 +1,12 @@
 {
   "enabled": true,
   "name": "Nintendo Switch",
-  "description": "The settings given to Citron before every Switch game starts.",
+  "description": "Settings of Citron, a Nintendo Switch emulator, applied when a game starts.",
+  "translations": {
+    "fr": {
+      "description": "Les réglages de Citron, un émulateur de la Nintendo Switch, appliqués au démarrage d'un jeu."
+    }
+  },
   "system": "Citron",
   "requirements": [
     "prod.keys"
@@ -20,17 +25,39 @@
         "3": "1× — the console's resolution",
         "4": "1.5×",
         "5": "2×"
+      },
+      "translations": {
+        "fr": {
+          "label": "Résolution de rendu",
+          "description": "La taille à laquelle Citron dessine, en multiple de l'image de la console (1080p sur le socle, 720p en portable). « Suivre le flux » dessine à la résolution choisie pour la partie : 540p donne 0,5×, 720p donne 0,75×.",
+          "options": {
+            "auto": "Suivre le flux",
+            "1": "0,5× — 540p sur le socle",
+            "2": "0,75× — 810p sur le socle",
+            "3": "1× — la résolution de la console"
+          }
+        }
       }
     },
     "consoleMode": {
       "type": "select",
       "label": "Console mode",
-      "description": "Handheld draws at 720p instead of 1080p, and some games lower their detail too: lighter for a phone.",
+      "description": "Handheld draws at 720p instead of 1080p, and some games also lower their detail: lighter for a phone or a small processor.",
       "config": "System > use_docked_mode",
       "value": "1",
       "options": {
         "1": "Docked — 1080p",
         "0": "Handheld — 720p"
+      },
+      "translations": {
+        "fr": {
+          "label": "Mode de la console",
+          "description": "Le mode portable dessine en 720p au lieu de 1080p, et certains jeux baissent aussi leurs détails : plus léger pour un téléphone ou un petit processeur.",
+          "options": {
+            "1": "Sur le socle — 1080p",
+            "0": "Portable — 720p"
+          }
+        }
       }
     },
     "asyncShaders": {
@@ -38,7 +65,13 @@
       "label": "Asynchronous shaders",
       "description": "Shaders are built in the background instead of pausing the game. A few frames may miss an effect while one is being built.",
       "config": "Renderer > use_asynchronous_shaders",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Shaders asynchrones",
+          "description": "Les shaders sont préparés en arrière-plan au lieu de mettre le jeu en pause. Quelques images peuvent manquer un effet pendant qu'un shader se prépare."
+        }
+      }
     },
     "gpuAccuracy": {
       "type": "select",
@@ -51,6 +84,18 @@
         "1": "Normal",
         "2": "High",
         "3": "Extreme"
+      },
+      "translations": {
+        "fr": {
+          "label": "Précision du GPU",
+          "description": "Basse est la plus rapide et peut montrer des défauts ; Haute corrige certains jeux et coûte davantage.",
+          "options": {
+            "0": "Basse",
+            "1": "Normale",
+            "2": "Haute",
+            "3": "Extrême"
+          }
+        }
       }
     },
     "cpuAccuracy": {
@@ -64,6 +109,18 @@
         "1": "Accurate",
         "2": "Unsafe",
         "3": "Paranoid"
+      },
+      "translations": {
+        "fr": {
+          "label": "Précision du processeur",
+          "description": "Non sûre saute certaines vérifications pour aller plus vite ; Précise et Paranoïaque corrigent de rares jeux et coûtent davantage.",
+          "options": {
+            "0": "Auto",
+            "1": "Précise",
+            "2": "Non sûre",
+            "3": "Paranoïaque"
+          }
+        }
       }
     },
     "vsync": {
@@ -77,6 +134,18 @@
         "1": "Mailbox",
         "2": "On",
         "3": "Relaxed"
+      },
+      "translations": {
+        "fr": {
+          "label": "Synchronisation verticale",
+          "description": "Désactivée, chaque image s'affiche dès qu'elle est prête : moins de latence, possible déchirement de l'image.",
+          "options": {
+            "0": "Désactivée",
+            "1": "Mailbox",
+            "2": "Activée",
+            "3": "Souple"
+          }
+        }
       }
     },
     "multiCore": {
@@ -84,7 +153,13 @@
       "label": "Multi-core CPU emulation",
       "description": "The Switch's cores run on separate threads. Off is only useful to work around a game that misbehaves with it.",
       "config": "Core > use_multi_core",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Émulation multicœur du processeur",
+          "description": "Les cœurs de la Switch tournent sur des fils séparés. Ne la désactivez que pour un jeu qui se comporte mal avec."
+        }
+      }
     },
     "antiAliasing": {
       "type": "select",
@@ -96,6 +171,15 @@
         "0": "None",
         "1": "FXAA",
         "2": "SMAA"
+      },
+      "translations": {
+        "fr": {
+          "label": "Anticrénelage",
+          "description": "Adoucit les contours crénelés une fois l'image dessinée ; Aucun ne coûte rien.",
+          "options": {
+            "0": "Aucun"
+          }
+        }
       }
     },
     "scalingFilter": {
@@ -109,6 +193,18 @@
         "1": "Bilinear",
         "2": "Bicubic",
         "7": "AMD FSR"
+      },
+      "translations": {
+        "fr": {
+          "label": "Filtre de mise à l'échelle",
+          "description": "La façon dont l'image est redimensionnée à l'écran. FSR affine une image agrandie et coûte un peu.",
+          "options": {
+            "0": "Plus proche voisin",
+            "1": "Bilinéaire",
+            "2": "Bicubique",
+            "7": "AMD FSR"
+          }
+        }
       }
     },
     "videoDecoding": {
@@ -121,6 +217,17 @@
         "0": "Off",
         "1": "Processor",
         "2": "Graphics processor"
+      },
+      "translations": {
+        "fr": {
+          "label": "Décodage des vidéos",
+          "description": "La façon dont les vidéos du jeu sont décodées. Désactivé les saute, ce qui aide un jeu qui se fige sur une vidéo.",
+          "options": {
+            "0": "Désactivé",
+            "1": "Processeur",
+            "2": "Processeur graphique"
+          }
+        }
       }
     },
     "reactiveFlushing": {
@@ -128,12 +235,18 @@
       "label": "Reactive flushing",
       "description": "Keeps what some games read back from the picture correct. Off is faster, and a few games show wrong shadows or lighting.",
       "config": "Renderer > use_reactive_flushing",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Vidage réactif",
+          "description": "Garde justes les données que certains jeux relisent dans l'image. Désactivé, c'est plus rapide, et quelques jeux montrent des ombres ou un éclairage faux."
+        }
+      }
     },
     "volume": {
       "type": "select",
       "label": "Volume",
-      "description": "Citron's own volume, before the stream's.",
+      "description": "The emulator's own volume, before the stream's.",
       "config": "Audio > volume",
       "value": "100",
       "options": {
@@ -141,12 +254,18 @@
         "75": "75 %",
         "50": "50 %",
         "25": "25 %"
+      },
+      "translations": {
+        "fr": {
+          "label": "Volume",
+          "description": "Le volume de l'émulateur lui-même, avant celui du flux."
+        }
       }
     },
     "turnipDebug": {
       "type": "select",
       "label": "Adreno driver workaround (Turnip)",
-      "description": "A debug option of Turnip, the graphics driver of Adreno phones: it changes how the driver renders, to work around its bugs. It has no effect on another graphics processor.",
+      "description": "Debug options of Turnip, the graphics driver of Adreno devices, which change how the driver renders to work around its bugs. They have no effect on other graphics processors.",
       "config": "Environment > TU_DEBUG",
       "value": "auto",
       "options": {
@@ -156,17 +275,41 @@
         "sysmem": "sysmem — never render in tiles",
         "nolrz": "nolrz — no early depth test",
         "syncdraw": "syncdraw — one draw at a time (slow)"
+      },
+      "translations": {
+        "fr": {
+          "label": "Contournement du pilote Adreno (Turnip)",
+          "description": "Des options de débogage de Turnip, le pilote graphique des appareils Adreno, qui changent sa façon de dessiner pour contourner ses défauts. Elles n'ont aucun effet sur les autres processeurs graphiques.",
+          "options": {
+            "auto": "Aucun",
+            "flushall": "flushall — vider les caches du GPU après chaque dessin (plus lent)",
+            "gmem": "gmem — toujours rendre en tuiles",
+            "sysmem": "sysmem — jamais de rendu en tuiles",
+            "nolrz": "nolrz — pas de test de profondeur anticipé",
+            "syncdraw": "syncdraw — un dessin à la fois (lent)"
+          }
+        }
       }
     },
     "ir3Debug": {
       "type": "select",
       "label": "Adreno shader compiler (Turnip)",
-      "description": "A debug option of ir3, the compiler of Turnip's shaders. “nopreamble” works around a known geometry bug of RPCS3 on Turnip (Mesa #14386). It has no effect on another graphics processor.",
+      "description": "A debug option of ir3, the shader compiler of Turnip. “nopreamble” works around a known geometry bug of some emulators on Turnip. It has no effect on other graphics processors.",
       "config": "Environment > IR3_SHADER_DEBUG",
       "value": "auto",
       "options": {
         "auto": "None",
         "nopreamble": "nopreamble — no shader preamble"
+      },
+      "translations": {
+        "fr": {
+          "label": "Compilateur de shaders Adreno (Turnip)",
+          "description": "Une option de débogage d'ir3, le compilateur de shaders de Turnip. « nopreamble » contourne un défaut de géométrie connu de certains émulateurs sur Turnip. Elle n'a aucun effet sur les autres processeurs graphiques.",
+          "options": {
+            "auto": "Aucun",
+            "nopreamble": "nopreamble — sans préambule de shader"
+          }
+        }
       }
     }
   }

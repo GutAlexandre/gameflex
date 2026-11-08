@@ -1,12 +1,28 @@
 {
   "name": "Default",
-  "description": "Kyty's occlusion queries and shader cache on, and Box64's own values — the translator on, its usual shortcuts, the session's sound — except two: the flags kept safest — with Box64's own value the game dies a few seconds after the start on the phone (bisected on the S25, 2026-10-14), and the safest flags cost nothing measurable — and the call/return shortcut off, which costs a third more processor for the same frame rate (2026-10-28).",
+  "description": "Kyty's occlusion queries, shader cache and unified memory on, and Box64's own values except two: the safest flags, which games need to start, and the call/return shortcut off.",
+  "translations": {
+    "fr": {
+      "name": "Par défaut",
+      "description": "Les requêtes d'occlusion, le cache des shaders et la mémoire unifiée de Kyty activés, et les valeurs de Box64 sauf deux : les drapeaux les plus sûrs, dont les jeux ont besoin pour démarrer, et l'optimisation des appels et retours désactivée."
+    }
+  },
   "override": false,
   "system": "KytyPS5",
   "values": {
     "sound": "auto",
     "occlusionQueries": true,
     "shaderCache": true,
+    "compileAside": true,
+    "shaderToast": true,
+    "unifiedMemory": true,
+    "outputResolution": "1080",
+    "frameRateCap": "auto",
+    "renderHeight": "540",
+    "renderBase": "0",
+    "renderVariable": "r.ScreenPercentage",
+    "engineSettings": "none",
+    "gamePatch": "none",
     "dynarec": true,
     "strongMemory": "0",
     "safeFlags": "2",

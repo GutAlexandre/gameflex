@@ -207,6 +207,7 @@ func serveSelfStatus(w http.ResponseWriter, r *http.Request) {
 	status["fps"] = activeChildFPS()
 	status["gpu"] = readGPUStatus()
 	status["emulator"] = activeChildCore()
+	status["resolution"] = activeChildFrameSize()
 
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(status)
@@ -240,6 +241,22 @@ func activeChildCore() string {
 	}
 	if eng := sess.currentEngine(); eng != nil {
 		return eng.CoreName()
+	}
+
+	return ""
+}
+
+// activeChildFrameSize — la taille de la dernière image du cœur (Engine.FrameSize),
+// pour la ligne « Résolution du jeu » du panneau ; vide avant la première.
+func activeChildFrameSize() string {
+	activeChildSessionMu.Lock()
+	sess := activeChildSession
+	activeChildSessionMu.Unlock()
+	if sess == nil {
+		return ""
+	}
+	if eng := sess.currentEngine(); eng != nil {
+		return eng.FrameSize()
 	}
 
 	return ""

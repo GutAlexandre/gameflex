@@ -127,6 +127,7 @@ html, body {
    restent en place quand on fait défiler la page. Sous la manette, du noir. */
 html[data-half-screen] {
     --gameflex-visible-height: calc(100dvh - var(--gameflex-covered-height));
+    --gameflex-touchpad-left: 68%;
     overflow: hidden;
     background: #000;
 }

@@ -1,32 +1,99 @@
 {
   "enabled": true,
   "name": "PlayStation 4",
-  "description": "shadPS4's own options, then the settings given to Box64 before every PS4 game starts on the phone — shadPS4 is x86-64 code that Box64 translates. The server runs it natively and ignores the Box64 ones.",
+  "description": "Settings of shadPS4, the PlayStation 4 emulator, followed by those of Box64, the translator that runs it on phones and other ARM devices. A server runs shadPS4 directly and ignores the Box64 settings.",
+  "translations": {
+    "fr": {
+      "description": "Les réglages de shadPS4, l'émulateur de la PlayStation 4, puis ceux de Box64, le traducteur qui le fait tourner sur les téléphones et les autres appareils ARM. Un serveur lance shadPS4 directement et ignore les réglages de Box64."
+    }
+  },
   "system": "shadPS4",
   "requirements": [],
   "params": {
     "sound": {
       "type": "select",
       "label": "Sound",
-      "description": "The session's sound through the phone, or nothing: the emulator still decodes audio, but SDL plays none of it — a little lighter.",
+      "description": "Plays the game's sound, or nothing. When off, the emulator still decodes the audio but plays none of it, which is slightly lighter.",
       "config": "Environment > SDL_AUDIO_DRIVER",
       "value": "auto",
       "options": {
-        "auto": "The session's sound",
-        "dummy": "Off — nothing is played"
+        "auto": "On",
+        "dummy": "Off"
+      },
+      "translations": {
+        "fr": {
+          "label": "Son",
+          "description": "Joue le son du jeu, ou rien. Coupé, l'émulateur décode toujours le son mais n'en joue rien, ce qui est un peu plus léger.",
+          "options": {
+            "auto": "Activé",
+            "dummy": "Coupé"
+          }
+        }
       }
     },
     "pipelineCache": {
       "type": "switch",
       "label": "Pipeline cache",
-      "description": "shadPS4 keeps the GPU pipelines it compiles, and reuses them at the next start instead of compiling them again: a shorter start, fewer stutters the first time a scene appears. The first game still compiles everything once.",
+      "description": "Keeps the graphics pipelines each game compiles and reuses them at the next start instead of compiling them again: a shorter start, and fewer stutters the first time a scene appears. A game still compiles everything the first time it runs.",
       "config": "Vulkan > pipeline_cache_enabled",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Cache des pipelines",
+          "description": "Garde les pipelines graphiques compilés par chaque jeu et les réutilise au démarrage suivant au lieu de les compiler de nouveau : un démarrage plus court, et moins de saccades la première fois qu'une scène apparaît. Un jeu compile tout de même l'ensemble la première fois."
+        }
+      }
+    },
+    "renderHeight": {
+      "type": "select",
+      "label": "Render height (Unreal Engine)",
+      "description": "The height at which an Unreal Engine game draws its 3D scene, written to its saved configuration. The engine then scales the image up to its output, keeping menus and text sharp. Lower is faster and softer. Games made with other engines are not affected. Applied when the game starts.",
+      "config": "Environment > GAMEFLEX_UE_RENDER_HEIGHT",
+      "value": "0",
+      "options": {
+        "0": "Game default",
+        "720": "720p",
+        "540": "540p",
+        "360": "360p (fastest)"
+      },
+      "translations": {
+        "fr": {
+          "label": "Hauteur de rendu (Unreal Engine)",
+          "description": "La hauteur à laquelle un jeu Unreal Engine dessine sa scène 3D, écrite dans sa configuration enregistrée. Le moteur agrandit ensuite l'image jusqu'à sa sortie, en gardant les menus et le texte nets. Plus bas, c'est plus rapide et moins net. Les jeux faits avec d'autres moteurs ne sont pas concernés. Appliqué au démarrage du jeu.",
+          "options": {
+            "0": "Celle du jeu",
+            "360": "360p (le plus rapide)"
+          }
+        }
+      }
+    },
+    "readbacksMode": {
+      "type": "select",
+      "label": "GPU readbacks",
+      "description": "Whether the processor can read what the graphics processor has computed. Off is the fastest and suits most games; a game that needs it shows a black or broken picture without it, and its patch can turn it on. Precise is the slowest.",
+      "config": "GPU > readbacks_mode",
+      "value": "0",
+      "options": {
+        "0": "Off",
+        "1": "Relaxed",
+        "2": "Precise"
+      },
+      "translations": {
+        "fr": {
+          "label": "Relectures du GPU",
+          "description": "Si le processeur peut relire ce que le processeur graphique a calculé. Désactivé est le plus rapide et convient à la plupart des jeux ; un jeu qui en a besoin affiche sans elles une image noire ou abîmée, et son correctif peut les activer. Précis est le plus lent.",
+          "options": {
+            "0": "Désactivées",
+            "1": "Souples",
+            "2": "Précises"
+          }
+        }
+      }
     },
     "turnipDebug": {
       "type": "select",
       "label": "Adreno driver workaround (Turnip)",
-      "description": "A debug option of Turnip, the graphics driver of Adreno phones: it changes how the driver renders, to work around its bugs. For a game whose log ends with “Device lost” — Final Fantasy VII Remake on the S25 (2026-10-26). It has no effect on another graphics processor.",
+      "description": "Debug options of Turnip, the graphics driver of Adreno devices, which change how the driver renders to work around its bugs. Try one when a game's log ends with “Device lost”. They have no effect on other graphics processors.",
       "config": "Environment > TU_DEBUG",
       "value": "auto",
       "options": {
@@ -39,37 +106,76 @@
         "sysmem,nolrz,noubwc": "sysmem, nolrz and noubwc together",
         "flushall": "flushall — empty the GPU caches after every draw (slower)",
         "syncdraw": "syncdraw — one draw at a time (slow)"
+      },
+      "translations": {
+        "fr": {
+          "label": "Contournement du pilote Adreno (Turnip)",
+          "description": "Des options de débogage de Turnip, le pilote graphique des appareils Adreno, qui changent sa façon de dessiner pour contourner ses défauts. Essayez-en une quand le journal d'un jeu se termine par « Device lost ». Elles n'ont aucun effet sur les autres processeurs graphiques.",
+          "options": {
+            "auto": "Aucun",
+            "sysmem": "sysmem — jamais de rendu en tuiles",
+            "nolrz": "nolrz — pas de test de profondeur anticipé",
+            "noubwc": "noubwc — pas de compression d'image",
+            "nocb": "nocb — pas de regroupement simultané",
+            "noconcurrentresolves,noconcurrentunresolves": "noconcurrentresolves — pas de résolutions simultanées",
+            "sysmem,nolrz,noubwc": "sysmem, nolrz et noubwc ensemble",
+            "flushall": "flushall — vider les caches du GPU après chaque dessin (plus lent)",
+            "syncdraw": "syncdraw — un dessin à la fois (lent)"
+          }
+        }
       }
     },
     "dynarec": {
       "type": "switch",
       "label": "Translator (DynaRec)",
-      "description": "Box64 translates the game's x86-64 code into ARM code. Off, it interprets it instead: many times slower, but exact — the way to tell a translation fault from the game's own.",
+      "description": "Box64 translates the game's x86-64 code into ARM code. When off, it interprets the code instead: many times slower, but exact. Useful to tell a translation fault from a fault in the game itself.",
       "config": "Environment > BOX64_DYNAREC",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Traducteur (DynaRec)",
+          "description": "Box64 traduit le code x86-64 du jeu en code ARM. Désactivé, il interprète le code à la place : bien plus lent, mais exact. Utile pour distinguer une erreur de traduction d'une erreur du jeu lui-même."
+        }
+      }
     },
     "cpuType": {
       "type": "select",
-      "label": "CPU shown to the game",
-      "description": "The processor Box64 tells shadPS4 and the game it runs on. The PS4's is an AMD one: told an Intel without SSE4a (Box64's own default), shadPS4 rewrites thousands of the game's instructions, and scans the whole game for them at every start — 108 s of the start of Final Fantasy VII Remake on the S25 (2026-10-26).",
+      "label": "Processor shown to the game",
+      "description": "The processor Box64 reports to the emulator and the game. The PlayStation 4 has an AMD processor: reporting one avoids the instruction rewriting the emulator otherwise performs on every game, which makes games start much faster.",
       "config": "Environment > BOX64_CPUTYPE",
       "value": "1",
       "options": {
-        "0": "Intel (Box64's own default)",
+        "0": "Intel (Box64 default)",
         "1": "AMD, like the console"
+      },
+      "translations": {
+        "fr": {
+          "label": "Processeur annoncé au jeu",
+          "description": "Le processeur que Box64 annonce à l'émulateur et au jeu. La PlayStation 4 a un processeur AMD : l'annoncer évite la réécriture d'instructions que l'émulateur ferait sinon sur chaque jeu, et les jeux démarrent bien plus vite.",
+          "options": {
+            "0": "Intel (valeur par défaut de Box64)",
+            "1": "AMD, comme la console"
+          }
+        }
       }
     },
     "trustShared": {
       "type": "switch",
       "label": "Game code in shared memory",
-      "description": "shadPS4 maps all the game's memory, its code included, from one shared file. Box64 cannot see a write made to that code through another view of the file, so on its own it checks every piece of the game's code it translated each time it runs it: 62 % of the processor time of Final Fantasy VII Remake on the S25 (2026-10-27). On, Box64 protects that code like ordinary memory and checks it only after a write. A PS4 game never writes its own code.",
+      "description": "The emulator loads the game, its code included, into shared memory. By default Box64 checks every piece of that code each time it runs it, because it cannot see changes made through another view of the memory. When on, it protects that code like ordinary memory and checks it only after a change, which is much faster. PlayStation 4 games do not modify their own code.",
       "config": "Environment > BOX64_DYNAREC_TRUSTSHARED",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Code du jeu en mémoire partagée",
+          "description": "L'émulateur charge le jeu, code compris, en mémoire partagée. Par défaut, Box64 vérifie chaque morceau de ce code à chaque exécution, car il ne voit pas les modifications faites par une autre vue de cette mémoire. Activé, il protège ce code comme de la mémoire ordinaire et ne le vérifie qu'après une modification, ce qui est bien plus rapide. Les jeux PlayStation 4 ne modifient pas leur propre code."
+        }
+      }
     },
     "strongMemory": {
       "type": "select",
       "label": "Memory ordering",
-      "description": "How faithfully the translator keeps the x86 memory ordering, which ARM relaxes. Stricter is slower; “Strong” is the usual fix for a multithreaded program that misbehaves.",
+      "description": "How strictly the translator keeps the x86 memory ordering, which ARM processors relax. Stricter is slower; “Strong” usually fixes a program whose threads misbehave.",
       "config": "Environment > BOX64_DYNAREC_STRONGMEM",
       "value": "0",
       "options": {
@@ -77,24 +183,47 @@
         "1": "Light",
         "2": "Strong",
         "3": "Strongest"
+      },
+      "translations": {
+        "fr": {
+          "label": "Ordre des accès mémoire",
+          "description": "Avec quelle rigueur le traducteur respecte l'ordre des accès mémoire du x86, que les processeurs ARM assouplissent. Plus strict, c'est plus lent ; « Fort » corrige en général un programme dont les fils se comportent mal.",
+          "options": {
+            "0": "Natif (le plus rapide)",
+            "1": "Léger",
+            "2": "Fort",
+            "3": "Le plus fort"
+          }
+        }
       }
     },
     "safeFlags": {
       "type": "select",
       "label": "Flags safety",
-      "description": "How carefully the translator preserves the x86 flags across calls and returns. Box64 ships with 1; the PS4 needs 2 on the phone — with 1, a “rep cmps” given a zero count loses the flags of the instruction before it, so the games' own memcmp compares wrong, and Final Fantasy VII Remake dies at its start (2026-10-26). The PS5 needs 2 too, and it costs nothing measurable there.",
+      "description": "How carefully the translator keeps the x86 processor flags across calls and returns. Safer is slightly slower. This emulator needs “Safest”: with less, some games compare memory wrongly and stop at their start.",
       "config": "Environment > BOX64_DYNAREC_SAFEFLAGS",
       "value": "2",
       "options": {
         "0": "Fastest",
-        "1": "Box64's own default",
-        "2": "Safest (what the PS4 needs)"
+        "1": "Box64 default",
+        "2": "Safest (recommended)"
+      },
+      "translations": {
+        "fr": {
+          "label": "Sûreté des drapeaux",
+          "description": "Avec quel soin le traducteur conserve les drapeaux du processeur x86 lors des appels et des retours. Plus sûr, c'est un peu plus lent. Cet émulateur a besoin de « Le plus sûr » : sinon, certains jeux comparent mal leur mémoire et s'arrêtent au démarrage.",
+          "options": {
+            "0": "Le plus rapide",
+            "1": "Valeur par défaut de Box64",
+            "2": "Le plus sûr (recommandé)"
+          }
+        }
       }
     },
     "bigBlock": {
       "type": "select",
       "label": "Block size",
-      "description": "How much code the translator handles in one block. Smaller blocks are slower but closer to the x86 instruction by instruction.",
+      "description": "How much code the translator handles in one block. Larger blocks are faster; smaller ones follow the x86 code more closely.",
       "config": "Environment > BOX64_DYNAREC_BIGBLOCK",
       "value": "2",
       "options": {
@@ -102,12 +231,24 @@
         "1": "Small",
         "2": "Default",
         "3": "Largest"
+      },
+      "translations": {
+        "fr": {
+          "label": "Taille des blocs",
+          "description": "La quantité de code que le traducteur traite en un bloc. Des blocs plus grands sont plus rapides ; des blocs plus petits suivent le code x86 de plus près.",
+          "options": {
+            "0": "La plus petite",
+            "1": "Petite",
+            "2": "Par défaut",
+            "3": "La plus grande"
+          }
+        }
       }
     },
     "callRet": {
       "type": "select",
       "label": "Call/return optimisation",
-      "description": "A shortcut for the x86 call and return instructions. Off is the safest, and on the phone the fastest to start: with Default, Kingdom Hearts III shows its first picture after 159 s, against 42 s with Off (Melody of Memory 123 s against 18 s, 2026-10-27), for the same frame rate afterwards.",
+      "description": "Changes how the translator handles x86 call and return instructions. Off is the safest, and games start noticeably faster with it off.",
       "config": "Environment > BOX64_DYNAREC_CALLRET",
       "value": "0",
       "options": {
@@ -115,59 +256,117 @@
         "1": "Basic",
         "2": "Default",
         "3": "Full"
+      },
+      "translations": {
+        "fr": {
+          "label": "Optimisation des appels et retours",
+          "description": "Change la façon dont le traducteur gère les instructions d'appel et de retour du x86. Désactivée est le plus sûr, et les jeux démarrent nettement plus vite ainsi.",
+          "options": {
+            "0": "Désactivée",
+            "1": "De base",
+            "2": "Par défaut",
+            "3": "Complète"
+          }
+        }
       }
     },
     "fastNaN": {
       "type": "switch",
       "label": "Fast NaN",
-      "description": "Skips the exact propagation of NaN values in floating-point maths. Off is exact and slower.",
+      "description": "Skips the exact handling of NaN (not-a-number) values in floating-point maths. Faster; turn it off if a game shows wrong values or graphical glitches.",
       "config": "Environment > BOX64_DYNAREC_FASTNAN",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "NaN rapides",
+          "description": "Ignore le traitement exact des valeurs NaN (« pas un nombre ») dans les calculs à virgule flottante. Plus rapide ; désactivez-le si un jeu affiche des valeurs fausses ou des défauts graphiques."
+        }
+      }
     },
     "fastRound": {
       "type": "select",
       "label": "Fast rounding",
-      "description": "How the translator rounds floating-point results.",
+      "description": "How the translator rounds floating-point results, from exact to fastest.",
       "config": "Environment > BOX64_DYNAREC_FASTROUND",
       "value": "1",
       "options": {
         "0": "Exact",
         "1": "Default",
         "2": "Fastest"
+      },
+      "translations": {
+        "fr": {
+          "label": "Arrondi rapide",
+          "description": "La façon dont le traducteur arrondit les résultats à virgule flottante, du plus exact au plus rapide.",
+          "options": {
+            "0": "Exact",
+            "1": "Par défaut",
+            "2": "Le plus rapide"
+          }
+        }
       }
     },
     "x87Double": {
       "type": "select",
       "label": "x87 precision",
-      "description": "The precision of the legacy x87 floating-point unit.",
+      "description": "The precision of the x87 floating-point unit, used by older code. Native is the fastest.",
       "config": "Environment > BOX64_DYNAREC_X87DOUBLE",
       "value": "0",
       "options": {
         "0": "Native (fastest)",
         "1": "Double",
         "2": "Double, always"
+      },
+      "translations": {
+        "fr": {
+          "label": "Précision x87",
+          "description": "La précision de l'unité de calcul à virgule flottante x87, utilisée par du code ancien. Natif est le plus rapide.",
+          "options": {
+            "0": "Natif (le plus rapide)",
+            "1": "Double",
+            "2": "Double, toujours"
+          }
+        }
       }
     },
     "alignedAtomics": {
       "type": "switch",
       "label": "Aligned atomics",
-      "description": "Treats the x86 atomic operations as aligned. Off is the default.",
+      "description": "Assumes that atomic operations are aligned in memory. Faster, but a program that does not align them can crash. Off by default.",
       "config": "Environment > BOX64_DYNAREC_ALIGNED_ATOMICS",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Opérations atomiques alignées",
+          "description": "Suppose que les opérations atomiques sont alignées en mémoire. Plus rapide, mais un programme qui ne les aligne pas peut planter. Désactivé par défaut."
+        }
+      }
     },
     "nativeFlags": {
       "type": "switch",
       "label": "Native flags",
-      "description": "Uses the ARM flags to compute the x86 ones. Off is slower and exact.",
+      "description": "Computes the x86 flags with the ARM processor's own. Faster; when off, slower but exact.",
       "config": "Environment > BOX64_DYNAREC_NATIVEFLAGS",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Drapeaux natifs",
+          "description": "Calcule les drapeaux x86 avec ceux du processeur ARM. Plus rapide ; désactivé, plus lent mais exact."
+        }
+      }
     },
     "selfTest": {
       "type": "switch",
       "label": "Translator self-test",
-      "description": "Runs every instruction through the interpreter as well and reports the first difference. Extremely slow: diagnostics only.",
+      "description": "Also runs every instruction through the interpreter and reports the first difference. Extremely slow: for diagnosing problems only.",
       "config": "Environment > BOX64_DYNAREC_TEST",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Autotest du traducteur",
+          "description": "Fait aussi passer chaque instruction par l'interpréteur et signale la première différence. Extrêmement lent : uniquement pour diagnostiquer un problème."
+        }
+      }
     },
     "log": {
       "type": "select",
@@ -179,6 +378,17 @@
         "0": "Quiet",
         "1": "Default",
         "2": "Debug"
+      },
+      "translations": {
+        "fr": {
+          "label": "Journal de Box64",
+          "description": "Ce que Box64 écrit dans le journal du jeu.",
+          "options": {
+            "0": "Silencieux",
+            "1": "Par défaut",
+            "2": "Débogage"
+          }
+        }
       }
     }
   }

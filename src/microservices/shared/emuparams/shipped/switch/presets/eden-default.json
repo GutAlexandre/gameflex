@@ -1,6 +1,12 @@
 {
   "name": "Default",
-  "description": "The values shipped with GameFlex: Eden's own, and the resolution of the stream.",
+  "description": "The values GameFlex recommends: Eden's own, and the resolution of the stream.",
+  "translations": {
+    "fr": {
+      "name": "Par défaut",
+      "description": "Les valeurs que recommande GameFlex : celles d'Eden, et la résolution du flux."
+    }
+  },
   "override": false,
   "system": "Eden",
   "values": {

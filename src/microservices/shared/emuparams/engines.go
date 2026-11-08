@@ -14,7 +14,8 @@ package emuparams
 // de neuf à apprendre, et ce qu'un moteur pose se lit dans la liste.
 //
 // Le moteur d'un jeu, chaque lanceur le reconnaît à ses fichiers
-// (storage.GameEngine) et le passe à SettingsFor.
+// (storage.GameEngine) et le passe à SettingsFor. Ce qui ne vaut que pour un jeu
+// est un correctif, par-dessus (gamepatch.go).
 
 import (
 	"encoding/json"
@@ -162,48 +163,73 @@ func (s Store) writeEnginesLocked(ref Ref, definition file, engines []EngineSett
 	return nil
 }
 
-// SettingsFor — ce qu'un lancement applique à cet émulateur pour un jeu de ce
-// moteur : Settings, et par-dessus les valeurs du préréglage que le moteur
-// désigne, s'il est actif. Elles gagnent sur celles du fichier ; et elles
-// s'écrivent même quand le fichier est absent ou coupé — ce que le moteur pose
-// n'en dépend pas. Un moteur inconnu, sans préréglage ou coupé : Settings tel
-// quel. Un préréglage illisible ou disparu : Settings tel quel, et l'erreur
-// dite (EngineError).
-func (s Store) SettingsFor(ref Ref, engine string) Settings {
+// SettingsFor — ce qu'un lancement applique à cet émulateur pour ce jeu :
+// Settings, par-dessus les valeurs du préréglage que son moteur désigne, s'il est
+// actif, et par-dessus encore celles du correctif du jeu (`game`, son identifiant,
+// gamepatch.go). Elles gagnent sur celles du fichier ; et elles s'écrivent même
+// quand le fichier est absent ou coupé — ce qu'ils posent n'en dépend pas. Un moteur
+// inconnu, sans préréglage ou coupé, un jeu sans correctif : rien de plus. Un
+// préréglage ou un correctif illisible : rien de plus, et l'erreur dite (EngineError,
+// GameError) ; la partie part quand même.
+func (s Store) SettingsFor(ref Ref, engine, game string) Settings {
 	settings := s.Settings(ref)
-	name, known := knownEngine(engine)
-	if !known || settings.State == "error" || !engineConsoles[ref.ConsoleID] {
+	if settings.State == "error" || !engineConsoles[ref.ConsoleID] {
 		return settings
 	}
 
 	mu.Lock()
 	defer mu.Unlock()
 	definition, _, _ := s.definitionLocked(ref)
-	setting := s.engineLocked(ref, definition, engine, name)
-	if setting.Error != "" {
-		settings.EngineError = setting.Error
-
-		return settings
-	}
-	if !setting.Enabled || setting.Preset == "" {
-		return settings
-	}
-	var chosen *Preset
-	for _, item := range s.presetsLocked(ref, definition) {
-		if item.ID == setting.Preset {
-			chosen = &item
-
-			break
+	if name, known := knownEngine(engine); known {
+		setting := s.engineLocked(ref, definition, engine, name)
+		switch {
+		case setting.Error != "":
+			settings.EngineError = setting.Error
+		case setting.Enabled && setting.Preset != "":
+			if s.layPresetLocked(&settings, ref, definition, setting.Preset) {
+				settings.Engine = engine
+				settings.EnginePreset = setting.Preset
+			} else {
+				settings.EngineError = "engine " + engine + ": preset " + setting.Preset + " missing or unreadable"
+			}
 		}
 	}
-	if chosen == nil || chosen.Error != "" {
-		settings.EngineError = "engine " + engine + ": preset " + setting.Preset + " missing or unreadable"
-
-		return settings
+	if validGame(game) {
+		values, err := s.gamePatchValues(definition, ref.ConsoleID, game)
+		switch {
+		case err != nil:
+			settings.GameError = err.Error()
+		case values != nil:
+			layValues(&settings, definition, values)
+			settings.Game = game
+		}
 	}
 
-	ids := make([]string, 0, len(chosen.Values))
-	for id := range chosen.Values {
+	return settings
+}
+
+// layPresetLocked — les valeurs d'un préréglage, posées par-dessus. false s'il
+// est illisible ou disparu : rien n'est posé.
+func (s Store) layPresetLocked(settings *Settings, ref Ref, definition file, presetID string) bool {
+	for _, item := range s.presetsLocked(ref, definition) {
+		if item.ID == presetID {
+			if item.Error != "" {
+				return false
+			}
+			layValues(settings, definition, item.Values)
+
+			return true
+		}
+	}
+
+	return false
+}
+
+// layValues — des valeurs, posées par-dessus celles de Settings. Ce que
+// l'émulateur ne connaît pas ne s'écrit pas.
+func layValues(settings *Settings, definition file, values map[string]any) {
+	ids := make([]string, 0, len(values))
+	for id := range values {
 		ids = append(ids, id)
 	}
 	sort.Strings(ids)
@@ -212,7 +238,7 @@ func (s Store) SettingsFor(ref Ref, engine string) Settings {
 		if !ok {
 			continue
 		}
-		value, ok := scalarText(chosen.Values[id])
+		value, ok := scalarText(values[id])
 		if !ok {
 			continue
 		}
@@ -230,8 +256,4 @@ func (s Store) SettingsFor(ref Ref, engine string) Settings {
 			settings.Entries = append(settings.Entries, entry)
 		}
 	}
-	settings.Engine = engine
-	settings.EnginePreset = setting.Preset
-
-	return settings
 }

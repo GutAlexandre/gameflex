@@ -512,13 +512,13 @@ export default function KeytestLive() {
         // overlay, nothing to stream yet.
         return (
             <div className="overflow-hidden" style={{ backgroundColor: "#000", minHeight: "var(--gameflex-visible-height)" }}>
-                <LoadingScreen label={t("streaming.connection.state.connecting")} />
+                <LoadingScreen launch label={t("streaming.connection.state.connecting")} />
             </div>
         );
     }
 
     return (terminateReason ? (
-        <LoadingScreen textOnFailure={terminateReason} onFailure={onTerminate} />
+        <LoadingScreen launch textOnFailure={terminateReason} onFailure={onTerminate} />
     ) : (
         <GamepadProvider>
             <KeytestShell

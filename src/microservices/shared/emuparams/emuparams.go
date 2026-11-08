@@ -165,6 +165,25 @@ type param struct {
 	Config      string              `json:"config"`
 	Value       any                 `json:"value"`
 	Options     *orderedMap[string] `json:"options,omitempty"`
+	// Translations — ses textes dans d'autres langues que l'anglais, par code
+	// de langue (« fr ») : la page montre celle de son utilisateur, l'anglais
+	// pour ce qui manque (le porteur, 2026-11-06, #641).
+	Translations map[string]ParamText `json:"translations,omitempty"`
+}
+
+// ParamText — les textes d'un paramètre dans une langue : son libellé, sa
+// description, et le libellé de ses options par valeur.
+type ParamText struct {
+	Label       string            `json:"label,omitempty"`
+	Description string            `json:"description,omitempty"`
+	Options     map[string]string `json:"options,omitempty"`
+}
+
+// Text — un nom et une description dans une langue, pour un émulateur ou un
+// préréglage.
+type Text struct {
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 // file — le fichier d'un émulateur.
@@ -174,6 +193,7 @@ type file struct {
 	Enabled      *bool             `json:"enabled,omitempty"`
 	Name         string            `json:"name"`
 	Description  string            `json:"description,omitempty"`
+	Translations map[string]Text   `json:"translations,omitempty"`
 	System       string            `json:"system"`
 	Requirements []string          `json:"requirements,omitempty"`
 	Params       orderedMap[param] `json:"params"`
@@ -185,8 +205,9 @@ func (f file) enabled() bool {
 
 // preset — un préréglage : des valeurs, par paramètre.
 type preset struct {
-	Name        string `json:"name"`
-	Description string `json:"description,omitempty"`
+	Name         string          `json:"name"`
+	Description  string          `json:"description,omitempty"`
+	Translations map[string]Text `json:"translations,omitempty"`
 	// Override — le préréglage peut-il être remplacé ou supprimé depuis
 	// l'écran ? Faux pour ceux que GameFlex livre ; vrai pour ceux qu'on
 	// enregistre ; absent (écrit à la main), il est à l'admin, donc vrai.

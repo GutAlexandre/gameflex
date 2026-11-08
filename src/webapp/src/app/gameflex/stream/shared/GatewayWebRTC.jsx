@@ -5,7 +5,7 @@ import {
 } from "../../api/gateway.js";
 import { applyReceiverLatencyHints } from "../../libs/webrtcLatencyHints.js";
 import { scanWebRTCReport, rateDeltas, nextCounters } from "../libs/webrtc-stats.js";
-import { answerGatewayOffer, applyLowLatencyAnswerSdp, buildIceServers } from "./gateway-helpers.js";
+import { NO_POSTER, answerGatewayOffer, applyLowLatencyAnswerSdp, buildIceServers } from "./gateway-helpers.js";
 import { streamHostOrigin } from "../../libs/serverBase.js";
 
 // GatewayVideoScreen — the ONE way any platform (retro-gaming, streamex,
@@ -991,6 +991,9 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
                 ref={videoRef}
                 autoPlay
                 playsInline
+                // Rien tant qu'aucune image n'est là, pas l'affiche de la
+                // WebView d'Android (NO_POSTER).
+                poster={NO_POSTER}
                 // ALWAYS muted, and that costs nothing: the sound is on the
                 // <audio> sibling below, so this element never carries an
                 // audio track. It used to follow the mute switch, which meant

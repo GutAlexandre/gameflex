@@ -1,46 +1,246 @@
 {
   "enabled": true,
   "name": "PlayStation 5",
-  "description": "Kyty's own options, then the settings given to Box64 before every PS5 game starts on the phone — KytyPS5 is x86-64 code that Box64 translates. The server runs it natively and ignores the Box64 ones.",
+  "description": "Settings of KytyPS5, the PlayStation 5 emulator, followed by those of Box64, the translator that runs it on phones and other ARM devices. A server runs KytyPS5 directly and ignores the Box64 settings.",
+  "translations": {
+    "fr": {
+      "description": "Les réglages de KytyPS5, l'émulateur de la PlayStation 5, puis ceux de Box64, le traducteur qui le fait tourner sur les téléphones et les autres appareils ARM. Un serveur lance KytyPS5 directement et ignore les réglages de Box64."
+    }
+  },
   "system": "KytyPS5",
   "requirements": [],
   "params": {
     "sound": {
       "type": "select",
       "label": "Sound",
-      "description": "The session's sound through the phone, or nothing: the emulator still decodes audio, but SDL plays none of it.",
+      "description": "Plays the game's sound, or nothing. When off, the emulator still decodes the audio but plays none of it.",
       "config": "Environment > SDL_AUDIO_DRIVER",
       "value": "auto",
       "options": {
-        "auto": "The session's sound",
-        "dummy": "Off — nothing is played"
+        "auto": "On",
+        "dummy": "Off"
+      },
+      "translations": {
+        "fr": {
+          "label": "Son",
+          "description": "Joue le son du jeu, ou rien. Coupé, l'émulateur décode toujours le son mais n'en joue rien.",
+          "options": {
+            "auto": "Activé",
+            "dummy": "Coupé"
+          }
+        }
       }
     },
     "occlusionQueries": {
       "type": "switch",
       "label": "Occlusion queries",
-      "description": "Kyty counts on the GPU what the game asks about hidden objects, so the game skips drawing them. Off, everything counts as visible: more work for the GPU (FF7 Remake at the same spot: 10 frames/s instead of 13.5).",
+      "description": "Lets the game skip drawing objects hidden behind others, as on the console. It saves graphics work, but the game has to wait for the graphics processor's answer, which can slow it down on devices without unified memory. When off, every object is drawn: more graphics work, no waiting.",
       "config": "Environment > KYTY_OCCLUSION_QUERIES",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Requêtes d'occlusion",
+          "description": "Permet au jeu de ne pas dessiner les objets cachés derrière d'autres, comme sur la console. Le processeur graphique travaille moins, mais le jeu doit attendre sa réponse, ce qui peut le ralentir sur un appareil sans mémoire unifiée. Désactivées, tous les objets sont dessinés : plus de travail graphique, aucune attente."
+        }
+      }
     },
     "shaderCache": {
       "type": "switch",
       "label": "Shader cache",
-      "description": "Kyty keeps the shaders and pipelines each game compiles, and compiles them again from that list when the game starts, before its first frame: a longer start, fewer stutters the first time a scene appears. Kyty's own launcher turns it on.",
+      "description": "Keeps the shaders each game compiles and prepares them again when the game next starts, before its first image. The game takes longer to start, and stutters less the first time a scene appears.",
       "config": "Environment > KYTY_SHADER_CACHE",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Cache des shaders",
+          "description": "Garde les shaders compilés par chaque jeu et les prépare de nouveau au démarrage suivant, avant la première image. Le jeu démarre plus lentement, et saccade moins la première fois qu'une scène apparaît."
+        }
+      }
+    },
+    "compileAside": {
+      "type": "switch",
+      "label": "Compile shaders in the background",
+      "description": "A shader seen for the first time normally pauses the game while it compiles, which causes sudden drops in frame rate. In the background, the game keeps running and what uses that shader appears a moment later. Compute shaders are still compiled immediately.",
+      "config": "Environment > KYTY_COMPILE_ASIDE",
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Compiler les shaders en arrière-plan",
+          "description": "Un shader vu pour la première fois met normalement le jeu en pause le temps de le compiler, d'où des chutes brusques d'images par seconde. En arrière-plan, le jeu continue, et ce qui utilise ce shader apparaît un instant plus tard. Les shaders de calcul restent compilés immédiatement."
+        }
+      }
+    },
+    "shaderToast": {
+      "type": "switch",
+      "label": "Shader compilation notice",
+      "description": "Shows a notice in a corner of the screen while shaders compile, with how many have been compiled so far.",
+      "config": "Environment > KYTY_SHADER_TOAST",
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Avis de compilation des shaders",
+          "description": "Affiche un avis dans un coin de l'écran pendant la compilation des shaders, avec le nombre déjà compilé."
+        }
+      }
+    },
+    "unifiedMemory": {
+      "type": "switch",
+      "label": "Unified memory (experimental)",
+      "description": "Shares the game's memory with the graphics processor, as on the console, instead of copying it back and forth. It makes most games much faster. It needs the system's dma-buf heap (/dev/dma_heap/system), found on Linux servers; without it, the usual memory is used. Turn it off if a game freezes or loses its image.",
+      "config": "Environment > KYTY_UNIFIED_MEMORY",
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Mémoire unifiée (expérimental)",
+          "description": "Partage la mémoire du jeu avec le processeur graphique, comme sur la console, au lieu de la copier dans un sens puis dans l'autre. La plupart des jeux sont bien plus rapides. Il faut le tas dma-buf du système (/dev/dma_heap/system), présent sur les serveurs Linux ; sans lui, la mémoire habituelle est utilisée. Désactivez-la si un jeu se fige ou perd son image."
+        }
+      }
+    },
+    "outputResolution": {
+      "type": "select",
+      "label": "Console resolution",
+      "description": "The video output resolution of the console, as chosen in the settings of a PlayStation 5. Every game is told this resolution, and games made with Unreal Engine draw their output images at this size. 1080p is much lighter and is enough for a stream; 2160p (4K) costs far more for an image that the stream scales down anyway.",
+      "config": "Environment > KYTY_OUTPUT_RESOLUTION",
+      "value": "1080",
+      "options": {
+        "1080": "1080p",
+        "2160": "2160p (4K)"
+      },
+      "translations": {
+        "fr": {
+          "label": "Résolution de la console",
+          "description": "La résolution de sortie vidéo de la console, comme dans les paramètres d'une PlayStation 5. Chaque jeu reçoit cette résolution, et ceux faits avec Unreal Engine dessinent leurs images de sortie à cette taille. 1080p est bien plus léger et suffit pour un flux ; 2160p (4K) coûte beaucoup plus, pour une image que le flux réduit de toute façon."
+        }
+      }
+    },
+    "frameRateCap": {
+      "type": "select",
+      "label": "Frame rate limit",
+      "description": "The most images per second the game may show. Following the stream keeps the game at the stream's frame rate: a game that runs faster gives its images unevenly, some are never seen, and the motion jumps. Without a limit, the game runs as fast as it can.",
+      "config": "Environment > KYTY_FRAME_RATE_CAP",
+      "value": "auto",
+      "options": {
+        "auto": "Follow the stream",
+        "30": "30",
+        "20": "20",
+        "0": "No limit"
+      },
+      "translations": {
+        "fr": {
+          "label": "Limite d'images par seconde",
+          "description": "Le plus d'images par seconde que le jeu peut montrer. Suivre le flux garde le jeu à la cadence du flux : un jeu plus rapide donne ses images de façon irrégulière, certaines ne sont jamais vues, et le mouvement saute. Sans limite, le jeu tourne aussi vite qu'il peut.",
+          "options": {
+            "auto": "Suivre le flux",
+            "0": "Aucune limite"
+          }
+        }
+      }
+    },
+    "renderHeight": {
+      "type": "select",
+      "label": "Render height (Unreal Engine)",
+      "description": "The height at which an Unreal Engine game draws its 3D scene. The engine then scales the image up to the screen, keeping menus and text sharp, and its dynamic resolution is turned off. Lower is faster and softer. Games made with other engines, and games that choose their own size, are not affected.",
+      "config": "Environment > KYTY_UE_RENDER_HEIGHT",
+      "value": "540",
+      "options": {
+        "0": "Game default",
+        "720": "720p",
+        "540": "540p",
+        "360": "360p (fastest)"
+      },
+      "translations": {
+        "fr": {
+          "label": "Hauteur de rendu (Unreal Engine)",
+          "description": "La hauteur à laquelle un jeu Unreal Engine dessine sa scène 3D. Le moteur agrandit ensuite l'image jusqu'à l'écran, en gardant les menus et le texte nets, et sa résolution dynamique est désactivée. Plus bas, c'est plus rapide et moins net. Les jeux faits avec d'autres moteurs, et ceux qui choisissent leur propre taille, ne sont pas concernés.",
+          "options": {
+            "0": "Celle du jeu",
+            "360": "360p (le plus rapide)"
+          }
+        }
+      }
+    },
+    "renderBase": {
+      "type": "select",
+      "label": "Render height reference",
+      "description": "The output height that the engine's scaling percentage is based on. Automatic uses the console resolution, which Unreal Engine games follow. A game patch can set another value for a game that draws below its output, for example at half of it.",
+      "config": "Environment > KYTY_UE_RENDER_BASE",
+      "value": "0",
+      "options": {
+        "0": "Automatic",
+        "540": "540p",
+        "1080": "1080p",
+        "2160": "2160p"
+      },
+      "translations": {
+        "fr": {
+          "label": "Référence de la hauteur de rendu",
+          "description": "La hauteur de sortie sur laquelle se base le pourcentage de mise à l'échelle du moteur. Automatique prend la résolution de la console, que suivent les jeux Unreal Engine. Un correctif peut fixer une autre valeur pour un jeu qui dessine en dessous de sa sortie, par exemple à sa moitié.",
+          "options": {
+            "0": "Automatique"
+          }
+        }
+      }
+    },
+    "renderVariable": {
+      "type": "select",
+      "label": "Render height variable",
+      "description": "The engine variable used to set the render height. r.ScreenPercentage suits most games; a game that sets that variable itself may need the other one, through its patch.",
+      "config": "Environment > KYTY_UE_RENDER_VARIABLE",
+      "value": "r.ScreenPercentage",
+      "options": {
+        "r.ScreenPercentage": "r.ScreenPercentage",
+        "r.SecondaryScreenPercentage.GameViewport": "r.SecondaryScreenPercentage.GameViewport"
+      },
+      "translations": {
+        "fr": {
+          "label": "Variable de la hauteur de rendu",
+          "description": "La variable du moteur qui fixe la hauteur de rendu. r.ScreenPercentage convient à la plupart des jeux ; un jeu qui règle lui-même cette variable peut demander l'autre, par son correctif."
+        }
+      }
+    },
+    "engineSettings": {
+      "type": "text",
+      "label": "Engine settings (Unreal Engine)",
+      "description": "Engine variables applied when an Unreal Engine game starts, to lower what it draws, such as shadows, view distance or effects: name=value pairs separated by semicolons, or none. Lighter settings raise the frame rate of many games at the cost of detail. A game's patch can provide its own list.",
+      "config": "Environment > KYTY_UE_ENGINE_SETTINGS",
+      "value": "none",
+      "translations": {
+        "fr": {
+          "label": "Réglages du moteur (Unreal Engine)",
+          "description": "Des variables du moteur appliquées au démarrage d'un jeu Unreal Engine pour alléger ce qu'il dessine, comme les ombres, la distance de vue ou les effets : des paires nom=valeur séparées par des points-virgules, ou none. Des réglages plus légers augmentent les images par seconde de nombreux jeux, au prix de détails. Le correctif d'un jeu peut fournir sa propre liste."
+        }
+      }
+    },
+    "gamePatch": {
+      "type": "text",
+      "label": "Game code patch",
+      "description": "A change to the game's own code, in the format of GoldHEN patches (their JSON, on one line), applied when the game starts. It only applies to the game and version it names, and only if the bytes it replaces are found. A game's patch provides it; none otherwise.",
+      "config": "Environment > KYTY_GAME_PATCH",
+      "value": "none",
+      "translations": {
+        "fr": {
+          "label": "Correctif de code du jeu",
+          "description": "Une modification du code du jeu lui-même, au format des correctifs GoldHEN (leur JSON, sur une ligne), appliquée au démarrage du jeu. Elle ne s'applique qu'au jeu et à la version qu'elle nomme, et seulement si les octets qu'elle remplace sont trouvés. Le correctif d'un jeu la fournit ; sinon, none."
+        }
+      }
     },
     "dynarec": {
       "type": "switch",
       "label": "Translator (DynaRec)",
-      "description": "Box64 translates the game's x86-64 code into ARM code. Off, it interprets it instead: many times slower, but exact — the way to tell a translation fault from the game's own.",
+      "description": "Box64 translates the game's x86-64 code into ARM code. When off, it interprets the code instead: many times slower, but exact. Useful to tell a translation fault from a fault in the game itself.",
       "config": "Environment > BOX64_DYNAREC",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Traducteur (DynaRec)",
+          "description": "Box64 traduit le code x86-64 du jeu en code ARM. Désactivé, il interprète le code à la place : bien plus lent, mais exact. Utile pour distinguer une erreur de traduction d'une erreur du jeu lui-même."
+        }
+      }
     },
     "strongMemory": {
       "type": "select",
       "label": "Memory ordering",
-      "description": "How faithfully the translator keeps the x86 memory ordering, which ARM relaxes. Stricter is slower; “Strong” is the usual fix for a multithreaded program that misbehaves.",
+      "description": "How strictly the translator keeps the x86 memory ordering, which ARM processors relax. Stricter is slower; “Strong” usually fixes a program whose threads misbehave.",
       "config": "Environment > BOX64_DYNAREC_STRONGMEM",
       "value": "0",
       "options": {
@@ -48,24 +248,47 @@
         "1": "Light",
         "2": "Strong",
         "3": "Strongest"
+      },
+      "translations": {
+        "fr": {
+          "label": "Ordre des accès mémoire",
+          "description": "Avec quelle rigueur le traducteur respecte l'ordre des accès mémoire du x86, que les processeurs ARM assouplissent. Plus strict, c'est plus lent ; « Fort » corrige en général un programme dont les fils se comportent mal.",
+          "options": {
+            "0": "Natif (le plus rapide)",
+            "1": "Léger",
+            "2": "Fort",
+            "3": "Le plus fort"
+          }
+        }
       }
     },
     "safeFlags": {
       "type": "select",
       "label": "Flags safety",
-      "description": "How carefully the translator preserves the x86 flags across calls and returns. Box64 ships with 1; KytyPS5 needs 2 on the phone — with 1 the game dies a few seconds after the start (bisected on the S25, 2026-10-14), and 2 costs nothing measurable: every other shortcut can stay on.",
+      "description": "How carefully the translator keeps the x86 processor flags across calls and returns. Safer is slightly slower. This emulator needs “Safest”: with less, games can stop shortly after they start.",
       "config": "Environment > BOX64_DYNAREC_SAFEFLAGS",
       "value": "2",
       "options": {
         "0": "Fastest",
-        "1": "Box64's own default",
-        "2": "Safest (what the PS5 needs)"
+        "1": "Box64 default",
+        "2": "Safest (recommended)"
+      },
+      "translations": {
+        "fr": {
+          "label": "Sûreté des drapeaux",
+          "description": "Avec quel soin le traducteur conserve les drapeaux du processeur x86 lors des appels et des retours. Plus sûr, c'est un peu plus lent. Cet émulateur a besoin de « Le plus sûr » : sinon, des jeux peuvent s'arrêter peu après leur démarrage.",
+          "options": {
+            "0": "Le plus rapide",
+            "1": "Valeur par défaut de Box64",
+            "2": "Le plus sûr (recommandé)"
+          }
+        }
       }
     },
     "bigBlock": {
       "type": "select",
       "label": "Block size",
-      "description": "How much code the translator handles in one block. Smaller blocks are slower but closer to the x86 instruction by instruction.",
+      "description": "How much code the translator handles in one block. Larger blocks are faster; smaller ones follow the x86 code more closely.",
       "config": "Environment > BOX64_DYNAREC_BIGBLOCK",
       "value": "2",
       "options": {
@@ -73,12 +296,24 @@
         "1": "Small",
         "2": "Default",
         "3": "Largest"
+      },
+      "translations": {
+        "fr": {
+          "label": "Taille des blocs",
+          "description": "La quantité de code que le traducteur traite en un bloc. Des blocs plus grands sont plus rapides ; des blocs plus petits suivent le code x86 de plus près.",
+          "options": {
+            "0": "La plus petite",
+            "1": "Petite",
+            "2": "Par défaut",
+            "3": "La plus grande"
+          }
+        }
       }
     },
     "callRet": {
       "type": "select",
       "label": "Call/return optimisation",
-      "description": "A shortcut for the x86 call and return instructions. Off is the safest, and on the phone the cheapest: Neptunia ReVerse plays its opening at the same frame rate with a third less processor (66-90 % against 120-145 % with Default, 2026-10-28).",
+      "description": "Changes how the translator handles x86 call and return instructions. Its effect on speed depends on the game; Off is the safest.",
       "config": "Environment > BOX64_DYNAREC_CALLRET",
       "value": "0",
       "options": {
@@ -86,59 +321,117 @@
         "1": "Basic",
         "2": "Default",
         "3": "Full"
+      },
+      "translations": {
+        "fr": {
+          "label": "Optimisation des appels et retours",
+          "description": "Change la façon dont le traducteur gère les instructions d'appel et de retour du x86. Son effet sur la vitesse dépend du jeu ; Désactivée est le plus sûr.",
+          "options": {
+            "0": "Désactivée",
+            "1": "De base",
+            "2": "Par défaut",
+            "3": "Complète"
+          }
+        }
       }
     },
     "fastNaN": {
       "type": "switch",
       "label": "Fast NaN",
-      "description": "Skips the exact propagation of NaN values in floating-point maths. Off is exact and slower.",
+      "description": "Skips the exact handling of NaN (not-a-number) values in floating-point maths. Faster; turn it off if a game shows wrong values or graphical glitches.",
       "config": "Environment > BOX64_DYNAREC_FASTNAN",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "NaN rapides",
+          "description": "Ignore le traitement exact des valeurs NaN (« pas un nombre ») dans les calculs à virgule flottante. Plus rapide ; désactivez-le si un jeu affiche des valeurs fausses ou des défauts graphiques."
+        }
+      }
     },
     "fastRound": {
       "type": "select",
       "label": "Fast rounding",
-      "description": "How the translator rounds floating-point results.",
+      "description": "How the translator rounds floating-point results, from exact to fastest.",
       "config": "Environment > BOX64_DYNAREC_FASTROUND",
       "value": "1",
       "options": {
         "0": "Exact",
         "1": "Default",
         "2": "Fastest"
+      },
+      "translations": {
+        "fr": {
+          "label": "Arrondi rapide",
+          "description": "La façon dont le traducteur arrondit les résultats à virgule flottante, du plus exact au plus rapide.",
+          "options": {
+            "0": "Exact",
+            "1": "Par défaut",
+            "2": "Le plus rapide"
+          }
+        }
       }
     },
     "x87Double": {
       "type": "select",
       "label": "x87 precision",
-      "description": "The precision of the legacy x87 floating-point unit.",
+      "description": "The precision of the x87 floating-point unit, used by older code. Native is the fastest.",
       "config": "Environment > BOX64_DYNAREC_X87DOUBLE",
       "value": "0",
       "options": {
         "0": "Native (fastest)",
         "1": "Double",
         "2": "Double, always"
+      },
+      "translations": {
+        "fr": {
+          "label": "Précision x87",
+          "description": "La précision de l'unité de calcul à virgule flottante x87, utilisée par du code ancien. Natif est le plus rapide.",
+          "options": {
+            "0": "Natif (le plus rapide)",
+            "1": "Double",
+            "2": "Double, toujours"
+          }
+        }
       }
     },
     "alignedAtomics": {
       "type": "switch",
       "label": "Aligned atomics",
-      "description": "Treats the x86 atomic operations as aligned. Off is the default.",
+      "description": "Assumes that atomic operations are aligned in memory. Faster, but a program that does not align them can crash. Off by default.",
       "config": "Environment > BOX64_DYNAREC_ALIGNED_ATOMICS",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Opérations atomiques alignées",
+          "description": "Suppose que les opérations atomiques sont alignées en mémoire. Plus rapide, mais un programme qui ne les aligne pas peut planter. Désactivé par défaut."
+        }
+      }
     },
     "nativeFlags": {
       "type": "switch",
       "label": "Native flags",
-      "description": "Uses the ARM flags to compute the x86 ones. Off is slower and exact.",
+      "description": "Computes the x86 flags with the ARM processor's own. Faster; when off, slower but exact.",
       "config": "Environment > BOX64_DYNAREC_NATIVEFLAGS",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Drapeaux natifs",
+          "description": "Calcule les drapeaux x86 avec ceux du processeur ARM. Plus rapide ; désactivé, plus lent mais exact."
+        }
+      }
     },
     "selfTest": {
       "type": "switch",
       "label": "Translator self-test",
-      "description": "Runs every instruction through the interpreter as well and reports the first difference. Extremely slow: diagnostics only.",
+      "description": "Also runs every instruction through the interpreter and reports the first difference. Extremely slow: for diagnosing problems only.",
       "config": "Environment > BOX64_DYNAREC_TEST",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Autotest du traducteur",
+          "description": "Fait aussi passer chaque instruction par l'interpréteur et signale la première différence. Extrêmement lent : uniquement pour diagnostiquer un problème."
+        }
+      }
     },
     "log": {
       "type": "select",
@@ -150,6 +443,17 @@
         "0": "Quiet",
         "1": "Default",
         "2": "Debug"
+      },
+      "translations": {
+        "fr": {
+          "label": "Journal de Box64",
+          "description": "Ce que Box64 écrit dans le journal du jeu.",
+          "options": {
+            "0": "Silencieux",
+            "1": "Par défaut",
+            "2": "Débogage"
+          }
+        }
       }
     }
   }

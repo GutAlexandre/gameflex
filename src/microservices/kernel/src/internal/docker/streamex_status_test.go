@@ -84,3 +84,43 @@ func TestStatusStreamex_DiskRead(t *testing.T) {
 		})
 	}
 }
+
+// « Résolution du jeu » et « Résolution de l'émulateur » : ce que l'émulateur
+// dit, jamais le flux. La sortie du jeu et la scène réduite de Kyty ; sa sortie
+// seule pour un jeu qui n'est pas Unreal ; rien quand le titre ne dit rien (le
+// flux `encoded` ne s'y substitue pas).
+func TestStatusStreamex_GameResolution(t *testing.T) {
+	cases := []struct {
+		name           string
+		body           string
+		game, emulator string
+	}{
+		{"Kyty, hauteur demandée", `{"resolution":{"encoded":"1280x720","emulator_render":"653x367","emulator_output":"3840x2160"}}`, "3840x2160", "653x367"},
+		{"Kyty, sortie seule", `{"resolution":{"encoded":"1280x720","emulator_output":"1920x1080"}}`, "1920x1080", ""},
+		{"titre muet (RPCS3)", `{"resolution":{"encoded":"1280x720","capture":"1280x720"}}`, "", ""},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				_, _ = w.Write([]byte(c.body))
+			}))
+			defer server.Close()
+			host, portText, err := net.SplitHostPort(server.Listener.Addr().String())
+			if err != nil {
+				t.Fatal(err)
+			}
+			port, err := strconv.Atoi(portText)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got, err := (&Client{}).StatusStreamex(host, port)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got.GameResolution != c.game || got.EmulatorResolution != c.emulator {
+				t.Fatalf("résolution = %q, %q ; attendu %q, %q", got.GameResolution, got.EmulatorResolution, c.game, c.emulator)
+			}
+		})
+	}
+}

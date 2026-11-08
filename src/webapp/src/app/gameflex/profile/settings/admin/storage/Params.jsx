@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import * as bs from "react-bootstrap";
 import Skeleton from "../../../../../skeleton/skeleton.js";
+import i18n from "@/i18n/index.js";
 import {
     DownloadRing,
     FormButton,
@@ -69,6 +70,38 @@ const Ruleset = Skeleton.Ruleset;
 const valuesOf = (emulator) => Object.fromEntries(emulator.params.map((param) => [param.id, param.value]));
 
 const titleOf = (emulator) => `${emulator.name} — ${emulator.system}`;
+
+// LES TEXTES DANS LA LANGUE DE LA PAGE (#641) : une fiche porte l'anglais, et
+// ses traductions par code de langue (`translations.fr`) ; ce qui n'est pas
+// traduit reste en anglais. Seuls les textes changent : identifiants, valeurs
+// et adresses sont ceux du serveur.
+const inLanguage = (emulator) => {
+    const language = (i18n.language || "en").split("-")[0];
+    const textOf = (item) => item?.translations?.[language] || {};
+
+    return {
+        ...emulator,
+        description: textOf(emulator).description || emulator.description,
+        params: (emulator.params || []).map((param) => {
+            const own = textOf(param);
+
+            return {
+                ...param,
+                label: own.label || param.label,
+                description: own.description || param.description,
+                options: param.options && param.options.map((option) => ({
+                    ...option,
+                    label: own.options?.[option.value] || option.label,
+                })),
+            };
+        }),
+        presets: (emulator.presets || []).map((preset) => ({
+            ...preset,
+            name: textOf(preset).name || preset.name,
+            description: textOf(preset).description || preset.description,
+        })),
+    };
+};
 
 // Les réglages des moteurs, tels que l'enregistrement les envoie.
 const enginesOf = (emulator) => (emulator.engines || []).map(({ engine, name, preset, enabled, error }) => ({
@@ -196,7 +229,7 @@ function EmulatorParams({ initial, onSaved, t }) {
                 // ce qu'il dit. Le préréglage qu'on vient d'écrire est celui
                 // que les champs montrent : il reste choisi, l'interrupteur
                 // coché à son nom.
-                setEmulator(result);
+                setEmulator(inLanguage(result));
                 setValues(valuesOf(result));
                 setEnabled(result.enabled);
                 setEngines(enginesOf(result));
@@ -227,7 +260,7 @@ function EmulatorParams({ initial, onSaved, t }) {
                 { variant: result.ok ? "success" : "error" },
             );
             if (result.ok) {
-                setEmulator(result);
+                setEmulator(inLanguage(result));
                 setPreset("");
                 setPresetSave(NO_PRESET_SAVE);
                 onSaved(result);
@@ -604,7 +637,7 @@ export default function Params({ t }) {
                     latestContext.current.toast.open(result.errorMessage || t("admin.storage.loadFailed"),
                         { variant: "error" });
                 }
-                setEmulators(result.emulators || []);
+                setEmulators((result.emulators || []).map(inLanguage));
             })
             .catch((failure) => {
                 console.error("Chargement des paramètres des émulateurs", failure);
@@ -620,7 +653,7 @@ export default function Params({ t }) {
     // LA RÉPONSE DE L'ENREGISTREMENT EST LE NOUVEAU FICHIER : la ligne de la
     // liste change sur place, rien à relire.
     const replace = (saved) => setEmulators((current) => current.map(
-        (item) => (item.consoleId === saved.consoleId && item.emulator === saved.emulator ? saved : item)));
+        (item) => (item.consoleId === saved.consoleId && item.emulator === saved.emulator ? inLanguage(saved) : item)));
 
     const open = (emulator) => latestContext.current.offcanvas.open(
         <OffCanvas icon="bi bi-sliders" label={titleOf(emulator)} helpText={emulator.description}>

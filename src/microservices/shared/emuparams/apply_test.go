@@ -202,8 +202,8 @@ func TestTheEnvironmentWriterSpeaksBox64(t *testing.T) {
 		{Config: "Environment > bad name", Value: "1"},
 	}}, home, 540, "")
 	content, _ := os.ReadFile(filepath.Join(home, "kyty", "environment"))
-	// Les deux dernières lignes sont celles du lanceur (kytyAuto, #445).
-	if string(content) != "BOX64_DYNAREC=0\nBOX64_DYNAREC_STRONGMEM=2\nSDL_AUDIO_DRIVER=auto\nKYTY_OCCLUSION_QUERIES=1\nKYTY_SHADER_CACHE=1\n" {
+	// Les quatre dernières lignes sont celles du lanceur (kytyAuto, #445).
+	if string(content) != "BOX64_DYNAREC=0\nBOX64_DYNAREC_STRONGMEM=2\nSDL_AUDIO_DRIVER=auto\nKYTY_OCCLUSION_QUERIES=1\nKYTY_SHADER_CACHE=1\nKYTY_UNIFIED_MEMORY=1\nKYTY_UE_RENDER_HEIGHT=540\n" {
 		t.Fatalf("environment après Apply :\n%s", content)
 	}
 	if len(report.Set) != 3 || len(report.Skipped) != 1 || report.Skipped[0] != "Environment > bad name" {
@@ -219,7 +219,7 @@ func TestTheEnvironmentWriterSpeaksBox64(t *testing.T) {
 	Apply("kyty", Settings{State: "enabled", Entries: []Entry{{Config: "Environment > BOX64_LOG", Value: "2"}}}, home, 540, "")
 	report = Apply("kyty", Settings{State: "disabled", Entries: []Entry{}}, home, 540, "")
 	content, _ = os.ReadFile(filepath.Join(home, "kyty", "environment"))
-	if string(content) != "KYTY_OCCLUSION_QUERIES=1\nKYTY_SHADER_CACHE=1\n" || len(report.Released) != 1 || report.Released[0] != "Environment > BOX64_LOG" {
+	if string(content) != "KYTY_OCCLUSION_QUERIES=1\nKYTY_SHADER_CACHE=1\nKYTY_UNIFIED_MEMORY=1\nKYTY_UE_RENDER_HEIGHT=540\n" || len(report.Released) != 1 || report.Released[0] != "Environment > BOX64_LOG" {
 		t.Fatalf("désactivé :\n%s\n%+v", content, report)
 	}
 }
@@ -434,32 +434,37 @@ func TestShadPS4GetsItsPipelineCacheFromTheLauncher(t *testing.T) {
 	}
 }
 
-// LES REQUÊTES D'OCCLUSION ET LE CACHE DE SHADERS DE KYTY, allumés par le
-// lanceur (#445, tools/kyty/0016) ; un paramètre les éteint, et retiré, le
-// lanceur les rallume.
+// LES REQUÊTES D'OCCLUSION, LE CACHE DE SHADERS ET LA MÉMOIRE UNIQUE DE KYTY,
+// allumés par le lanceur (#445, tools/kyty/0016, 0026) ; un paramètre les
+// éteint, et retiré, le lanceur les rallume.
 func TestKytyGetsItsOcclusionQueriesAndShaderCacheFromTheLauncher(t *testing.T) {
 	home := t.TempDir()
 	report := Apply("kyty", Settings{State: "absent"}, home, 540, "")
 	if report.Error != "" {
 		t.Fatalf("Apply : %s", report.Error)
 	}
-	if got := Environment("kyty", home); len(got) != 2 || got[0] != "KYTY_OCCLUSION_QUERIES=1" || got[1] != "KYTY_SHADER_CACHE=1" {
+	if got := Environment("kyty", home); len(got) != 4 || got[0] != "KYTY_OCCLUSION_QUERIES=1" || got[1] != "KYTY_SHADER_CACHE=1" ||
+		got[2] != "KYTY_UNIFIED_MEMORY=1" || got[3] != "KYTY_UE_RENDER_HEIGHT=540" {
 		t.Fatalf("sans paramètre : %v", got)
 	}
 
 	Apply("kyty", Settings{State: "enabled", Entries: []Entry{
 		{Config: "Environment > KYTY_OCCLUSION_QUERIES", Value: "0"},
 		{Config: "Environment > KYTY_SHADER_CACHE", Value: "0"},
+		{Config: "Environment > KYTY_UNIFIED_MEMORY", Value: "0"},
+		{Config: "Environment > KYTY_UE_RENDER_HEIGHT", Value: "720"},
 		{Config: "Environment > BOX64_DYNAREC", Value: "1"},
 	}}, home, 540, "")
 	got := Environment("kyty", home)
-	if len(got) != 3 || got[0] != "KYTY_OCCLUSION_QUERIES=0" || got[1] != "KYTY_SHADER_CACHE=0" || got[2] != "BOX64_DYNAREC=1" {
+	if len(got) != 5 || got[0] != "KYTY_OCCLUSION_QUERIES=0" || got[1] != "KYTY_SHADER_CACHE=0" ||
+		got[2] != "KYTY_UNIFIED_MEMORY=0" || got[3] != "KYTY_UE_RENDER_HEIGHT=720" || got[4] != "BOX64_DYNAREC=1" {
 		t.Fatalf("éteints par les paramètres : %v", got)
 	}
 
 	// Les paramètres retirés : le lanceur les rallume, il ne les retire pas.
 	Apply("kyty", Settings{State: "enabled", Entries: nil}, home, 540, "")
-	if got := Environment("kyty", home); len(got) != 2 || got[0] != "KYTY_OCCLUSION_QUERIES=1" || got[1] != "KYTY_SHADER_CACHE=1" {
+	if got := Environment("kyty", home); len(got) != 4 || got[0] != "KYTY_OCCLUSION_QUERIES=1" || got[1] != "KYTY_SHADER_CACHE=1" ||
+		got[2] != "KYTY_UNIFIED_MEMORY=1" || got[3] != "KYTY_UE_RENDER_HEIGHT=540" {
 		t.Fatalf("paramètres retirés : %v", got)
 	}
 }

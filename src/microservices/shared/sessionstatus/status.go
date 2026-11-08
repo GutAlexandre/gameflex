@@ -57,6 +57,19 @@ type Status struct {
 	// et c'est justement quand elles divergent que ce panneau sert.
 	EmulationFPS float64 `json:"emulationFps,omitempty"`
 
+	// Les tailles d'image de l'ÉMULATION, « 1920x1080 », pas celle du flux (le
+	// navigateur la mesure de son côté, ligne « Résolution gateway »). Le
+	// porteur, 2026-11-07 : « Résolution du jeu » dit ce que c'est réellement,
+	// et une ligne « Résolution de l'émulateur » ce que l'émulateur a réduit.
+	//
+	// GameResolution — l'image que le jeu rend à la console : la sortie d'un
+	// jeu PS5 (1920x1080, 3840x2160), l'image d'un cœur libretro.
+	// EmulatorResolution — la scène plus petite que l'émulateur fait calculer
+	// au jeu (la hauteur de rendu de Kyty), quand il en demande une.
+	// Vides quand l'émulateur ne les dit pas (TitleResolution).
+	GameResolution     string `json:"gameResolution,omitempty"`
+	EmulatorResolution string `json:"emulatorResolution,omitempty"`
+
 	// CPUPercent — fraction d'UN cœur, donc au-dessus de 100 sur plusieurs.
 	//
 	// UN POINTEUR, ET C'EST LE SUJET : `omitempty` sur un nombre confond
@@ -127,3 +140,16 @@ func ReadBytes(pid int) (int64, bool) {
 // Percent emballe une mesure en pourcentage pour les champs à pointeur —
 // voir CPUPercent : c'est ce qui distingue « zéro » de « pas mesuré ».
 func Percent(value float64) *float64 { return &value }
+
+// SetEmulatorSize range ce que l'émulateur dit de ses tailles d'image
+// (TitleResolution) : la sortie du jeu en GameResolution, la scène réduite en
+// EmulatorResolution. Sans sortie, la scène est l'image du jeu : un cœur
+// libretro n'en distingue pas deux. Une seule règle pour le serveur et le
+// téléphone.
+func (status *Status) SetEmulatorSize(render, output string) {
+	if output == "" {
+		render, output = "", render
+	}
+	status.GameResolution = output
+	status.EmulatorResolution = render
+}

@@ -489,6 +489,25 @@ var registry = []Console{
 	// (`ma`) : sa manette, en cemuhook, atteint AUSSI le jeu derrière le
 	// clavier — B y efface une lettre et fait revenir le jeu en arrière.
 	{ID: "switch", Name: "Nintendo Switch", Publisher: "Nintendo", Year: 2017, Method: MethodStreamex, Cores: []string{"Eden (streamex)", "Citron (streamex)"}, MaxPlayers: 8, Width: 1280, Height: 720, Bios: []string{"prod.keys"}, BiosOptional: []string{"title.keys"}, Touch: true, Experimental: ExperimentalHeavy, Enabled: true},
+	// switch2 — streamex + Eglantine (#644, 2026-11-06), un fork d'Eden qui lit
+	// les jeux de la Switch 2 : ses clés dans bios/switch2/, ses jeux dans
+	// roms/switch2/. Très expérimental, comme son émulateur. Ses formats, en
+	// plus de ceux de la Switch : le .nup, un conteneur propre à Eglantine qui
+	// réunit un jeu, ses mises à jour et ses contenus (`--pack-nup`), et qu'il
+	// lance tel quel.
+	//
+	// RETIRÉE LE 2026-11-06, en attendant une version d'Eglantine qui tienne
+	// (le porteur : « on peut attendre un peu qu'une mise à jour arrive. En
+	// attendant on retire l'émulateur »). Sa quotidienne du 5 laisse la 3D de
+	// *Zelda Ocarina of Time* noire ; la version corrective de sa branche
+	// fix/oot-blackscreen l'affiche, puis envoie au GPU une commande invalide :
+	// la puce entière a été remise à zéro, l'affichage du serveur perdu, et la
+	// machine redémarrée (journal 459). Le branchement reste (image, adaptateur,
+	// invité du téléphone) ; les fichiers de l'émulateur sont sur Gamebox.
+	// Rallumer : Enabled, un Eglantine dans cores/switch2/, la distribution
+	// publique (compose, guides, publish.sh), et une partie éprouvée sans
+	// personne d'autre sur le serveur.
+	{ID: "switch2", Name: "Nintendo Switch 2", Publisher: "Nintendo", Year: 2025, Method: MethodStreamex, Cores: []string{"Eglantine (streamex)"}, MaxPlayers: 8, Extensions: []string{"xci", "nsp", "nup"}, Width: 1920, Height: 1080, Bios: []string{"prod.keys"}, BiosOptional: []string{"title.keys"}, Touch: true, Experimental: ExperimentalGeneral, Enabled: false},
 
 	// xbox — streamex + xemu, same per-console pattern as switch above.
 	//
@@ -541,6 +560,17 @@ var registry = []Console{
 	// figure (GlibcGuest.guestForCore).
 	{ID: "xbox360", Name: "Xbox 360", Publisher: "Microsoft", Year: 2005, Method: MethodStreamex, Cores: []string{"Xenia Canary (streamex)"}, MaxPlayers: 4, Width: 1280, Height: 720, Experimental: ExperimentalGeneral, Enabled: true},
 	{ID: "xboxone", Name: "Xbox One", Publisher: "Microsoft", Year: 2013, Method: MethodStreamex, Cores: []string{}, MaxPlayers: 2, Enabled: false},
+
+	// ── Les ports PC (chantier 40, #609) ──
+	//
+	// Pas une machine : des jeux recompilés pour le PC par leur communauté,
+	// qui ne lisent de la ROM du joueur que ses données (le porteur,
+	// 2026-10-29 : « nouvelle console dans streamex »). Chaque cœur est un
+	// port (ports.go), et ne joue qu'un jeu dans une version précise. PAS DE
+	// DOSSIER À ELLE : ses jeux sont les ROM des autres consoles qu'un port
+	// accepte (le porteur : « trouvés dans roms/n64 »). Pas d'extensions donc,
+	// ni d'année : comme ScummVM, ce n'est pas une machine.
+	{ID: PortsID, Name: "PC Ports", Publisher: "Community", Method: MethodStreamex, Cores: []string{"Zelda 64: Recompiled (streamex)"}, MaxPlayers: 4, Width: 1280, Height: 720, Enabled: true},
 
 	// ── Consoles jouées À DISTANCE : identifiants préfixés `rp-` ──
 	//
@@ -636,7 +666,10 @@ func All() []Console {
 func Stored() []Console {
 	out := make([]Console, 0, len(registry))
 	for _, console := range registry {
-		if console.Enabled && console.Method != MethodRemotePlay {
+		// Les ports PC n'ont ni ROM ni BIOS à eux : leurs jeux vivent dans
+		// les dossiers des consoles dont ils lisent les ROM (ports.go). Leur
+		// `cores/ports/` est celui du serveur, que tient emulators.sh.
+		if console.Enabled && console.Method != MethodRemotePlay && console.ID != PortsID {
 			out = append(out, console)
 		}
 	}

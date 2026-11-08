@@ -96,11 +96,11 @@ dossier `downloads/`) ou posés dans `jniLibs/` (git-ignoré) :
   | console | invité | binaire | x86_64 | aarch64 |
   |---|---|---|---|---|
   | xbox | `xemu` | `xemu` | ✔ 0.8.139 | ✔ 0.8.139 |
-  | ps3 | `rpcs3` | `rpcs3` | ✔ 0.0.43-20404 (celui du serveur) | ✔ même build |
+  | ps3 | `rpcs3` | `rpcs3` | ✔ 0.0.43-20508 (celui du serveur) | ✔ même build |
   | wiiu | `cemu` | `Cemu` | ✔ 2.6 | ✔ fced55a — l'AppImage arm64 de sa CI : aucune release arm64, et la 2.6 n'a pas de recompilateur AArch64 ; artefact authentifié (`GITHUB_TOKEN`), qui expire le 2027-01-04 |
   | switch | `eden` | `eden` | ✔ 0.2.1 — la nocturne du serveur réclame `GLIBC_2.44` | ✔ nocturne de7e6e01d4 (celle du serveur) |
   | ps4 | `shadps4` | `shadps4` (+ `pkgextract`) | ✔ 0.18.0 — le serveur est en 0.20.0, qui exige (depuis la 0.19.0) des tampons clairsemés que lavapipe ne fournit pas | — exige ≈ 85 Tio d'adresses, un noyau Android en donne 512 Gio (voir le chantier 11, `#254`) |
-  | ps5 | `kyty` | `kyty_emulator` | ✔ 2026-10-26 (celui du serveur) | — mémoire étendue fixée à 8 Tio : même mur |
+  | ps5 | `kyty` | `kyty_emulator` | ✔ 2026-10-29 (celui du serveur) | — mémoire étendue fixée à 8 Tio : même mur |
 
   `GlibcGuest` porte la même liste d'architectures : une console sans bundle pour l'ABI de
   l'appareil n'y est jamais proposée.

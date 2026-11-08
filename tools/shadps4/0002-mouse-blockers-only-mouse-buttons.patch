@@ -1,5 +1,5 @@
 diff --git a/src/input/input_mouse.cpp b/src/input/input_mouse.cpp
-index f90c204..4d046a1 100644
+index f90c2048..4d046a16 100644
 --- a/src/input/input_mouse.cpp
 +++ b/src/input/input_mouse.cpp
 @@ -112,8 +112,12 @@ void ApplyMouseInputBlockers() {

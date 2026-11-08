@@ -1,11 +1,19 @@
 {
   "name": "Default",
-  "description": "Box64's own values — the translator on, its usual shortcuts, the session's sound — except four: the flags kept safest (with Box64's own value the games' memcmp compares wrong, and Final Fantasy VII Remake dies at its start on the phone, 2026-10-26), the call/return shortcut off (with it, a game takes two minutes more to show its first picture on the phone, 2026-10-27), an AMD processor shown to the game, and the game's code in shared memory protected instead of checked at every run.",
+  "description": "Box64's own values, except four: the safest flags, which some games need to start; the call/return shortcut off, which makes games start faster; an AMD processor shown to the game, as on the console; and the game's code in shared memory protected instead of checked every time it runs.",
+  "translations": {
+    "fr": {
+      "name": "Par défaut",
+      "description": "Les valeurs de Box64, sauf quatre : les drapeaux les plus sûrs, dont certains jeux ont besoin pour démarrer ; l'optimisation des appels et retours désactivée, qui fait démarrer les jeux plus vite ; un processeur AMD annoncé au jeu, comme sur la console ; et le code du jeu en mémoire partagée protégé au lieu d'être vérifié à chaque exécution."
+    }
+  },
   "override": false,
   "system": "shadPS4",
   "values": {
     "sound": "auto",
     "pipelineCache": true,
+    "renderHeight": "0",
+    "readbacksMode": "0",
     "turnipDebug": "auto",
     "dynarec": true,
     "cpuType": "1",

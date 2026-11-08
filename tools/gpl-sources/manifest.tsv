@@ -1,5 +1,7 @@
-# D'OÙ VIENT CHAQUE ÉMULATEUR QUE NOUS DIFFUSONS — lu par assemble.py, qui en fait
-# le dossier src/ du miroir (chantier 34, P1, #488).
+# D'OÙ VIENT CHAQUE ÉMULATEUR QUE NOUS DIFFUSONS (chantier 34, #488). Ce registre et nos
+# correctifs (tools/kyty, tools/shadps4, tools/eden, tools/box64) partent dans le dépôt
+# public gameflex : c'est là, et seulement là, que vit leur code (le porteur, 2026-11-06,
+# #640 : plus de dossier src/ dans les bibliothèques ni sur le miroir).
 #
 # Une ligne par fichier de cores/ (hors cœurs libretro), séparée par des TABULATIONS :
 #
@@ -23,16 +25,26 @@
 # Un fichier livré dans cores/ sans sa ligne ici fait échouer assemble.py : chaque
 # livraison ajoute la sienne. Les anciennes lignes restent (Gamebox garde l'historique).
 
-ps3/rpcs3-v0.0.43-20404-e8979d31_linux64.AppImage	upstream	https://github.com/RPCS3/rpcs3@e8979d31b3a22c8bc9a6eae6bdc31756eac8ee89	-	-
+ps3/rpcs3-v0.0.43-20508-8e26652c_linux64.AppImage	upstream	https://github.com/RPCS3/rpcs3@8e26652c85bb5658965fa5731d9a0309ca10b42b	-	-
+ps3/rpcs3-0.0.43-20508-forky-r1-x86_64.zip	repackaged	https://github.com/RPCS3/rpcs3@8e26652c85bb5658965fa5731d9a0309ca10b42b	src/mobileapp/tools/assemble-appimage.sh@43050ecf src/mobileapp/tools/assemble-glibc.sh@43050ecf src/microservices/runtimes/streamex/consoles/emulators.sh@43050ecf	src/mobileapp/tools/assemble-appimage.sh ps3 x86_64
+ps3/rpcs3-0.0.43-20508-forky-r1-aarch64.zip	repackaged	https://github.com/RPCS3/rpcs3@8e26652c85bb5658965fa5731d9a0309ca10b42b	src/mobileapp/tools/assemble-appimage.sh@43050ecf src/mobileapp/tools/assemble-glibc.sh@43050ecf	src/mobileapp/tools/assemble-appimage.sh ps3 aarch64
 ps3/rpcs3-0.0.43-20404-forky-r1-x86_64.zip	repackaged	https://github.com/RPCS3/rpcs3@e8979d31b3a22c8bc9a6eae6bdc31756eac8ee89	src/mobileapp/tools/assemble-appimage.sh@e92f5609 src/mobileapp/tools/assemble-glibc.sh@e92f5609 src/microservices/runtimes/streamex/consoles/emulators.sh@e92f5609	src/mobileapp/tools/assemble-appimage.sh ps3 x86_64
 ps3/rpcs3-0.0.43-20404-forky-r1-aarch64.zip	repackaged	https://github.com/RPCS3/rpcs3@e8979d31b3a22c8bc9a6eae6bdc31756eac8ee89	src/mobileapp/tools/assemble-appimage.sh@e92f5609 src/mobileapp/tools/assemble-glibc.sh@e92f5609	src/mobileapp/tools/assemble-appimage.sh ps3 aarch64
 
 ps4/shadps4-linux-sdl-0.20.0.zip	upstream	https://github.com/shadps4-emu/shadPS4@v.0.20.0	-	-
-ps4/shadps4-gameflex-0.20.0	ours	https://github.com/shadps4-emu/shadPS4@3eecea94ddaca360b19f4b800523b609a8b2ffcc	tools/shadps4@7f5dfcd4	tools/shadps4/build.sh
+ps4/shadps4-gameflex-0.20.0	ours	https://github.com/shadps4-emu/shadPS4@ce7643cab4c956cd386f3410edd149df7052394d	tools/shadps4@c30073f2	tools/shadps4/build.sh
+ps4/shadps4-0.20.0+box64-d653d0ebe-forky-r9-aarch64.zip	ours	https://github.com/shadps4-emu/shadPS4@ce7643cab4c956cd386f3410edd149df7052394d https://github.com/ptitSeb/box64@d653d0ebefeba2c9abe13a5c4c13663bbd242549	tools/shadps4@c30073f2 tools/box64@c30073f2 tools/box64/bundle.sh@c30073f2	tools/shadps4/build.sh; tools/box64/build.sh; tools/box64/bundle.sh
 ps4/shadps4-0.20.0+box64-d653d0ebe-forky-r7-aarch64.zip	ours	https://github.com/shadps4-emu/shadPS4@v.0.20.0 https://github.com/ptitSeb/box64@d653d0ebefeba2c9abe13a5c4c13663bbd242549	tools/shadps4@e779bb05 tools/box64@e779bb05 tools/box64/bundle.sh@e92f5609	tools/shadps4/build.sh; tools/box64/build.sh; tools/box64/bundle.sh
 ps4/shadps4-0.20.0+box64-d653d0ebe-forky-r1-x86_64.zip	repackaged	https://github.com/shadps4-emu/shadPS4@v.0.18.0	src/mobileapp/tools/assemble-appimage.sh@006bc43c src/mobileapp/tools/assemble-glibc.sh@006bc43c	src/mobileapp/tools/assemble-appimage.sh ps4 x86_64
 
-ps5/KytyPS5-2026-10-26-597137e-Linux-x86_64.tar.gz	upstream	https://github.com/KytyPS5/KytyPS5@597137e8b19aa86d64710cd38064bb14a7ca3e44	-	-
+ps5/KytyPS5-2026-11-04-91c5820-Linux-x86_64.tar.gz	upstream	https://github.com/KytyPS5/KytyPS5@91c5820c0cecb8ca024d691ca8750be811370591	-	-
+ps5/kyty_emulator-gameflex-KytyPS5-2026-11-04-91c5820	ours	https://github.com/KytyPS5/KytyPS5@91c5820c0cecb8ca024d691ca8750be811370591	tools/kyty@17d8eab5	tools/kyty/build.sh --server
+ps5/kyty-2026-11-04+box64-d653d0ebe-forky-r11-aarch64.zip	ours	https://github.com/KytyPS5/KytyPS5@91c5820c0cecb8ca024d691ca8750be811370591 https://github.com/ptitSeb/box64@d653d0ebefeba2c9abe13a5c4c13663bbd242549	tools/kyty@83832e5f tools/box64@83832e5f tools/box64/bundle.sh@83832e5f	tools/kyty/build.sh; tools/box64/build.sh; tools/box64/bundle.sh
+ps5/kyty-2026-11-04+box64-d653d0ebe-forky-r11-x86_64.zip	repackaged	https://github.com/KytyPS5/KytyPS5@91c5820c0cecb8ca024d691ca8750be811370591	src/mobileapp/tools/assemble-appimage.sh@83832e5f src/mobileapp/tools/assemble-glibc.sh@83832e5f src/microservices/runtimes/streamex/consoles/emulators.sh@83832e5f	src/mobileapp/tools/assemble-appimage.sh ps5 x86_64
+ps5/KytyPS5-2026-10-29-5eab0ec-Linux-x86_64.tar.gz	upstream	https://github.com/KytyPS5/KytyPS5@5eab0ec73855acdf776f5c0669911e2f5ddfb743	-	-
+ps5/kyty_emulator-gameflex-KytyPS5-2026-10-29-5eab0ec	ours	https://github.com/KytyPS5/KytyPS5@5eab0ec73855acdf776f5c0669911e2f5ddfb743	tools/kyty@14f2e7d8	tools/kyty/build.sh --server
+ps5/kyty-2026-10-29+box64-d653d0ebe-forky-r1-aarch64.zip	ours	https://github.com/KytyPS5/KytyPS5@5eab0ec73855acdf776f5c0669911e2f5ddfb743 https://github.com/ptitSeb/box64@d653d0ebefeba2c9abe13a5c4c13663bbd242549	tools/kyty@14f2e7d8 tools/box64@14f2e7d8 tools/box64/bundle.sh@14f2e7d8	tools/kyty/build.sh; tools/box64/build.sh; tools/box64/bundle.sh
+ps5/kyty-2026-10-29+box64-d653d0ebe-forky-r1-x86_64.zip	repackaged	https://github.com/KytyPS5/KytyPS5@5eab0ec73855acdf776f5c0669911e2f5ddfb743	src/mobileapp/tools/assemble-appimage.sh@14f2e7d8 src/mobileapp/tools/assemble-glibc.sh@14f2e7d8 src/microservices/runtimes/streamex/consoles/emulators.sh@14f2e7d8	src/mobileapp/tools/assemble-appimage.sh ps5 x86_64
 ps5/kyty_emulator-gameflex-KytyPS5-2026-10-26-597137e	ours	https://github.com/KytyPS5/KytyPS5@597137e8b19aa86d64710cd38064bb14a7ca3e44	tools/kyty@18388165	tools/kyty/build.sh --server
 ps5/kyty-2026-10-26+box64-d653d0ebe-forky-r1-aarch64.zip	ours	https://github.com/KytyPS5/KytyPS5@597137e8b19aa86d64710cd38064bb14a7ca3e44 https://github.com/ptitSeb/box64@d653d0ebefeba2c9abe13a5c4c13663bbd242549	tools/kyty@006bc43c tools/box64@006bc43c tools/box64/bundle.sh@e92f5609	tools/kyty/build.sh; tools/box64/build.sh; tools/box64/bundle.sh
 ps5/kyty-2026-10-26+box64-d653d0ebe-forky-r1-x86_64.zip	repackaged	https://github.com/KytyPS5/KytyPS5@597137e8b19aa86d64710cd38064bb14a7ca3e44	src/mobileapp/tools/assemble-appimage.sh@e92f5609 src/mobileapp/tools/assemble-glibc.sh@e92f5609 src/microservices/runtimes/streamex/consoles/emulators.sh@e92f5609	src/mobileapp/tools/assemble-appimage.sh ps5 x86_64
@@ -52,7 +64,7 @@ xbox/xemu-0.8.139-x86_64.AppImage	upstream	https://github.com/xemu-project/xemu@
 xbox/xemu-0.8.139-forky-r1-x86_64.zip	repackaged	https://github.com/xemu-project/xemu@v0.8.139	src/mobileapp/tools/assemble-appimage.sh@e92f5609 src/mobileapp/tools/assemble-glibc.sh@e92f5609 src/microservices/runtimes/streamex/consoles/emulators.sh@e92f5609	src/mobileapp/tools/assemble-appimage.sh xbox x86_64
 xbox/xemu-0.8.139-forky-r1-aarch64.zip	repackaged	https://github.com/xemu-project/xemu@v0.8.139	src/mobileapp/tools/assemble-appimage.sh@e92f5609 src/mobileapp/tools/assemble-glibc.sh@e92f5609	src/mobileapp/tools/assemble-appimage.sh xbox aarch64
 
-xbox360/xenia_canary_linux-291f0c9.AppImage	upstream	https://github.com/xenia-canary/xenia-canary@291f0c9be398a3e0a0e29f378cbd564fa28c55a9	-	-
+xbox360/xenia_canary_linux-57cddf7.AppImage	upstream	https://github.com/xenia-canary/xenia-canary@57cddf7d2939b52ed91344718b9afbf4870f4087	-	-
 
 # L'HISTORIQUE DE GAMEBOX (le porteur, 2026-10-27 : il garde les anciennes versions de nos
 # constructions). Mêmes règles ; les zips y ont été recopiés le 2026-10-24 à 15:09, la date
@@ -61,6 +73,7 @@ xbox360/xenia_canary_linux-291f0c9.AppImage	upstream	https://github.com/xenia-ca
 ps3/rpcs3-0.0.43-20247-forky-r2-x86_64.zip	repackaged	https://github.com/RPCS3/rpcs3@222754bfd3d2a482ea60b27d5661a12960491fd9	src/mobileapp/tools/assemble-appimage.sh@43719c4f src/mobileapp/tools/assemble-glibc.sh@43719c4f src/microservices/runtimes/streamex/consoles/emulators.sh@43719c4f	src/mobileapp/tools/assemble-appimage.sh ps3 x86_64
 ps3/rpcs3-0.0.43-20247-forky-r2-aarch64.zip	repackaged	https://github.com/RPCS3/rpcs3@222754bfd3d2a482ea60b27d5661a12960491fd9	src/mobileapp/tools/assemble-appimage.sh@43719c4f src/mobileapp/tools/assemble-glibc.sh@43719c4f	src/mobileapp/tools/assemble-appimage.sh ps3 aarch64
 
+ps4/shadps4-gameflex-0.20.0-p9	ours	https://github.com/shadps4-emu/shadPS4@3eecea94ddaca360b19f4b800523b609a8b2ffcc	tools/shadps4@7f5dfcd4	tools/shadps4/build.sh
 ps4/shadps4-gameflex-0.19.0	ours	https://github.com/shadps4-emu/shadPS4@v.0.19.0	tools/shadps4@54337754	tools/shadps4/build.sh
 ps4/shadps4-0.19.0+box64-d653d0ebe-forky-r5-aarch64.zip	ours	https://github.com/shadps4-emu/shadPS4@v.0.19.0 https://github.com/ptitSeb/box64@d653d0ebefeba2c9abe13a5c4c13663bbd242549	tools/shadps4@2a1ad705 tools/box64@2a1ad705	tools/shadps4/build.sh; tools/box64/build.sh; tools/box64/bundle.sh
 ps4/shadps4-0.19.0+box64-d653d0ebe-forky-r5-x86_64.zip	repackaged	https://github.com/shadps4-emu/shadPS4@v.0.18.0	src/mobileapp/tools/assemble-appimage.sh@2a1ad705 src/mobileapp/tools/assemble-glibc.sh@2a1ad705	src/mobileapp/tools/assemble-appimage.sh ps4 x86_64
@@ -80,3 +93,4 @@ ps5/kyty_emulator-gameflex-KytyPS5-2026-10-26-597137e-p16	ours	https://github.co
 
 xbox/xemu-0.8.136-forky-r2-x86_64.zip	repackaged	https://github.com/xemu-project/xemu@v0.8.136	src/mobileapp/tools/assemble-appimage.sh@3e4c29f2 src/mobileapp/tools/assemble-glibc.sh@3e4c29f2 src/microservices/runtimes/streamex/consoles/emulators.sh@3e4c29f2	src/mobileapp/tools/assemble-appimage.sh xbox x86_64
 xbox/xemu-0.8.136-forky-r2-aarch64.zip	repackaged	https://github.com/xemu-project/xemu@v0.8.136	src/mobileapp/tools/assemble-appimage.sh@3e4c29f2 src/mobileapp/tools/assemble-glibc.sh@3e4c29f2	src/mobileapp/tools/assemble-appimage.sh xbox aarch64
+ports/Zelda64Recompiled-v1.2.2-Linux-X64.zip	upstream	https://github.com/Zelda64Recomp/Zelda64Recomp@v1.2.2	-	-

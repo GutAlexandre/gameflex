@@ -477,7 +477,7 @@ export default function ButtonPositioningPanel({ controllerName = "dualshock" })
             {/* The editor itself takes whatever height is left — button
                 positions are relative to the play area, so it has to be as
                 large as the offcanvas allows. */}
-            <div className="flex-grow-1" style={{ position: "relative", bottom: 0, minHeight: 470 }}>
+            <div className="flex-grow-1" style={{ position: "relative", bottom: 0, minHeight: 500 }}>
                 <ControllerLayout
                     name={controllerName}
                     callbacks={{}}

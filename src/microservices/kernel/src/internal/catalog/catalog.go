@@ -49,6 +49,51 @@ func New(console, gamesDir string) *Catalog {
 	return &Catalog{console: console, gamesDir: gamesDir, scan: scan}
 }
 
+// For — le catalogue d'une console sous `romsDir`, le `roms/` d'un dossier ou
+// d'un disque interne : son propre dossier, sauf pour les ports PC, dont les
+// jeux vivent chez les consoles qu'ils lisent (chantier 40). UNE règle, pour
+// la bibliothèque comme pour les disques.
+func For(console, romsDir string) *Catalog {
+	if console == consoles.PortsID {
+		return &Catalog{console: console, gamesDir: romsDir, scan: scanPorts}
+	}
+
+	return New(console, filepath.Join(romsDir, console))
+}
+
+// scanPorts — les ROM qu'un port accepte (storage.PortOf), rangées à plat
+// chez leur console. `RelPath` part de `roms/` (« n64/Majora's Mask.z64 ») :
+// le conteneur ne reçoit que le dossier de cette console, à sa place sous
+// /opt/game (docker.go).
+func scanPorts(_, romsDir string) []Game {
+	games := []Game{}
+	for _, from := range consoles.PortSources() {
+		entries, err := os.ReadDir(filepath.Join(romsDir, from))
+		if err != nil {
+			continue
+		}
+		for _, entry := range entries {
+			name := entry.Name()
+			if entry.IsDir() || strings.HasPrefix(name, ".") {
+				continue
+			}
+			if _, ok := storage.PortOf(from, filepath.Join(romsDir, from, name)); !ok {
+				continue
+			}
+			relativePath := filepath.Join(from, name)
+			games = append(games, Game{
+				ID:      shortID(relativePath),
+				Title:   strings.TrimSuffix(name, filepath.Ext(name)),
+				Folder:  from,
+				RelPath: relativePath,
+			})
+		}
+	}
+	sort.Slice(games, func(i, j int) bool { return games[i].RelPath < games[j].RelPath })
+
+	return games
+}
+
 // NewKeyTest builds the keytest catalog: ONE fixed entry — the console has
 // no games, the adapter ignores the path (see the streamex keytest console).
 func NewKeyTest() *Catalog {
@@ -232,6 +277,10 @@ func Formats(console string) string {
 // la console ? Quand Resolve échoue, il distingue le jeu absent du jeu présent
 // dont aucun fichier ne se lance — un paquet PS5, que Kyty ne lit pas (#431).
 func (catalog *Catalog) HoldsFolder(identifier string) bool {
+	// Les dossiers sous `roms/` sont des consoles, pas des jeux des ports.
+	if catalog.console == consoles.PortsID {
+		return false
+	}
 	entries, err := os.ReadDir(catalog.gamesDir)
 	if err != nil {
 		return false

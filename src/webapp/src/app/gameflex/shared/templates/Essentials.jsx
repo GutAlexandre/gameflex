@@ -4,26 +4,36 @@ import * as bs from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import Skeleton from "../../../skeleton/skeleton.js";
 import { useDownloadProgress } from "../../libs/deviceStream.js";
+import { LAUNCH_BAR_GRADIENT, LAUNCH_SCREEN_BACKGROUND } from "../../stream/shared/launch-backdrop.js";
 
 const Form = Skeleton.Form;
 
 // Full-viewport spinner — the screen every async page entry shows before
 // its data resolves (was duplicated in index.js and the streaming pages).
-export function LoadingScreen({ label = null, bgColor = "black", textOnFailure = null, onFailure = null }) {
+//
+// `launch` — L'ASPECT DE L'ÉCRAN DE LANCEMENT, pour celui d'une partie (le
+// porteur, 2026-11-06 : « le background de GameFlex ») : son fond, et le
+// contenu en bas sur le même dégradé — le haut de l'image est au logo, et une
+// erreur posée au milieu le recouvrait.
+export function LoadingScreen({ label = null, bgColor = "black", textOnFailure = null, onFailure = null, launch = false }) {
     const { t } = useTranslation();
 
     return (
         <div
-            className="d-flex flex-column align-items-center justify-content-center text-white gap-3"
+            className={`d-flex flex-column align-items-center ${launch ? "justify-content-end" : "justify-content-center"} text-white gap-3`}
             style={{
                 position: "fixed",
                 inset: 0,
                 width: "100vw",
                 height: "var(--gameflex-visible-height)",
                 zIndex: 3005,
-                background: bgColor,
+                background: launch ? LAUNCH_SCREEN_BACKGROUND : bgColor,
             }}
         >
+            <div
+                className={launch ? "w-100 d-flex flex-column align-items-center px-3 pb-4 pt-5" : undefined}
+                style={launch ? { background: LAUNCH_BAR_GRADIENT } : undefined}
+            >
             {textOnFailure ? (
                 <div className="text-center">
                     <p className="text-danger mb-3">{textOnFailure}</p>
@@ -39,6 +49,7 @@ export function LoadingScreen({ label = null, bgColor = "black", textOnFailure =
                     <span className="visually-hidden">{label || t("app.loading")}</span>
                 </bs.Spinner>
             )}
+            </div>
         </div>
     );
 }

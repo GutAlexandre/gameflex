@@ -100,3 +100,6 @@ services:
     gameflex-xbox360:
         image: ${GAMEFLEX_NAMESPACE:-zinosaure}/gameflex-xbox360:${GAMEFLEX_VERSION}
         build: { context: ., dockerfile: src/microservices/runtimes/streamex/consoles/xbox360/Dockerfile, args: *console-arguments }
+    gameflex-ports-zelda64recomp:
+        image: ${GAMEFLEX_NAMESPACE:-zinosaure}/gameflex-ports-zelda64recomp:${GAMEFLEX_VERSION}
+        build: { context: ., dockerfile: src/microservices/runtimes/streamex/consoles/ports-zelda64recomp/Dockerfile, args: *console-arguments }

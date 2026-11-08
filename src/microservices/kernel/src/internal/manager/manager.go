@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -220,7 +221,7 @@ func (manager *Manager) sessionFromAdopted(adopted docker.AdoptedSession) *Sessi
 // Zero values mean "keep the console's default"; normalization below
 // revalidates everything the form can send.
 type LaunchSettings struct {
-	Resolution string // "540p" | "720p" | "1080p", anything else ignored
+	Resolution string // "360p" | "540p" | "720p" | "1080p", anything else ignored
 	FPS        int    // 15-60, otherwise ignored
 	Bitrate    int    // kbps, 500-20000, otherwise ignored
 	Language   string // the page's language, "fr" | "en" (chantier 21), otherwise ignored
@@ -294,6 +295,17 @@ func (manager *Manager) Launch(
 		}
 	}
 
+	// LE PORT, C'EST LA ROM QUI LE CHOISIT (chantier 40) : un port ne joue
+	// qu'une version d'un jeu, et la fiche n'a pas à le demander.
+	if console == consoles.PortsID {
+		from, _, _ := strings.Cut(filepath.ToSlash(game.RelPath), "/")
+		port, ok := storage.PortOf(from, gamePath)
+		if !ok {
+			return nil, ErrGameNotFound
+		}
+		settings.Core = port.Core
+	}
+
 	if console != "keytest" {
 		// Stop the player's previous session BEFORE spawning the new one so
 		// the GPU and the port are free and the "1 session per player" rule
@@ -342,6 +354,7 @@ func (manager *Manager) Launch(
 		Core:           settings.Core,
 		GamesHostDir:   gamesHostDir,
 		Engine:         gameEngine(console, gamePath, game.RelPath),
+		GameID:         storage.GameTitleID(gamePath),
 	}
 
 	announce("container.creating", spec.ContainerBase)
@@ -428,13 +441,20 @@ func (manager *Manager) resolveOnDisks(ctx context.Context, console, identifier 
 		manager.diskCatalogsMu.Lock()
 		diskCatalog, ok := manager.diskCatalogs[key]
 		if !ok {
-			diskCatalog = catalog.New(console, filepath.Join(disk.RomsDir(), console))
+			diskCatalog = catalog.For(console, disk.RomsDir())
 			manager.diskCatalogs[key] = diskCatalog
 		}
 		manager.diskCatalogsMu.Unlock()
 
 		if game, err := diskCatalog.Resolve(identifier); err == nil {
-			return game, filepath.Join(disk.RomsHostDir(), console), diskCatalog.Path(game), nil
+			// Un jeu des ports PC vit chez la console qu'il lit : son chemin
+			// part de `roms/`, et c'est de là que docker.go monte le dossier.
+			gamesHostDir := filepath.Join(disk.RomsHostDir(), console)
+			if console == consoles.PortsID {
+				gamesHostDir = disk.RomsHostDir()
+			}
+
+			return game, gamesHostDir, diskCatalog.Path(game), nil
 		}
 	}
 
@@ -468,7 +488,7 @@ func (manager *Manager) holdsFolder(ctx context.Context, console string, local *
 		return true
 	}
 	for _, disk := range manager.dockerHandler.InternalDisks(ctx) {
-		if disk.Present && catalog.New(console, filepath.Join(disk.RomsDir(), console)).HoldsFolder(identifier) {
+		if disk.Present && catalog.For(console, disk.RomsDir()).HoldsFolder(identifier) {
 			return true
 		}
 	}
@@ -698,6 +718,9 @@ func (manager *Manager) RetroStatus(sessionID string) (sessionstatus.Status, boo
 		EmulationFPS: status.FPS,
 		CPUPercent:   sessionstatus.Percent(status.CPUPercent),
 		RSSBytes:     status.RSSBytes,
+	}
+	if size, ok := sessionstatus.Size(status.Resolution); ok {
+		out.GameResolution = size
 	}
 	if status.GPU != nil {
 		out.GPUBusyPercent = sessionstatus.Percent(float64(status.GPU.BusyPercent))

@@ -850,6 +850,21 @@ function useElapsedSince(startedAt) {
     return `${pad(Math.floor(seconds / 3600))}:${pad(Math.floor(seconds / 60) % 60)}:${pad(seconds % 60)}`;
 }
 
+// LE TITRE D'UNE SECTION DU PANNEAU DE PERFORMANCES (le porteur, 2026-11-07 :
+// « tu peux rajouter juste un horizontal bar ou des légendes pour créer des
+// sections ») : sur toute la largeur de la grille, un trait au-dessus, sauf
+// pour la première. Défini ici, une fois, pour toutes les sections.
+function StatsSection({ title, first = false }) {
+    return (
+        <div
+            className={`fw-bold text-uppercase small text-white text-opacity-50${first ? "" : " border-top border-secondary pt-2 mt-2"}`}
+            style={{ gridColumn: "1 / -1" }}
+        >
+            {title}
+        </div>
+    );
+}
+
 export function StreamingStatsPanel({ stats, session, t }) {
     // != null is not enough for these: NaN and undefined both pass it, and
     // the panel then printed "NaN" and "undefinedxundefined" (React even warns
@@ -911,10 +926,30 @@ export function StreamingStatsPanel({ stats, session, t }) {
         || ((session?.playerCount ?? 0) + (session?.openSlots ?? 0));
     const padSlot = session?.me?.padSlot;
 
+    // « 960x540 (−50 %) » : la scène que l'émulateur fait calculer au jeu, et
+    // sa réduction en hauteur par rapport à l'image que le jeu rend (le
+    // porteur, 2026-11-07). La scène seule quand l'image du jeu manque.
+    const emulatorResolution = () => {
+        const scene = stats?.emulatorResolution;
+        if (!scene) return null;
+        const sceneHeight = Number(scene.split("x")[1]);
+        const gameHeight = Number(String(stats?.gameResolution || "").split("x")[1]);
+        if (!(sceneHeight > 0) || !(gameHeight > 0)) return scene;
+        const percent = Math.round((sceneHeight / gameHeight - 1) * 100);
+        const sign = percent > 0 ? "+" : percent < 0 ? "−" : "";
+
+        return `${scene} (${sign}${Math.abs(percent)} %)`;
+    };
+
     return (
         // EN COLONNES SUR TOUTE LA LARGEUR (le porteur, 2026-10-28) : une
         // seule colonne de vingt lignes débordait la hauteur d'un téléphone
         // couché ; la largeur entière les range côte à côte.
+        //
+        // EN SECTIONS (le porteur, 2026-11-07 : « séparer les informations qui
+        // concernent le Gateway avec celles qui concernent l'émulateur, la
+        // machine ») : le téléphone qu'on tient, la partie, le flux, l'émulateur,
+        // la machine. Chaque section commence par StatsSection.
         <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
@@ -923,11 +958,11 @@ export function StreamingStatsPanel({ stats, session, t }) {
         }}>
             {/* LE TÉLÉPHONE QU'ON TIENT, EN PREMIER, dans l'application
                 seulement (le porteur, 2026-10-29 : « les joueurs préfèrent
-                avoir l'info de leur téléphone aussi (et en premier) »). Une
-                ligne le sépare de ce qui suit : la machine qui fait tourner la
-                partie. Voir useSessionStats. */}
+                avoir l'info de leur téléphone aussi (et en premier) »). Voir
+                useSessionStats. */}
             {inApp && (
                 <>
+                    <StatsSection title={t("streaming.page.stats.sections.phone")} first />
                     <div className="d-flex justify-content-between gap-3">
                         <span className="text-white text-opacity-75">{t("streaming.page.stats.phoneTemperature")}</span>
                         <span>
@@ -944,51 +979,24 @@ export function StreamingStatsPanel({ stats, session, t }) {
                                 : "—"}
                         </span>
                     </div>
-                    <hr className="my-1" style={{ gridColumn: "1 / -1" }} />
                 </>
             )}
-            {/* L'émulateur et sa version, tels que la session les déclare
-                (sessionstatus.Status.Emulator) : un cœur libretro par son nom,
-                une console streamex par son image, un invité du téléphone par
-                son paquet. Absent pour Remote Play, qui n'émule rien. */}
-            <div className="d-flex justify-content-between gap-3">
-                <span className="text-white text-opacity-75">{t("streaming.page.stats.emulator")}</span>
-                <span className="text-end">{stats?.emulator || "—"}</span>
-            </div>
-            {/* La machine qui fait tourner la partie — celle d'un serveur
-                fédéré quand on joue chez lui : c'est lui qui répond
-                (sessionstatus.Status.Host). */}
-            <div className="d-flex justify-content-between gap-3">
-                <span className="text-white text-opacity-75">{t("streaming.page.stats.host")}</span>
-                <span className="text-end">{describeResources(stats?.host, t) || "—"}</span>
-            </div>
-            {/* La chaleur et la batterie de cette machine — 100 % pour un
-                serveur sur secteur (sessionstatus.ServerPower ; un téléphone
-                donne les siennes). */}
-            {machinePower && (
-                <>
-                    <div className="d-flex justify-content-between gap-3">
-                        <span className="text-white text-opacity-75">{t("streaming.page.stats.temperature")}</span>
-                        <span>
-                            {num(stats?.temperatureCelsius) != null
-                                ? `${Math.round(stats.temperatureCelsius)} °C${delta("temperatureCelsius", (v) => `${v} °C`)}`
-                                : "—"}
-                        </span>
-                    </div>
-                    <div className="d-flex justify-content-between gap-3">
-                        <span className="text-white text-opacity-75">{t("streaming.page.stats.battery")}</span>
-                        <span>
-                            {num(stats?.batteryPercent) != null
-                                ? `${Math.round(stats.batteryPercent)} %${delta("batteryPercent", (v) => `${v} %`)}`
-                                : "—"}
-                        </span>
-                    </div>
-                </>
-            )}
+
+            <StatsSection title={t("streaming.page.stats.sections.session")} first={!inApp} />
             <div className="d-flex justify-content-between gap-3">
                 <span className="text-white text-opacity-75">{t("streaming.page.stats.uptime")}</span>
                 <span style={{ fontVariantNumeric: "tabular-nums" }}>{uptime ?? "—"}</span>
             </div>
+            <div className="d-flex justify-content-between gap-3">
+                <span className="text-white text-opacity-75">{t("streaming.page.stats.slot")}</span>
+                <span>
+                    {padSlot != null && maxSlots > 0 ? `${padSlot}/${maxSlots}` : "—"}
+                </span>
+            </div>
+
+            {/* LE FLUX, du gateway jusqu'à cette page : ce que le navigateur
+                mesure de son côté. */}
+            <StatsSection title={t("streaming.page.stats.sections.gateway")} />
             <div className="d-flex justify-content-between gap-3">
                 <span className="text-white text-opacity-75">
                     {t("streaming.page.stats.resolution")}
@@ -1033,6 +1041,35 @@ export function StreamingStatsPanel({ stats, session, t }) {
                     {num(stats?.latencyMs) != null ? `${Math.round(stats.latencyMs)} ms` : "—"}
                 </span>
             </div>
+
+            {/* L'ÉMULATEUR et sa version, tels que la session les déclare
+                (sessionstatus.Status.Emulator) : un cœur libretro par son nom,
+                une console streamex par son image, un invité du téléphone par
+                son paquet. Absent pour Remote Play, qui n'émule rien. */}
+            <StatsSection title={t("streaming.page.stats.sections.emulator")} />
+            <div className="d-flex justify-content-between gap-3">
+                <span className="text-white text-opacity-75">{t("streaming.page.stats.emulator")}</span>
+                <span className="text-end">{stats?.emulator || "—"}</span>
+            </div>
+            {/* LA RÉSOLUTION DU JEU, ce qu'il rend réellement à la console (la
+                sortie d'un jeu PS5 : 1920x1080 ou 3840x2160 ; l'image d'un cœur
+                libretro), puis la scène plus petite que l'émulateur lui fait
+                calculer, avec sa réduction. À ne pas confondre avec
+                « Résolution gateway », celle du flux. Voir sessionstatus.Status. */}
+            <div className="d-flex justify-content-between gap-3">
+                <span className="text-white text-opacity-75">{t("streaming.page.stats.gameResolution")}</span>
+                <span>{stats?.gameResolution || "—"}</span>
+            </div>
+            <div className="d-flex justify-content-between gap-3">
+                <span className="text-white text-opacity-75">{t("streaming.page.stats.emulatorResolution")}</span>
+                <span>{emulatorResolution() || "—"}</span>
+            </div>
+            <div className="d-flex justify-content-between gap-3">
+                <span className="text-white text-opacity-75">{t("streaming.page.stats.emulationFps")}</span>
+                <span>
+                    {num(stats?.emulationFps) != null ? `${Math.round(stats.emulationFps)}` : "—"}
+                </span>
+            </div>
             <div className="d-flex justify-content-between gap-3">
                 <span className="text-white text-opacity-75">{t("streaming.page.stats.cpuEmulator")}</span>
                 <span>
@@ -1041,7 +1078,6 @@ export function StreamingStatsPanel({ stats, session, t }) {
                         : "—"}
                 </span>
             </div>
-
             <div className="d-flex justify-content-between gap-3">
                 <span className="text-white text-opacity-75">{t("streaming.page.stats.ram")}</span>
                 <span>{bytes(stats?.rssBytes) != null ? `${bytes(stats.rssBytes)}${bytesDelta("rssBytes")}` : "—"}</span>
@@ -1058,21 +1094,6 @@ export function StreamingStatsPanel({ stats, session, t }) {
                         : "—"}
                 </span>
             </div>
-            <div className="d-flex justify-content-between gap-3">
-                <span className="text-white text-opacity-75">{t("streaming.page.stats.gpuBusyPercent")}</span>
-                <span>
-                    {num(stats?.gpuBusyPercent) != null ? `${Math.round(stats.gpuBusyPercent)} %` : "—"}
-                </span>
-            </div>
-
-            <div className="d-flex justify-content-between gap-3">
-                <span className="text-white text-opacity-75">{t("streaming.page.stats.vramUsedBytes")}</span>
-                <span>
-                    {bytes(stats?.vramUsedBytes) != null
-                        ? `${bytes(stats.vramUsedBytes)}${bytes(stats?.vramTotalBytes) ? ` / ${bytes(stats.vramTotalBytes)}` : ""}${bytesDelta("vramUsedBytes")}`
-                        : "—"}
-                </span>
-            </div>
             {/* Ce que l'émulateur lit sur le disque, par seconde
                 (sessionstatus.Status.DiskReadBytesPerSec) : la vitesse à
                 laquelle le jeu se charge. Une décimale sous 10 Mo/s, où
@@ -1085,19 +1106,53 @@ export function StreamingStatsPanel({ stats, session, t }) {
                         : "—"}
                 </span>
             </div>
-            <div className="d-flex justify-content-between gap-3">
-                <span className="text-white text-opacity-75">{t("streaming.page.stats.emulationFps")}</span>
-                <span>
-                    {num(stats?.emulationFps) != null ? `${Math.round(stats.emulationFps)}` : "—"}
-                </span>
-            </div>
-            <div className="d-flex justify-content-between gap-3">
-                <span className="text-white text-opacity-75">{t("streaming.page.stats.slot")}</span>
-                <span>
-                    {padSlot != null && maxSlots > 0 ? `${padSlot}/${maxSlots}` : "—"}
-                </span>
-            </div>
 
+            {/* LA MACHINE qui fait tourner la partie — celle d'un serveur
+                fédéré quand on joue chez lui : c'est lui qui répond
+                (sessionstatus.Status.Host). Son GPU est partagé par toutes les
+                parties. */}
+            <StatsSection title={t("streaming.page.stats.sections.host")} />
+            <div className="d-flex justify-content-between gap-3">
+                <span className="text-white text-opacity-75">{t("streaming.page.stats.host")}</span>
+                <span className="text-end">{describeResources(stats?.host, t) || "—"}</span>
+            </div>
+            {/* La chaleur et la batterie de cette machine — 100 % pour un
+                serveur sur secteur (sessionstatus.ServerPower ; un téléphone
+                donne les siennes). */}
+            {machinePower && (
+                <>
+                    <div className="d-flex justify-content-between gap-3">
+                        <span className="text-white text-opacity-75">{t("streaming.page.stats.temperature")}</span>
+                        <span>
+                            {num(stats?.temperatureCelsius) != null
+                                ? `${Math.round(stats.temperatureCelsius)} °C${delta("temperatureCelsius", (v) => `${v} °C`)}`
+                                : "—"}
+                        </span>
+                    </div>
+                    <div className="d-flex justify-content-between gap-3">
+                        <span className="text-white text-opacity-75">{t("streaming.page.stats.battery")}</span>
+                        <span>
+                            {num(stats?.batteryPercent) != null
+                                ? `${Math.round(stats.batteryPercent)} %${delta("batteryPercent", (v) => `${v} %`)}`
+                                : "—"}
+                        </span>
+                    </div>
+                </>
+            )}
+            <div className="d-flex justify-content-between gap-3">
+                <span className="text-white text-opacity-75">{t("streaming.page.stats.gpuBusyPercent")}</span>
+                <span>
+                    {num(stats?.gpuBusyPercent) != null ? `${Math.round(stats.gpuBusyPercent)} %` : "—"}
+                </span>
+            </div>
+            <div className="d-flex justify-content-between gap-3">
+                <span className="text-white text-opacity-75">{t("streaming.page.stats.vramUsedBytes")}</span>
+                <span>
+                    {bytes(stats?.vramUsedBytes) != null
+                        ? `${bytes(stats.vramUsedBytes)}${bytes(stats?.vramTotalBytes) ? ` / ${bytes(stats.vramTotalBytes)}` : ""}${bytesDelta("vramUsedBytes")}`
+                        : "—"}
+                </span>
+            </div>
         </div>
     );
 }

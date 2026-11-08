@@ -49,7 +49,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # régression doit pouvoir se comparer à quelque chose. Pour monter : la
 # version ici ET dans consoles/emulators.sh, puis
 #   tools/streamex-emulators.sh build ps5
-ARG KYTY_RELEASE=KytyPS5-2026-10-26-597137e
+ARG KYTY_RELEASE=KytyPS5-2026-11-04-91c5820
 
 # MESA VIENT DE trixie-backports (26.1.2), comme pour la PS3.
 #
@@ -107,7 +107,7 @@ RUN groupadd -f pulse-access && usermod -aG pulse-access root && usermod -aG pul
 # même, avec nos patchs pour le serveur (#431, tools/kyty/README.md).
 # Sans lui, celui de l'éditeur — et le journal de la partie le dit.
 ARG KYTY_FILE=${KYTY_RELEASE}-Linux-x86_64.tar.gz
-ARG KYTY_URL=https://github.com/KytyPS5/KytyPS5/releases/download/KytyPS5-2026-10-26-597137e/KytyPS5-2026-10-26-597137e-Linux-x86_64.tar.gz
+ARG KYTY_URL=https://github.com/KytyPS5/KytyPS5/releases/download/KytyPS5-2026-11-04-91c5820/KytyPS5-2026-11-04-91c5820-Linux-x86_64.tar.gz
 # Les versions éprouvées avec cette image (emulator_tested) : la liste informe,
 # elle ne bloque pas — toute version que reconnaît le motif se lance.
 ARG KYTY_TESTED="${KYTY_FILE}"
@@ -176,7 +176,11 @@ ENV STREAMEX_PAD_VENDOR=0x054c \
 # `swap_xy_from_slot: -1` dans adapter.json. Absent, il valait 0 — X et Y
 # inversés à l'émission sur chaque pad, carré et triangle échangés en jeu
 # (trouvé sur la PS4, qui avait le même mapping, le 2026-10-22).
-ENV SDL_GAMECONTROLLERCONFIG="030000004c050000e60c000011010000,PS5 Controller,a:b0,b:b1,x:b3,y:b2,back:b6,start:b7,guide:b8,leftshoulder:b4,rightshoulder:b5,leftstick:b9,rightstick:b10,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5,dpup:h0.1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,platform:Linux,"
+#
+# LE PAVÉ TACTILE (2026-11-08) : le clic du pavé arrive sur b11
+# (BTN_TRIGGER_HAPPY1, internal/gamepad), et Kyty lit le bouton « touchpad »
+# de SDL comme le clic du pavé de ce joueur (hostInput.cpp, PAD_BUTTON_TOUCH_PAD).
+ENV SDL_GAMECONTROLLERCONFIG="030000004c050000e60c000011010000,PS5 Controller,a:b0,b:b1,x:b3,y:b2,back:b6,start:b7,guide:b8,leftshoulder:b4,rightshoulder:b5,leftstick:b9,rightstick:b10,touchpad:b11,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5,dpup:h0.1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,platform:Linux,"
 
 # Où les jeux sont montés, et où le scanner de l'adapter les cherche.
 ENV KYTY_GAMES_DIR=/opt/game

@@ -36,7 +36,8 @@
 #
 #   *.AppImage   déballée par --appimage-extract (pas de FUSE dans un conteneur)
 #   *.zip        décompressée ; l'AppImage qu'elle contient est déballée à son
-#                tour (shadPS4 publie un zip qui la porte)
+#                tour (shadPS4 publie un zip qui la porte), ou son archive
+#                tar.gz (Zelda 64: Recompiled publie un zip qui en porte une)
 #   *.tar.gz     décompressée telle quelle (Kyty)
 #
 # GAMEFLEX_EMULATOR_TESTED — les versions éprouvées avec cette image
@@ -120,8 +121,13 @@ case "$file" in
     *.zip)
         unzip -q "$source" -d "$work/zip"
         appimage=$(find "$work/zip" -name '*.AppImage' | head -n 1)
+        tarball=$(find "$work/zip" -name '*.tar.gz' | head -n 1)
         if [ -n "$appimage" ]; then
             extract_appimage "$appimage"
+        elif [ -n "$tarball" ]; then
+            rm -rf "$dest"
+            mkdir -p "$dest"
+            tar xzf "$tarball" -C "$dest"
         else
             rm -rf "$dest"
             mv "$work/zip" "$dest"

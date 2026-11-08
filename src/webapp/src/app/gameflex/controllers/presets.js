@@ -537,11 +537,11 @@ export const CONTROLLER_PRESETS = {
                 column: "center",
                 x: 0.5,
                 y: 0,
-                size: DEFAULT_BUTTON_SIZE * XXLARGE_BUTTON_SIZE,
+                size: DEFAULT_BUTTON_SIZE,
                 xl: {
                     x: 0.5,
                     y: 0.7,
-                    size: DEFAULT_BUTTON_SIZE * XXLARGE_BUTTON_SIZE
+                    size: DEFAULT_BUTTON_SIZE * LARGE_BUTTON_SIZE
                 },
                 icon: "bi bi-square fs-1",
             },

@@ -61,13 +61,14 @@ func ForConsole(console string) string {
 // DualSense (seules SHARE/CREATE et OPTIONS remplacent SELECT/START, et le
 // pavé tactile n'est pas encore une surface qu'une manette à l'écran sait
 // offrir — voir docs/TODO.md). La Wii U reprend celle de la Switch, et les
-// trois Xbox la même. keytest n'est pas une console mais un banc d'essai de
+// trois Xbox la même ; les ports PC aussi (chantier 40) : ils lisent tous une
+// manette SDL moderne. keytest n'est pas une console mais un banc d'essai de
 // touches, avec son propre profil.
 func baseProfile(console string) string {
 	switch console {
 	case "ps3", "ps4", "ps5":
 		return ps3Profile
-	case "xbox", "xbox360", "xboxone":
+	case "xbox", "xbox360", "xboxone", "ports":
 		return xboxProfile
 	case "keytest":
 		return keytestProfile

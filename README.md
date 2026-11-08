@@ -84,12 +84,14 @@ GameFlex on the phone, which plays its own games and streams them to the screens
 |---|---|
 | **Retro** | NES, Super Nintendo, Game Boy and Game Boy Color, Game Boy Advance, Virtual Boy, Nintendo 64, Nintendo DS, GameCube, Wii, Master System, Mega Drive / Genesis, Saturn, Dreamcast, PlayStation, PlayStation 2, PSP, Neo Geo, Neo Geo Pocket, Capcom CPS-1 and CPS-2, PC Engine, PC-FX, Atari 2600, 7800, Lynx and Jaguar, WonderSwan, ColecoVision, Vectrex, Commodore 64, Amstrad CPC, ZX Spectrum, Doom |
 | **Recent, with Streamex** | PlayStation 3, Xbox, and, still experimental, PlayStation 4, PlayStation 5, Nintendo Switch, Wii U and Xbox 360 |
+| **PC Ports, with Streamex** | Nintendo 64 games remade for the PC by their community, which read your own ROM: *The Legend of Zelda: Majora's Mask* (Zelda 64: Recompiled) |
 | **Remote Play** | your own PlayStation 4 or PlayStation 5 |
 
 The full list, with the files each console needs, is in [Consoles](docs/consoles.md).
 
 Retro consoles run on [libretro](https://www.libretro.com) cores. Recent consoles run on their own
-Linux emulators: RPCS3, xemu, shadPS4, KytyPS5, Eden, Citron, Cemu and Xenia Canary.
+Linux emulators: RPCS3, xemu, shadPS4, KytyPS5, Eden, Citron, Cemu and Xenia Canary. PC Ports
+run on the port published by its authors for Linux.
 
 **Streamex** is what plays them: GameFlex's own engine for the recent consoles, the same skeleton in
 every console's image. It starts the console's emulator, captures its picture and sound, encodes the

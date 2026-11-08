@@ -1,5 +1,5 @@
 diff --git a/src/core/address_space.cpp b/src/core/address_space.cpp
-index 10b0bc3..faa79c2 100644
+index 10b0bc3a..faa79c25 100644
 --- a/src/core/address_space.cpp
 +++ b/src/core/address_space.cpp
 @@ -677,6 +677,22 @@ struct AddressSpace::Impl {
@@ -26,7 +26,7 @@ index 10b0bc3..faa79c2 100644
          constexpr int protection_flags = PROT_READ | PROT_WRITE;
          int map_flags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED; // compiler knows its constexpr
 diff --git a/src/core/emulator_settings.h b/src/core/emulator_settings.h
-index f36308a..a255231 100644
+index 118aea00..d34f3e0e 100644
 --- a/src/core/emulator_settings.h
 +++ b/src/core/emulator_settings.h
 @@ -189,6 +189,10 @@ struct GeneralSettings {
@@ -58,7 +58,7 @@ index f36308a..a255231 100644
                                     trophy_notification_side, discord_rpc_enabled, show_fps_counter,
                                     console_language, big_picture_scale, big_picture_folder_depth,
                                     redzone_patches)
-@@ -672,6 +678,7 @@ public:
+@@ -680,6 +686,7 @@ public:
      SETTING_FORWARD_BOOL(m_general, DevKit, dev_kit_mode)
      SETTING_FORWARD(m_general, ExtraDmemInMBytes, extra_dmem_in_mbytes)
      SETTING_FORWARD(m_general, ExtraFmemInMBytes, extra_fmem_in_mbytes)

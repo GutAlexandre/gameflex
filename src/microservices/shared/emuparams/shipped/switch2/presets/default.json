@@ -1,0 +1,32 @@
+{
+  "name": "Default",
+  "description": "The values GameFlex recommends: Eglantine's own, and the resolution of the stream.",
+  "translations": {
+    "fr": {
+      "name": "Par défaut",
+      "description": "Les valeurs que recommande GameFlex : celles d'Eglantine, et la résolution du flux."
+    }
+  },
+  "override": false,
+  "system": "Eglantine",
+  "values": {
+    "resolution": "auto",
+    "consoleMode": "1",
+    "asyncShaders": false,
+    "gpuAccuracy": "1",
+    "cpuAccuracy": "0",
+    "vsync": "2",
+    "multiCore": true,
+    "antiAliasing": "0",
+    "scalingFilter": "1",
+    "videoDecoding": "1",
+    "reactiveFlushing": true,
+    "volume": "100",
+    "turnipDebug": "auto",
+    "ir3Debug": "auto",
+    "asyncPresentation": false,
+    "dynamicState": "2",
+    "vertexInputDynamicState": true,
+    "nativeExecution": "auto"
+  }
+}

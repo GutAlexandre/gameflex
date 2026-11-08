@@ -75,6 +75,11 @@ var writers = map[string]writer{
 	"eden": {file: "eden/qt-config.ini", format: qtINIFormat, auto: edenAuto, launcher: []string{"Renderer > resolution_setup"},
 		environment: "eden/environment",
 		language:    "System > language_index", languages: map[string]string{"fr": "2", "en": "1"}},
+	// EGLANTINE, la Switch 2 (#644) : un fork d'Eden, qui en garde le fichier et
+	// les paliers de résolution.
+	"eglantine": {file: "eden/qt-config.ini", format: qtINIFormat, auto: edenAuto, launcher: []string{"Renderer > resolution_setup"},
+		environment: "eden/environment",
+		language:    "System > language_index", languages: map[string]string{"fr": "2", "en": "1"}},
 	"cemu": {file: "Cemu/settings.xml", format: xmlFormat,
 		language: "content > console_language", languages: map[string]string{"fr": "2", "en": "1"}},
 	// LES INVITÉS DU TÉLÉPHONE SOUS BOX64 (chantier 17, #371) : leurs réglages
@@ -85,9 +90,12 @@ var writers = map[string]writer{
 	// Les requêtes d'occlusion de Kyty, allumées par le lanceur quand aucun
 	// paramètre n'en décide (#445) : sans elles, le GPU dessine ce que le jeu
 	// voulait sauter (FF7 Remake, 10 i/s au lieu de 13,5). Son cache de
-	// shaders aussi, comme le fait son propre lanceur (tools/kyty/0016).
+	// shaders aussi, comme le fait son propre lanceur (tools/kyty/0016). Et
+	// sa mémoire unique (tools/kyty/0026, 0027) : FF7 Remake de 7,6 à 21,8 i/s ;
+	// et la hauteur de rendu d'un jeu Unreal, 540p (0028, 0040) : FF7 Remake de 29 à 60 i/s.
 	"kyty": {file: "kyty/environment", format: envFormat, env: true, auto: kytyAuto,
-		launcher: []string{"Environment > KYTY_OCCLUSION_QUERIES", "Environment > KYTY_SHADER_CACHE"}},
+		launcher: []string{"Environment > KYTY_OCCLUSION_QUERIES", "Environment > KYTY_SHADER_CACHE",
+			"Environment > KYTY_UNIFIED_MEMORY", "Environment > KYTY_UE_RENDER_HEIGHT"}},
 	// shadPS4 : son config.json (chantier 21, la langue de la console) ; ses
 	// paramètres — Box64, le son de SDL — restent dans l'environnement d'à
 	// côté, au même chemin pour GlibcGuest. Le téléphone pose aussi la plage
@@ -225,12 +233,19 @@ func xemuAuto(config string, streamHeight int, _ []string) (string, bool) {
 	return strconv.Itoa(XemuSurfaceScale(streamHeight)), true
 }
 
-// kytyAuto — la valeur que le lanceur donne aux requêtes d'occlusion et au
-// cache de shaders de Kyty : allumés. `KYTY_OCCLUSION_QUERIES` vaut
-// `--occlusion-queries` (tools/kyty/0015), `KYTY_SHADER_CACHE` vaut
-// `--shader-cache` (0016).
+// kytyAuto — la valeur que le lanceur donne aux requêtes d'occlusion, au
+// cache de shaders et à la mémoire unique de Kyty : allumés.
+// `KYTY_OCCLUSION_QUERIES` vaut `--occlusion-queries` (tools/kyty/0015),
+// `KYTY_SHADER_CACHE` vaut `--shader-cache` (0016), `KYTY_UNIFIED_MEMORY`
+// tire la mémoire du jeu du tas dma-buf (0026) — sans lui, Kyty garde la
+// sienne, et le téléphone ne l'a pas. `KYTY_UE_RENDER_HEIGHT` (0040) : la
+// hauteur à laquelle un jeu Unreal calcule sa scène, 540p.
 func kytyAuto(config string, _ int, _ []string) (string, bool) {
-	if config != "Environment > KYTY_OCCLUSION_QUERIES" && config != "Environment > KYTY_SHADER_CACHE" {
+	switch config {
+	case "Environment > KYTY_OCCLUSION_QUERIES", "Environment > KYTY_SHADER_CACHE", "Environment > KYTY_UNIFIED_MEMORY":
+	case "Environment > KYTY_UE_RENDER_HEIGHT":
+		return "540", true
+	default:
 		return "", false
 	}
 

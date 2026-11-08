@@ -33,6 +33,7 @@ import { setGameInputSuspended } from "./libs/gameInput.js";
 import { useScreenOrientation } from "./libs/screenOrientation.js";
 import { createSwitchesStore } from "./stream/shared/switches-store.js";
 import { FloatingPanel, StreamingStatsPanel } from "./stream/onscreen/FloatingPanel.jsx";
+import { TouchpadOnlyContext } from "./stream/onscreen/Controllers.jsx";
 // Vendor-prefixed fullscreen, already written once — the page was calling
 // the raw API and ignoring this.
 import { requestFullscreen, exitFullscreen, isFullscreen, isMobileDevice, isTabletDevice } from "./shared/utils/device-detection.js";
@@ -1797,7 +1798,15 @@ export function StreamingShell({ t, user, token, session, context, setTerminateR
                 // translated phase otherwise — passing the key itself would
                 // render it raw.
                 connectingLabel={phase === "live" ? OVERLAY_HIDDEN : t(`streaming.connection.phase.${phase}`)}
-            />
+            >
+                {/* Sous la vidéo, en portrait (le porteur, 2026-11-03). Une
+                    surface tournée est un paysage : la vidéo y prend tout. */}
+                {isPortraitViewport && !rotateSurface && (
+                    <div className="text-center text-white text-opacity-50 small py-1" style={{ pointerEvents: "none" }}>
+                        {t("streaming.page.brand")}
+                    </div>
+                )}
+            </SessionStream>
 
             {/* LA SOURIS, POUR LES PLATEFORMES QUI ONT UN BUREAU DERRIÈRE.
                 Une surface transparente par-dessus la vidéo, et non des
@@ -1924,6 +1933,11 @@ export function StreamingShell({ t, user, token, session, context, setTerminateR
                     zIndex: 1002,
                 }}>
                     {drivesPad && switches.isControllerVisible && controller?.Component && controller.Component}
+                    {drivesPad && !switches.isControllerVisible && hasPhysicalGamepad && controller?.Component && (
+                        <TouchpadOnlyContext.Provider value={isPortraitViewport && !rotateSurface ? "portrait" : "landscape"}>
+                            {controller.Component}
+                        </TouchpadOnlyContext.Provider>
+                    )}
                     {!isWatching && !drivesPad && childLoan.canReclaim && (
                         <div className="p-3 text-center text-white small">
                             <p>{t("streaming.handover.lentNotice", { username: nameOf(childLoan.lentTo) })}</p>
@@ -2436,7 +2450,7 @@ export default function Streaming() {
     // 2026-09-08. Une attente sans fin est le pire des deux affichages : elle
     // ne dit ni ce qu'on attend, ni qu'on a cessé d'attendre.
     if (terminateReason) {
-        return <LoadingScreen textOnFailure={terminateReason} onFailure={onTerminate} />;
+        return <LoadingScreen launch textOnFailure={terminateReason} onFailure={onTerminate} />;
     }
 
     // ANNULER AVANT QUE LA PAGE N'AIT SA PARTIE (#287). On n'arrive ici

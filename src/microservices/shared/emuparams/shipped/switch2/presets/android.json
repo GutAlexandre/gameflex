@@ -1,0 +1,32 @@
+{
+  "name": "Android",
+  "description": "The values Eden, on which Eglantine is based, uses on Android devices: low GPU accuracy, no reactive flushing, asynchronous presentation, dynamic state off, handheld mode. A starting point for a phone.",
+  "translations": {
+    "fr": {
+      "name": "Android",
+      "description": "Les valeurs qu'Eden, dont Eglantine est issu, emploie sur les appareils Android : précision du GPU basse, sans vidage réactif, présentation asynchrone, état dynamique désactivé, mode portable. Un point de départ pour un téléphone."
+    }
+  },
+  "override": false,
+  "system": "Eglantine",
+  "values": {
+    "resolution": "auto",
+    "consoleMode": "0",
+    "asyncShaders": false,
+    "gpuAccuracy": "0",
+    "cpuAccuracy": "0",
+    "vsync": "2",
+    "multiCore": true,
+    "antiAliasing": "0",
+    "scalingFilter": "1",
+    "videoDecoding": "1",
+    "reactiveFlushing": false,
+    "asyncPresentation": true,
+    "dynamicState": "0",
+    "vertexInputDynamicState": false,
+    "nativeExecution": "auto",
+    "volume": "100",
+    "turnipDebug": "auto",
+    "ir3Debug": "auto"
+  }
+}

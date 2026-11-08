@@ -23,22 +23,24 @@ import (
 // CEUX DE L'ÉMULATEUR CHOISI (StreamexParams) : une console peut livrer les
 // paramètres de plusieurs émulateurs, la session n'en fait tourner qu'un.
 //
-// ET CEUX DU MOTEUR DU JEU par-dessus (`engine`, chantier 36) : le préréglage
-// que le moteur désigne, s'il est actif (emuparams.SettingsFor).
-func emulatorParamsEnv(root, consoleID, core, engine string) (string, bool) {
+// ET CEUX DU MOTEUR DU JEU par-dessus (`engine`, chantier 36), puis LE CORRECTIF
+// DU JEU (`game`, chantier 43), de la bibliothèque ou d'un disque interne
+// (`patchDirs`) : emuparams.SettingsFor.
+func emulatorParamsEnv(root string, patchDirs []string, consoleID, core, engine, game string) (string, bool) {
 	name, ok := StreamexParams(consoleID, core)
 	ref := emuparams.Ref{ConsoleID: consoleID, Emulator: name}
 	if !ok || !emuparams.IsShipped(ref) {
 		return "", false
 	}
-	settings := emuparams.Store{Root: root}.SettingsFor(ref, engine)
+	settings := emuparams.Store{Root: root, PatchDirs: patchDirs}.SettingsFor(ref, engine, game)
 	encoded, err := json.Marshal(settings)
 	if err != nil {
 		return "", false
 	}
 	slog.Info("paramètres de l'émulateur transmis", "console", consoleID, "émulateur", ref.Emulator,
 		"état", settings.State, "valeurs", len(settings.Entries), "erreur", settings.Error,
-		"moteur", settings.Engine, "préréglage du moteur", settings.EnginePreset, "erreur du moteur", settings.EngineError)
+		"moteur", settings.Engine, "préréglage du moteur", settings.EnginePreset, "erreur du moteur", settings.EngineError,
+		"correctif du jeu", settings.Game, "erreur du jeu", settings.GameError)
 
 	return "GAMEFLEX_EMULATOR_PARAMS=" + string(encoded), true
 }

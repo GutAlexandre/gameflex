@@ -1,17 +1,5 @@
---- a/src/graphics/host_gpu/renderer/pipeline/descriptorHeap.h
-+++ b/src/graphics/host_gpu/renderer/pipeline/descriptorHeap.h
-@@ -13,6 +13,11 @@
- struct GraphicContext;
- class MasterSemaphore;
- 
-+// A descriptor set layout that needs `count` descriptors of `type`: every pool created from now
-+// on holds a few such sets. The default quotas are below what some games bind in one set (Final
-+// Fantasy VII Rebirth, past its main menu), and a fresh pool that cannot hold one set was fatal.
-+void RequireDescriptorPoolSize(vk::DescriptorType type, uint32_t count);
-+
- class DescriptorHeap {
- public:
- 	DescriptorHeap(GraphicContext& graphics, MasterSemaphore& master_semaphore);
+diff --git a/src/graphics/host_gpu/renderer/pipeline/descriptorHeap.cpp b/src/graphics/host_gpu/renderer/pipeline/descriptorHeap.cpp
+index ad343767..4ee6b92c 100644
 --- a/src/graphics/host_gpu/renderer/pipeline/descriptorHeap.cpp
 +++ b/src/graphics/host_gpu/renderer/pipeline/descriptorHeap.cpp
 @@ -5,6 +5,10 @@
@@ -25,7 +13,7 @@
  namespace Libs::Graphics {
  namespace {
  
-@@ -15,9 +19,39 @@
+@@ -15,9 +19,39 @@ constexpr std::array DescriptorPoolSizes = {
      vk::DescriptorPoolSize {vk::DescriptorType::eStorageImage, 1024},
      vk::DescriptorPoolSize {vk::DescriptorType::eSampler, 1024},
  };
@@ -65,7 +53,7 @@
  DescriptorHeap::DescriptorHeap(GraphicContext& graphics, MasterSemaphore& master_semaphore)
      : m_graphics(graphics), m_master_semaphore(master_semaphore) {
  	CreateDescriptorPool();
-@@ -54,7 +88,13 @@
+@@ -52,7 +86,13 @@ vk::DescriptorSet DescriptorHeap::Commit(vk::DescriptorSetLayout layout) {
  
  	m_sets.clear();
  	auto& fresh_batch = m_sets[layout];
@@ -80,7 +68,7 @@
  	return fresh_batch.sets[--fresh_batch.size];
  }
  
-@@ -83,10 +123,15 @@
+@@ -81,10 +121,15 @@ bool DescriptorHeap::Allocate(vk::DescriptorSetLayout layout, Batch& batch) {
  }
  
  void DescriptorHeap::CreateDescriptorPool() {
@@ -98,17 +86,35 @@
  	EXIT_IF(m_graphics.device.createDescriptorPool(&create, nullptr, &m_current_pool) !=
  	        vk::Result::eSuccess);
  }
+diff --git a/src/graphics/host_gpu/renderer/pipeline/descriptorHeap.h b/src/graphics/host_gpu/renderer/pipeline/descriptorHeap.h
+index 2fb83ae5..5b6c9381 100644
+--- a/src/graphics/host_gpu/renderer/pipeline/descriptorHeap.h
++++ b/src/graphics/host_gpu/renderer/pipeline/descriptorHeap.h
+@@ -13,6 +13,11 @@ namespace Libs::Graphics {
+ struct GraphicContext;
+ class MasterSemaphore;
+ 
++// A descriptor set layout that needs `count` descriptors of `type`: every pool created from now
++// on holds a few such sets. The default quotas are below what some games bind in one set (Final
++// Fantasy VII Rebirth, past its main menu), and a fresh pool that cannot hold one set was fatal.
++void RequireDescriptorPoolSize(vk::DescriptorType type, uint32_t count);
++
+ class DescriptorHeap {
+ public:
+ 	DescriptorHeap(GraphicContext& graphics, MasterSemaphore& master_semaphore);
+diff --git a/src/graphics/host_gpu/renderer/pipeline/shaders.cpp b/src/graphics/host_gpu/renderer/pipeline/shaders.cpp
+index 1db65a3e..af94e453 100644
 --- a/src/graphics/host_gpu/renderer/pipeline/shaders.cpp
 +++ b/src/graphics/host_gpu/renderer/pipeline/shaders.cpp
-@@ -6,6 +6,7 @@
+@@ -4,6 +4,7 @@
+ #include "gpu_blit_shaders/gpu_mesh_indirect_spv.h"
  #include "graphics/guest_gpu/gpu_defs.h"
  #include "graphics/host_gpu/graphicContext.h"
- #include "graphics/host_gpu/renderer/debug.h"
 +#include "graphics/host_gpu/renderer/pipeline/descriptorHeap.h"
  #include "graphics/host_gpu/renderer/pipeline/descriptors.h"
  #include "graphics/host_gpu/renderer/pipeline/pipelineCache.h"
  #include "graphics/host_gpu/renderer/pipeline/shaderResourceBarrier.h"
-@@ -229,6 +230,18 @@
+@@ -114,6 +115,18 @@ static void CreateLayouts(GraphicContext& graphics, PipelineCache::Pipeline& pip
  		     samplers, limits.maxDescriptorSetSamplers);
  	}
  	pipeline.uses_push_descriptors = descriptor_count <= graphics.max_push_descriptors;

@@ -143,14 +143,18 @@ fi
 # ── Rendu à la résolution du flux (#340) ──
 # Eden multiplie la sortie de la console — 1080p en mode docké, son défaut —
 # par `resolution_setup`, un NUMÉRO dans sa liste (src/common/settings_enums.h :
-# Res1_4X, Res1_2X, Res3_4X, Res1X, Res3_2X, Res2X, Res3X, …, Res5_4X, Res7_4X).
+# Res1_4X, Res1_2X, Res3_4X, Res1X, Res5_4X, Res3_2X, Res2X, Res3X, …).
 # On prend le palier le plus proche du flux, et à égalité le plus bas : 360p et
 # 540p → ×0,5, 720p → ×0,75, 1080p → ×1. ×0,25 est écarté : Eden ne le
 # propose même pas dans ses menus. Sans `\default=false`, Eden ignore la
 # valeur et garde son défaut. Le téléphone suit la même règle
-# (GlibcGuest.edenResolution).
+# (GlibcGuest.edenResolution), et emuparams.EdenResolution aussi.
+#
+# CE N'ÉTAIT PAS LA LISTE D'EDEN, MAIS CELLE DE CITRON (12 : ×1,25 ; 13 : ×1,75),
+# recopiée de l'image de Citron. Elle donne le même palier jusqu'en 1080p ;
+# au-delà, 12 est le ×8 d'Eden (relevé le 2026-11-06).
 RES_SETUP=$(awk -v h="$RES_H" 'BEGIN {
-  n = split("1:0.5 2:0.75 3:1 12:1.25 4:1.5 13:1.75 5:2 6:3", steps, " ")
+  n = split("1:0.5 2:0.75 3:1 4:1.25 5:1.5 6:2 7:3", steps, " ")
   best = 3; bestDistance = -1; bestHeight = 0
   for (i = 1; i <= n; i++) {
     split(steps[i], step, ":"); height = step[2] * 1080; distance = height - h

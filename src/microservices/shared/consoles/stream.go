@@ -13,9 +13,10 @@ import "strings"
 // elle vit ici — le serveur avait déjà vu deux tables écrites par nous dériver
 // (360p et 540p manquaient d'un côté, 480p de l'autre).
 //
-// 360p A ÉTÉ RETIRÉ PARTOUT le 2026-10-26 (le porteur : « de nos jours 540p est
-// assez bien partout ») ; une préférence encore en « 360p » est ignorée, comme
-// une en « 480p ».
+// 360p, RETIRÉ le 2026-10-26 (« de nos jours 540p est assez bien partout »),
+// REVIENT le 2026-11-06 (#636) : un jeu que l'émulateur rend en 360p (une PS5 sur
+// téléphone) n'a rien à gagner d'un flux plus grand, et le porteur le redemande.
+// C'est aussi un des quatre modes de Remote Play.
 //
 // 480p A ÉTÉ RETIRÉ PARTOUT le 2026-09-20, sur décision de l'utilisateur.
 //
@@ -26,6 +27,7 @@ import "strings"
 // plateformes. Une entrée déjà enregistrée en « 480p » ne casse rien :
 // `StreamSize` ne la connaît pas, et la console garde sa géométrie d'époque.
 var streamSizes = map[string][2]int{
+	"360p":  {640, 360},
 	"540p":  {960, 540},
 	"720p":  {1280, 720},
 	"1080p": {1920, 1080},

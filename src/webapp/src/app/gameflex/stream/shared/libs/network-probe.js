@@ -73,8 +73,11 @@ function suggestPreset(latencyMs, throughputKbps) {
     if (throughputKbps >= 6000) {
         return { resolution: "540p", frameRate: "60" };
     }
-    // Le bas de l'échelle est 540p à 30 : le 360p n'existe plus (2026-10-26).
-    return { resolution: "540p", frameRate: "30" };
+    if (throughputKbps >= 3000) {
+        return { resolution: "540p", frameRate: "30" };
+    }
+    // Le bas de l'échelle : 360p à 30, revenu le 2026-11-06 (#636).
+    return { resolution: "360p", frameRate: "30" };
 }
 
 /**

@@ -65,6 +65,7 @@ services:
             - GAMEFLEX_WIIU_IMAGE=zinosaure/gameflex-wiiu:${GAMEFLEX_VERSION:-latest}
             - GAMEFLEX_XBOX_IMAGE=zinosaure/gameflex-xbox:${GAMEFLEX_VERSION:-latest}
             - GAMEFLEX_XBOX360_IMAGE=zinosaure/gameflex-xbox360:${GAMEFLEX_VERSION:-latest}
+            - GAMEFLEX_PORTS_ZELDA64RECOMP_IMAGE=zinosaure/gameflex-ports-zelda64recomp:${GAMEFLEX_VERSION:-latest}
         volumes:
             # GameFlex starts the games in their own containers.
             - /var/run/docker.sock:/var/run/docker.sock
@@ -126,7 +127,7 @@ services:
     gameflex-retrogaming:
         image: zinosaure/gameflex-retrogaming:${GAMEFLEX_VERSION:-latest}
         container_name: ${GAMEFLEX_NAME:-gameflex}-retrogaming
-        restart: "no"
+        restart: unless-stopped
 
     # Recent consoles: one image each, downloaded only when you ask for it,
     # for example `docker compose --profile ps3 pull`. These never run on their
@@ -170,6 +171,13 @@ services:
     gameflex-xbox360:
         image: zinosaure/gameflex-xbox360:${GAMEFLEX_VERSION:-latest}
         profiles: [ "xbox360" ]
+        entrypoint: [ "true" ]
+        restart: "no"
+    # PC Ports: games remade for the PC by their community, that read your
+    # Nintendo 64 ROM (in roms/n64). One image per port.
+    gameflex-ports-zelda64recomp:
+        image: zinosaure/gameflex-ports-zelda64recomp:${GAMEFLEX_VERSION:-latest}
+        profiles: [ "ports" ]
         entrypoint: [ "true" ]
         restart: "no"
 

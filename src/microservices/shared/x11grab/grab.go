@@ -47,6 +47,11 @@ type Display struct {
 	conn *xgb.Conn
 	root xproto.Drawable
 
+	// socket : l'adresse ouverte, pour la seconde connexion qui suit les
+	// changements de l'écran (changes.go) ; nil tant qu'elle n'est pas ouverte.
+	socket  string
+	changes *changes
+
 	// Width/Height : la taille de l'écran, lue au raccordement.
 	Width  int
 	Height int
@@ -108,6 +113,7 @@ func Open(socket string) (*Display, error) {
 	display := &Display{
 		conn:   conn,
 		root:   xproto.Drawable(screen.Root),
+		socket: socket,
 		Width:  int(screen.WidthInPixels),
 		Height: int(screen.HeightInPixels),
 	}
@@ -457,6 +463,10 @@ func (d *Display) fetch(need int) ([]byte, error) {
 
 // Close ferme la connexion.
 func (d *Display) Close() {
+	if d.changes != nil {
+		d.changes.close()
+		d.changes = nil
+	}
 	if d.conn != nil {
 		d.conn.Close()
 		d.conn = nil

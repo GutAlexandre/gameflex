@@ -4,6 +4,8 @@ import (
 	"context"
 	"sort"
 	"strings"
+
+	"gameflex/consoles"
 )
 
 // LES ÉMULATEURS DE CHAQUE CONSOLE, ET L'IMAGE DE CHACUN.
@@ -29,6 +31,11 @@ import (
 // porte le même) ; `data`, pour la Switch, où ses données se montent — les
 // mêmes sauvegardes du compte pour les deux émulateurs, qui rangent leur NAND
 // de la même façon (héritage yuzu).
+//
+// LES PORTS PC (chantier 40) sont une console à part, `ports`, dont chaque
+// « émulateur » est un port : un jeu recompilé, qui ne lit de sa ROM que les
+// données. Chacun a son image et son dossier — `params` le nomme sous
+// `saves/<compte>/streamex/ports/`, `data` dit où le port le cherche.
 type streamexEmulator struct {
 	core   string
 	params string
@@ -41,12 +48,17 @@ var streamexEmulators = map[string][]streamexEmulator{
 		{core: "Eden (streamex)", params: "eden", image: "streamex-switch-eden", data: "/root/.local/share/eden"},
 		{core: "Citron (streamex)", params: "citron", image: "streamex-switch", data: "/root/.local/share/citron"},
 	},
+	// La Switch 2 (#644) : Eglantine, un fork d'Eden qui en garde les dossiers.
+	"switch2": {{core: "Eglantine (streamex)", params: "eglantine", image: "streamex-switch2", data: "/root/.local/share/eden"}},
 	"ps3":     {{core: "RPCS3 (streamex)", params: "rpcs3", image: "streamex-ps3"}},
 	"xbox":    {{core: "xemu (streamex)", params: "xemu", image: "streamex-xbox"}},
 	"wiiu":    {{core: "Cemu (streamex)", params: "cemu", image: "streamex-wiiu"}},
 	"ps4":     {{core: "shadPS4 (streamex)", params: "shadps4", image: "streamex-ps4"}},
 	"ps5":     {{core: "KytyPS5 (streamex)", params: "kyty", image: "streamex-ps5"}},
 	"xbox360": {{core: "Xenia Canary (streamex)", params: "xenia", image: "streamex-xbox360"}},
+	consoles.PortsID: {
+		{core: "Zelda 64: Recompiled (streamex)", params: "zelda64recomp", image: "streamex-ports-zelda64recomp", data: "/root/.config/Zelda64Recompiled"},
+	},
 }
 
 // StreamexCores — les cœurs du registre que ce serveur fait tourner pour

@@ -1,7 +1,12 @@
 {
   "enabled": true,
   "name": "PlayStation 3",
-  "description": "The settings given to RPCS3 before every PS3 game starts.",
+  "description": "Settings of RPCS3, the PlayStation 3 emulator, applied when a game starts.",
+  "translations": {
+    "fr": {
+      "description": "Les réglages de RPCS3, l'émulateur de la PlayStation 3, appliqués au démarrage d'un jeu."
+    }
+  },
   "system": "RPCS3",
   "requirements": [
     "PS3UPDAT.PUP"
@@ -19,6 +24,36 @@
         "75": "75 % — 960×540",
         "100": "100 % — the game's resolution",
         "150": "150 % — 1920×1080"
+      },
+      "translations": {
+        "fr": {
+          "label": "Résolution de rendu",
+          "description": "La taille à laquelle RPCS3 dessine, en pourcentage de celle du jeu (le plus souvent 720p). « Suivre le flux » dessine à la résolution choisie pour la partie : 540p donne 75 %, 360p donne 50 %.",
+          "options": {
+            "auto": "Suivre le flux",
+            "50": "50 % — 640×360 pour un jeu en 720p",
+            "75": "75 % — 960×540",
+            "100": "100 % — la résolution du jeu",
+            "150": "150 % — 1920×1080"
+          }
+        }
+      }
+    },
+    "consoleResolution": {
+      "type": "select",
+      "label": "Console resolution",
+      "description": "The video output resolution of the console, as chosen in the display settings of a PlayStation 3. Games are told this resolution and choose their output from it. 720p, the resolution of most games, is the lightest; 1080p only helps the few games that offer it.",
+      "config": "Video > Resolution",
+      "value": "1280x720",
+      "options": {
+        "1280x720": "720p",
+        "1920x1080": "1080p"
+      },
+      "translations": {
+        "fr": {
+          "label": "Résolution de la console",
+          "description": "La résolution de sortie vidéo de la console, comme dans les paramètres d'affichage d'une PlayStation 3. Les jeux reçoivent cette résolution et en tirent leur sortie. 720p, la résolution de la plupart des jeux, est la plus légère ; 1080p ne sert qu'aux quelques jeux qui la proposent."
+        }
       }
     },
     "frameLimit": {
@@ -33,17 +68,38 @@
         "60": "60",
         "PS3 Native": "PS3 native — 59.94",
         "Off": "No limit"
+      },
+      "translations": {
+        "fr": {
+          "label": "Limite d'images par seconde",
+          "description": "Auto suit le rythme du jeu. Sans limite, un jeu qui ne règle pas son rythme lui-même peut tourner trop vite.",
+          "options": {
+            "Auto": "Auto",
+            "PS3 Native": "Celle de la PS3 — 59,94",
+            "Off": "Aucune limite"
+          }
+        }
       }
     },
     "msaa": {
       "type": "select",
       "label": "Anti-aliasing (MSAA)",
-      "description": "Disabled, the graphics processor has less to do; edges look more jagged.",
+      "description": "Smooths the edges of objects. When disabled, the graphics processor has less to do and edges look more jagged.",
       "config": "Video > MSAA",
       "value": "Auto",
       "options": {
         "Auto": "As the game asks",
         "Disabled": "Disabled"
+      },
+      "translations": {
+        "fr": {
+          "label": "Anticrénelage (MSAA)",
+          "description": "Adoucit le contour des objets. Désactivé, le processeur graphique a moins à faire et les contours paraissent plus crénelés.",
+          "options": {
+            "Auto": "Comme le jeu le demande",
+            "Disabled": "Désactivé"
+          }
+        }
       }
     },
     "shaderMode": {
@@ -57,6 +113,18 @@
         "Async Recompiler (multi-threaded)": "Asynchronous",
         "Legacy Recompiler (single-threaded)": "Legacy recompiler, single thread",
         "Shader Interpreter only": "Interpreter only"
+      },
+      "translations": {
+        "fr": {
+          "label": "Compilation des shaders",
+          "description": "Avec l'interpréteur, un shader pas encore compilé est interprété au lieu de figer l'image.",
+          "options": {
+            "Async Recompiler with Shader Interpreter": "Asynchrone, avec interpréteur",
+            "Async Recompiler (multi-threaded)": "Asynchrone",
+            "Legacy Recompiler (single-threaded)": "Ancien recompilateur, un seul fil",
+            "Shader Interpreter only": "Interpréteur seulement"
+          }
+        }
       }
     },
     "shaderPrecision": {
@@ -69,6 +137,17 @@
         "Ultra": "Ultra — full precision",
         "High": "High — RPCS3's default",
         "Low": "Low — faster, less exact"
+      },
+      "translations": {
+        "fr": {
+          "label": "Précision des shaders",
+          "description": "Avec quelle exactitude le processeur graphique calcule les shaders de la PS3. Ultra garde tout en pleine précision 32 bits et est plus lent ; Basse est plus rapide mais moins exacte.",
+          "options": {
+            "Ultra": "Ultra — pleine précision",
+            "High": "Haute — valeur par défaut de RPCS3",
+            "Low": "Basse — plus rapide, moins exacte"
+          }
+        }
       }
     },
     "multithreadedRsx": {
@@ -76,63 +155,117 @@
       "label": "RSX on its own thread",
       "description": "Part of the PS3's rendering runs on a thread of its own. Faster with many cores, sometimes slower because of the extra thread.",
       "config": "Video > Multithreaded RSX",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "RSX sur son propre fil",
+          "description": "Une partie du rendu de la PS3 tourne sur un fil à elle. Plus rapide avec beaucoup de cœurs, parfois plus lent à cause du fil supplémentaire."
+        }
+      }
     },
     "writeColorBuffers": {
       "type": "switch",
       "label": "Write color buffers",
-      "description": "Some games need it to display correctly; slower.",
+      "description": "Some games need it to display correctly. Slower.",
       "config": "Video > Write Color Buffers",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Écrire les tampons de couleur",
+          "description": "Certains jeux en ont besoin pour s'afficher correctement. Plus lent."
+        }
+      }
     },
     "relaxedZcull": {
       "type": "switch",
       "label": "Relaxed ZCULL sync",
       "description": "Faster in some games, at the risk of instability or display errors.",
       "config": "Video > Relaxed ZCULL Sync",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Synchronisation ZCULL souple",
+          "description": "Plus rapide dans certains jeux, au risque d'instabilités ou d'erreurs d'affichage."
+        }
+      }
     },
     "accurateZcull": {
       "type": "switch",
       "label": "Accurate ZCULL stats",
       "description": "Disabled, faster; a few games then show objects that flicker or disappear.",
       "config": "Video > Accurate ZCULL stats",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Statistiques ZCULL exactes",
+          "description": "Désactivées, c'est plus rapide ; quelques jeux montrent alors des objets qui clignotent ou disparaissent."
+        }
+      }
     },
     "disableZcullQueries": {
       "type": "switch",
       "label": "No occlusion queries",
       "description": "The graphics processor stops counting which objects are hidden. Some effects can go wrong (lens flares, shadows), but it removes a known source of graphics driver hangs.",
       "config": "Video > Disable ZCull Occlusion Queries",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Sans requêtes d'occlusion",
+          "description": "Le processeur graphique ne compte plus les objets cachés. Certains effets peuvent se dérégler (reflets d'objectif, ombres), mais une cause connue de blocage du pilote graphique disparaît."
+        }
+      }
     },
     "disableVertexCache": {
       "type": "switch",
       "label": "No vertex cache",
       "description": "RPCS3 stops reusing the vertices it has already decoded. Slower, but a stale cache is a known cause of stretched polygons.",
       "config": "Video > Disable Vertex Cache",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Sans cache de sommets",
+          "description": "RPCS3 ne réutilise plus les sommets déjà décodés. Plus lent, mais un cache périmé est une cause connue de polygones étirés."
+        }
+      }
     },
     "strictRendering": {
       "type": "switch",
       "label": "Strict rendering",
       "description": "RPCS3 follows the PS3's rendering rules to the letter instead of taking shortcuts. Slower; fixes some glitches.",
       "config": "Video > Strict Rendering Mode",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Rendu strict",
+          "description": "RPCS3 suit les règles de rendu de la PS3 à la lettre au lieu de prendre des raccourcis. Plus lent ; corrige certains défauts d'affichage."
+        }
+      }
     },
     "asyncTextureStreaming": {
       "type": "switch",
       "label": "Asynchronous texture streaming",
       "description": "Vulkan sends textures on a separate compute queue. Useful on a graphics processor with headroom.",
       "config": "Video > Vulkan > Asynchronous Texture Streaming",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Envoi asynchrone des textures",
+          "description": "Vulkan envoie les textures par une file de calcul séparée. Utile sur un processeur graphique qui a de la marge."
+        }
+      }
     },
     "performanceOverlay": {
       "type": "switch",
       "label": "RPCS3 performance overlay",
       "description": "Shows the frame rate and processor load, measured by RPCS3 itself, over the game.",
       "config": "Video > Performance Overlay > Enabled",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Indicateurs de performance de RPCS3",
+          "description": "Affiche par-dessus le jeu les images par seconde et la charge du processeur, mesurées par RPCS3."
+        }
+      }
     },
     "spuBlockSize": {
       "type": "select",
@@ -144,6 +277,12 @@
         "Safe": "Safe",
         "Mega": "Mega",
         "Giga": "Giga"
+      },
+      "translations": {
+        "fr": {
+          "label": "Taille des blocs SPU",
+          "description": "Mega et Giga compilent le code des SPU en blocs moins nombreux et plus grands : plus rapide. Safe est le plus compatible."
+        }
       }
     },
     "xfloatAccuracy": {
@@ -156,6 +295,17 @@
         "Accurate": "Accurate — exact, slower",
         "Approximate": "Approximate — RPCS3's default",
         "Relaxed": "Relaxed — fastest, least exact"
+      },
+      "translations": {
+        "fr": {
+          "label": "Précision des calculs SPU",
+          "description": "Avec quelle exactitude les coprocesseurs SPU de la PS3 calculent les nombres à virgule flottante. Précise corrige les jeux dont les modèles ou la physique se dérèglent, au prix de temps processeur.",
+          "options": {
+            "Accurate": "Précise — exacte, plus lente",
+            "Approximate": "Approchée — valeur par défaut de RPCS3",
+            "Relaxed": "Souple — la plus rapide, la moins exacte"
+          }
+        }
       }
     },
     "maxSpursThreads": {
@@ -171,6 +321,15 @@
         "3": "3",
         "2": "2",
         "1": "1"
+      },
+      "translations": {
+        "fr": {
+          "label": "Fils SPURS",
+          "description": "Le nombre maximal de fils SPURS par groupe. En dessous de 6, peut aider un processeur qui a peu de cœurs libres, mais peut aussi faire planter le jeu.",
+          "options": {
+            "6": "6, comme la PS3"
+          }
+        }
       }
     },
     "preferredSpuThreads": {
@@ -187,6 +346,15 @@
         "4": "4",
         "5": "5",
         "6": "6"
+      },
+      "translations": {
+        "fr": {
+          "label": "Fils SPU simultanés",
+          "description": "Combien de fils SPU travaillent en même temps sur les étapes sensibles. Moins réduit les saccades de certains jeux ; remettez Auto si c'est pire.",
+          "options": {
+            "0": "Auto"
+          }
+        }
       }
     },
     "spuLoopDetection": {
@@ -194,24 +362,41 @@
       "label": "SPU loop detection",
       "description": "Spots wait loops in SPU code to share the work better: faster, less processor. Rarely, the sound stutters.",
       "config": "Core > SPU loop detection",
-      "value": false
+      "value": false,
+      "translations": {
+        "fr": {
+          "label": "Détection des boucles SPU",
+          "description": "Repère les boucles d'attente dans le code des SPU pour mieux répartir le travail : plus rapide, moins de processeur. Rarement, le son saccade."
+        }
+      }
     },
     "threadScheduler": {
       "type": "select",
       "label": "Thread scheduling",
-      "description": "System: Android places the threads on the cores. The other two are RPCS3's own, which picks each thread's cores itself.",
+      "description": "System lets the operating system place the threads on the processor cores. The other two are RPCS3's own schedulers, which choose each thread's cores themselves.",
       "config": "Core > Thread Scheduler Mode",
       "value": "Operating System",
       "options": {
         "Operating System": "System",
         "RPCS3 Scheduler": "RPCS3",
         "RPCS3 Alternative Scheduler": "RPCS3, alternative"
+      },
+      "translations": {
+        "fr": {
+          "label": "Répartition des fils",
+          "description": "Système laisse le système d'exploitation placer les fils sur les cœurs du processeur. Les deux autres sont ceux de RPCS3, qui choisissent eux-mêmes les cœurs de chaque fil.",
+          "options": {
+            "Operating System": "Système",
+            "RPCS3 Scheduler": "RPCS3",
+            "RPCS3 Alternative Scheduler": "RPCS3, variante"
+          }
+        }
       }
     },
     "llvmThreads": {
       "type": "select",
       "label": "Compilation threads",
-      "description": "Compiling a game at its first launch. 8 threads: almost three times faster than 2 (measured on the server).",
+      "description": "How many threads compile a game's code the first time it starts. More threads compile faster on a processor with many cores.",
       "config": "Core > Max LLVM Compile Threads",
       "value": "8",
       "options": {
@@ -219,6 +404,15 @@
         "2": "2",
         "4": "4",
         "8": "8"
+      },
+      "translations": {
+        "fr": {
+          "label": "Fils de compilation",
+          "description": "Combien de fils compilent le code d'un jeu à son premier démarrage. Plus de fils compilent plus vite sur un processeur qui a beaucoup de cœurs.",
+          "options": {
+            "0": "Auto"
+          }
+        }
       }
     },
     "timeStretching": {
@@ -226,25 +420,40 @@
       "label": "Time stretching",
       "description": "When the game runs below its speed, the sound slows down with it instead of skipping.",
       "config": "Audio > Enable Time Stretching",
-      "value": true
+      "value": true,
+      "translations": {
+        "fr": {
+          "label": "Étirement du son",
+          "description": "Quand le jeu tourne moins vite que prévu, le son ralentit avec lui au lieu de sauter."
+        }
+      }
     },
     "audioBuffer": {
       "type": "select",
       "label": "Audio buffer",
-      "description": "Longer, the sound stutters less when frames are missing, but arrives later.",
+      "description": "A longer buffer makes the sound stutter less when the game slows down, but the sound arrives later.",
       "config": "Audio > Desired Audio Buffer Duration",
       "value": "34",
       "options": {
         "20": "20 ms",
-        "34": "34 ms, RPCS3's own",
+        "34": "34 ms (RPCS3 default)",
         "50": "50 ms",
         "100": "100 ms"
+      },
+      "translations": {
+        "fr": {
+          "label": "Tampon audio",
+          "description": "Un tampon plus long fait moins saccader le son quand le jeu ralentit, mais le son arrive plus tard.",
+          "options": {
+            "34": "34 ms (valeur par défaut de RPCS3)"
+          }
+        }
       }
     },
     "turnipDebug": {
       "type": "select",
       "label": "Adreno driver workaround (Turnip)",
-      "description": "A debug option of Turnip, the graphics driver of Adreno phones: it changes how the driver renders, to work around its bugs. It has no effect on another graphics processor.",
+      "description": "Debug options of Turnip, the graphics driver of Adreno devices, which change how the driver renders to work around its bugs. They have no effect on other graphics processors.",
       "config": "Environment > TU_DEBUG",
       "value": "auto",
       "options": {
@@ -254,17 +463,41 @@
         "sysmem": "sysmem — never render in tiles",
         "nolrz": "nolrz — no early depth test",
         "syncdraw": "syncdraw — one draw at a time (slow)"
+      },
+      "translations": {
+        "fr": {
+          "label": "Contournement du pilote Adreno (Turnip)",
+          "description": "Des options de débogage de Turnip, le pilote graphique des appareils Adreno, qui changent sa façon de dessiner pour contourner ses défauts. Elles n'ont aucun effet sur les autres processeurs graphiques.",
+          "options": {
+            "auto": "Aucun",
+            "flushall": "flushall — vider les caches du GPU après chaque dessin (plus lent)",
+            "gmem": "gmem — toujours rendre en tuiles",
+            "sysmem": "sysmem — jamais de rendu en tuiles",
+            "nolrz": "nolrz — pas de test de profondeur anticipé",
+            "syncdraw": "syncdraw — un dessin à la fois (lent)"
+          }
+        }
       }
     },
     "ir3Debug": {
       "type": "select",
       "label": "Adreno shader compiler (Turnip)",
-      "description": "A debug option of ir3, the compiler of Turnip's shaders. “nopreamble” works around a known geometry bug of RPCS3 on Turnip (Mesa #14386). It has no effect on another graphics processor.",
+      "description": "A debug option of ir3, the shader compiler of Turnip. “nopreamble” works around a known geometry bug of RPCS3 on Turnip. It has no effect on other graphics processors.",
       "config": "Environment > IR3_SHADER_DEBUG",
       "value": "auto",
       "options": {
         "auto": "None",
         "nopreamble": "nopreamble — no shader preamble"
+      },
+      "translations": {
+        "fr": {
+          "label": "Compilateur de shaders Adreno (Turnip)",
+          "description": "Une option de débogage d'ir3, le compilateur de shaders de Turnip. « nopreamble » contourne un défaut de géométrie connu de RPCS3 sur Turnip. Elle n'a aucun effet sur les autres processeurs graphiques.",
+          "options": {
+            "auto": "Aucun",
+            "nopreamble": "nopreamble — sans préambule de shader"
+          }
+        }
       }
     }
   }

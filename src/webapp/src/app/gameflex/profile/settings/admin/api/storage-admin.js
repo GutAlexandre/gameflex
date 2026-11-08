@@ -368,13 +368,13 @@ export function fetchEmulatorParams() {
     return api(`${BASE}/params`);
 }
 
-// `engines` — le préréglage que chaque moteur de jeu pose (chantier 36) ;
-// absent, le kernel n'y touche pas.
-export function writeEmulatorParams(consoleId, emulator, { enabled, values, preset = "", engines }) {
+// `engines`, `games` — le préréglage que chaque moteur de jeu et chaque jeu
+// posent (chantier 36) ; absents, le kernel n'y touche pas.
+export function writeEmulatorParams(consoleId, emulator, { enabled, values, preset = "", engines, games }) {
     return api(emulatorPath(consoleId, emulator), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled, values, preset, ...(engines ? { engines } : {}) }),
+        body: JSON.stringify({ enabled, values, preset, ...(engines ? { engines } : {}), ...(games ? { games } : {}) }),
     });
 }
 
