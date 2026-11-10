@@ -35,6 +35,10 @@ pendant une partie : aucun jeu ni son de test n’a été lancé sur la TV occup
   chargement et titres ; 74 icônes ; reconnexion manette HTTP ; QR et préremplissage ;
   nouvelle régression d’autoplay TV et protection des navigateurs.
 - Cinq empreintes des moteurs et licences vérifiées.
+- Build web de production réussi en 275 secondes (avertissements de taille des
+  bundles et de configuration ESM, aucune erreur). Compilation de validation
+  effectuée avant le commit : métadonnées du parent ; reconstruire avec le SHA
+  final avant tout déploiement. Aucun bundle de validation publié.
 - APK 0.4.0 / code 7 compilée, signature identique à l’installation précédente.
 - 416 fichiers de travail d’origine, 20 fichiers natifs d’origine et 68 fichiers
   d’interfaces archivées : empreintes inchangées.
