@@ -1,0 +1,36 @@
+{
+  "jsnesVersion": "2.1.0",
+  "binjgbRevision": "16621111ed0ee73bcc45c912a823bcebedcffc0f",
+  "files": [
+    {
+      "file": "jsnes.min.js",
+      "url": "https://unpkg.com/jsnes@2.1.0/dist/jsnes.min.js",
+      "sha256": "84946f0dae4bcf3b2dfebe84ad3bfeb1dbcb413bd9b1a69e1f45910a95fd7b41",
+      "bytes": 135545
+    },
+    {
+      "file": "jsnes.LICENSE",
+      "url": "https://unpkg.com/jsnes@2.1.0/LICENSE",
+      "sha256": "530136cec696ac1fcdeb792a77472cb273f9f814ad0ed795dccdc95db7423e0a",
+      "bytes": 10758
+    },
+    {
+      "file": "binjgb.js",
+      "url": "https://raw.githubusercontent.com/binji/binjgb/16621111ed0ee73bcc45c912a823bcebedcffc0f/docs/binjgb.js",
+      "sha256": "a68e5854b5d68339a34c0aa0b6dbeacd615ed316657ee17b63dafa5e00561b09",
+      "bytes": 13640
+    },
+    {
+      "file": "binjgb.wasm",
+      "url": "https://raw.githubusercontent.com/binji/binjgb/16621111ed0ee73bcc45c912a823bcebedcffc0f/docs/binjgb.wasm",
+      "sha256": "52c165069441a09180b4bd63464318aa7b861b1d36e0d05e8047b48619fd2f0b",
+      "bytes": 88269
+    },
+    {
+      "file": "binjgb.LICENSE",
+      "url": "https://raw.githubusercontent.com/binji/binjgb/16621111ed0ee73bcc45c912a823bcebedcffc0f/LICENSE",
+      "sha256": "5a7b61a51a5efb789721b3480b502f324094911aeca46937956c561b52638009",
+      "bytes": 1053
+    }
+  ]
+}

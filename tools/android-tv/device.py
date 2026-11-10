@@ -3,6 +3,7 @@
 import argparse,hashlib,json,subprocess,time,shlex
 from pathlib import Path
 from tv_device import TV
+from availability import require_unoccupied
 ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'output/android-tv';PKG='org.gameflex.tv';TOOL=Path('/home/config/LoutreTV/.toolchain');SIGNER=TOOL/'android-sdk/build-tools/35.0.0/lib/apksigner.jar';JAVA=TOOL/'jdk/bin/java'
 def certificate(path):
  raw=subprocess.check_output([str(JAVA),'-jar',str(SIGNER),'verify','--print-certs',str(path)],text=True)
@@ -12,6 +13,7 @@ def main():
  if not a.tv_free:raise SystemExit('TV availability confirmation required before installation or launch.')
  info=json.loads((OUT/'apk.json').read_text());apk=Path(info['apk']);assert hashlib.sha256(apk.read_bytes()).hexdigest()==info['sha256']
  with TV() as tv:
+  require_unoccupied(tv)
   installed='package:'+PKG in tv.shell('pm list packages '+PKG).splitlines()
   if a.action=='launch':
    if not installed:raise RuntimeError('GameFlex not installed')
@@ -31,6 +33,9 @@ def main():
   remote='/data/local/tmp/gameflex-'+info['sha256'][:16]+'-'+str(int(time.time()))+'.apk'
   tv.device.push(str(apk),remote,transport_timeout_s=30,read_timeout_s=300)
   if tv.shell('sha256sum '+remote,timeout=60).split()[0]!=info['sha256']:raise RuntimeError('Transfer incomplete; no package installation attempted')
+  try:require_unoccupied(tv)
+  except Exception:
+   tv.shell('rm '+remote);raise
   result=tv.shell('pm install '+('-r ' if installed else '')+remote,timeout=180)
   if 'Success' not in result:raise RuntimeError('Package installation refused: '+result)
   tv.shell('rm '+remote)

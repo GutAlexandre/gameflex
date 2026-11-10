@@ -5,3 +5,4 @@ const previous=require.extensions['.js'];const compile=(m,name)=>{if(name.includ
 require(path.join(root,'tests/pi-tv/console-icons-check.cjs'));
 require(path.join(root,'tests/pi-tv/phone-channel-check.cjs'));
 require(path.join(root,'tests/pi-tv/device-roles-check.cjs'));
+require(path.join(root,'tests/pi-tv/audio-autoplay-check.cjs'));
