@@ -1,0 +1,8 @@
+opus-decoder 0.7.12
+Copyright 2021-2026 Ethan Halsall
+Source: https://github.com/eshaz/wasm-audio-decoders/tree/c9ff316db7f21fe95b0e89b308d0720fde6fecd2
+## Licensing
+
+The source code that originates in this project is licensed under the MIT license. Please note that any external source code included by repository, such as the decoding libraries included as git submodules and compiled into the dist files, may have different licensing terms.
+
+The bundled decoder also includes libopus (BSD) and puff from zlib.

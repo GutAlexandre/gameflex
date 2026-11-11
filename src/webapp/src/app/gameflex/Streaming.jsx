@@ -1729,7 +1729,6 @@ export function StreamingShell({ t, user, token, session, context, setTerminateR
                 // fond de son écran, et non une seconde fois (chantier 35).
                 launch={launchId}
                 muted={!switches.isSoundEnabled}
-                onAutoplayForcedMute={() => switchesStore.setValues({ isSoundEnabled: false })}
                 onVideoSilent={setVideoSilent}
                 onQuality={(state) => {
                     switchesStore.setValues({

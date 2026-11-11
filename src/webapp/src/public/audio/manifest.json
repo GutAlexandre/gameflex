@@ -1,0 +1,13 @@
+{
+  "package": "opus-decoder",
+  "version": "0.7.12",
+  "source": "https://github.com/eshaz/wasm-audio-decoders",
+  "files": {
+    "opus-decoder.min.js": "68a08546a23df78bc837808af82af5a7550899ed5e17e281826dc2b3320dccdf",
+    "libopus.LICENSE": "01e1167d54a096d123cf6dfbbeb19587278845c6481d2d66d545669846079551",
+    "puff.LICENSE": "671cb6988484d8ff368c8a0ba61356eeb8f66eb76cb148e3a6875ba5011d7fea",
+    "opus-decoder.LICENSE": "8f88f233931fd9dcc0d98352684894bf7c5e39935f1b4e054ee5071d7b0c5bbb",
+    "ATTRIBUTION.txt": "e2a58a99fda0fac97b63638efeef489784ee12266d63335d63b4c12ef8ad8a4a"
+  },
+  "sourceCommit": "c9ff316db7f21fe95b0e89b308d0720fde6fecd2"
+}

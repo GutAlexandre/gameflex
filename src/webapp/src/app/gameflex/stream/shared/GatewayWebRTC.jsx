@@ -1,3 +1,4 @@
+import {FallbackAudio} from './fallback-audio.js';
 import {mustWaitForAudioGesture} from './audio-autoplay-policy.js';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import {
@@ -201,6 +202,12 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
     const videoRef = useRef(null);
     const audioRef = useRef(null);
     const fallbackCanvasRef = useRef(null);
+    const fallbackAudioRef = useRef(null);
+    const fallbackAudioActiveRef = useRef(false);
+    const [fallbackAudioActive, setFallbackAudioActive] = useState(false);
+    const [audioNeedsGesture, setAudioNeedsGesture] = useState(false);
+    const mutedRef = useRef(muted);
+    mutedRef.current = muted;
     const pcRef = useRef(null);
     // Keyed by DataChannel label — "input" is the one every platform uses
     // today; remote-play also opens its own "keepalive" ping/pong channel
@@ -374,7 +381,38 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
         };
     }, [isStatsEnabled]);
 
+    const unlockAudio = useCallback(() => {
+        if (keepMutedRef.current || mutedRef.current) return;
+        fallbackAudioRef.current?.resume();
+        const target = combinedAudioVideoRef.current ? videoRef.current : audioRef.current;
+        if (target?.srcObject && !fallbackAudioActiveRef.current) {
+            target.muted = false;
+            target.volume = target.volume > 0 ? target.volume : 1;
+            target.play().then(() => setAudioNeedsGesture(false)).catch(() => setAudioNeedsGesture(true));
+        }
+    }, []);
+    useEffect(() => {
+        const unlock = event => { if (event.isTrusted) unlockAudio(); };
+        for (const event of ['pointerup', 'touchend', 'keydown']) window.addEventListener(event, unlock, true);
+        return () => { for (const event of ['pointerup', 'touchend', 'keydown']) window.removeEventListener(event, unlock, true); };
+    }, [unlockAudio]);
+    useEffect(() => {
+        fallbackAudioRef.current?.setMuted(muted || keepMuted);
+        if (!muted && !keepMuted && fallbackAudioActiveRef.current) fallbackAudioRef.current?.resume();
+        if (muted || keepMuted) setAudioNeedsGesture(false);
+    }, [muted, keepMuted]);
+
+    useEffect(() => {
+        if (!fallbackAudioActive && !muted && !keepMuted && audioRef.current?.srcObject) unlockAudio();
+    }, [fallbackAudioActive, muted, keepMuted, unlockAudio]);
+
     const closeFallback = useCallback(() => {
+        fallbackAudioRef.current?.close();
+        fallbackAudioRef.current = null;
+        fallbackAudioActiveRef.current = false;
+        setFallbackAudioActive(false);
+        // A normal WebRTC "connected" also calls this. Preserve its gesture
+        // prompt: "playing" may already have reported blocked autoplay.
         clearTimeout(fallbackTimerRef.current);
         fallbackTimerRef.current = null;
 
@@ -406,13 +444,23 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
 
     const openFallback = useCallback(() => {
         const gateway = gatewayRef.current;
-        if (!gateway || fallbackSocketRef.current
-            || typeof globalThis.VideoDecoder === "undefined"
-            || typeof globalThis.EncodedVideoChunk === "undefined") {
+        if (!gateway || fallbackSocketRef.current) {
             return;
         }
 
-        let decoder;
+        const audio = new FallbackAudio({
+            onBlocked: blocked => { if (fallbackAudioRef.current === audio) setAudioNeedsGesture(blocked); },
+            onActive: () => {
+                if (fallbackAudioRef.current !== audio) return;
+                fallbackAudioActiveRef.current = true;
+                setFallbackAudioActive(true);
+                const target = combinedAudioVideoRef.current ? videoRef.current : audioRef.current;
+                if (target) target.muted = true; // Never play both transports.
+            },
+        });
+        audio.setMuted(mutedRef.current || keepMutedRef.current);
+        fallbackAudioRef.current = audio;
+        let decoder = null;
         try {
             decoder = new globalThis.VideoDecoder({
                 output: (frame) => {
@@ -455,7 +503,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
             });
         } catch {
             decoder?.close();
-            return;
+            decoder = null; // Audio fallback remains usable without WebCodecs.
         }
 
         fallbackDecoderRef.current = decoder;
@@ -498,20 +546,19 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
             if (buffer instanceof Blob) {
                 buffer = await buffer.arrayBuffer();
             }
-            if (!(buffer instanceof ArrayBuffer) || buffer.byteLength < 10 || decoder.state !== "configured") {
+            if (!(buffer instanceof ArrayBuffer) || buffer.byteLength < 10) {
                 return;
             }
 
             const view = new DataView(buffer);
             const kind = view.getUint8(0);
-            if (kind !== 0) {
-                // The fallback picture is deliberately video-only. Audio stays
-                // on WebRTC and resumes if the peer eventually connects.
-                return;
-            }
-
             const durationNs = view.getBigUint64(1, false);
             const payload = new Uint8Array(buffer, 9);
+            if (kind === 1) {
+                if (durationNs > 0n && durationNs <= 120000000n) audio.push(payload);
+                return;
+            }
+            if (kind !== 0 || decoder?.state !== 'configured') return;
             fallbackStatsRef.current.videoBytes += payload.byteLength;
             const nalTypes = annexBNalTypes(payload);
             if (durationNs === 0n && nalTypes.some((type) => type === 7 || type === 8)) {
@@ -551,6 +598,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
 
     const cleanup = useCallback(() => {
         closeFallback();
+        setAudioNeedsGesture(false);
         detachAudioPlayRetryRef.current?.();
 
         signalSocketRef.current?.close();
@@ -601,6 +649,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
         async ({ hasInput = false, username, sessionId: sessionIdOverride, quality = null, preview = false, launch = null } = {}) => {
             const effectiveSessionId = sessionIdOverride ?? sessionId;
             closeFallback();
+            setAudioNeedsGesture(false);
             firstPictureReportedRef.current = false;
             // One component instance owns ONE viewer at a time: a platform
             // reconnect calls createViewer again on the SAME mounted
@@ -661,6 +710,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
         }
 
         closeFallback();
+        setAudioNeedsGesture(false);
         if (pcRef.current) {
             pcRef.current.close();
             pcRef.current = null;
@@ -1030,6 +1080,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
                 target.muted = true;
                 target.volume = 0;
                 target.play().catch(() => { });
+                setAudioNeedsGesture(true);
                 onAutoplayForcedMuteRef.current?.();
             };
 
@@ -1056,7 +1107,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
 
                     hasStartedPlaying = true;
 
-                    if (keepMutedRef.current) {
+                    if (keepMutedRef.current || fallbackAudioActiveRef.current) {
                         // Stay muted, but put the VOLUME back: ontrack zeroed
                         // it for the fade-in that we are skipping here, and a
                         // caller that later unmutes (the user flipping the
@@ -1097,7 +1148,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
                     const unmutePlay = target.play();
 
                     if (unmutePlay && typeof unmutePlay.catch === "function") {
-                        unmutePlay.catch(() => resumeMutedAfterAutoplayBlock());
+                        unmutePlay.then(() => setAudioNeedsGesture(false)).catch(() => resumeMutedAfterAutoplayBlock());
                     }
 
                     // Chrome's pause path rejects NO promise — it just
@@ -1133,6 +1184,12 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
             target.addEventListener("loadedmetadata", attemptPlay, { once: true });
             target.addEventListener("canplay", attemptPlay);
             target.addEventListener("waiting", attemptPlay);
+            // A muted audio element can itself remain paused on mobile. Do
+            // not wait for "playing" to offer the gesture that starts it.
+            if (!keepMutedRef.current && !mutedRef.current && !fallbackAudioActiveRef.current) {
+                setAudioNeedsGesture(true);
+                if (!mustWaitForAudioGesture(navigator.userActivation, window)) unlockAudio();
+            }
             attemptPlay();
         };
 
@@ -1281,6 +1338,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
             setStatsMonitoring,
             renegotiate,
             getRawStats,
+            getAudioStats: () => fallbackAudioRef.current?.stats() || null,
             setQuality,
             // Real DOM access for callers that need actual browser APIs a
             // data callback can't provide (e.g. Blackscreen.jsx's
@@ -1308,7 +1366,11 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
     );
 
     return (
-        <div>
+        <div style={{ position: 'relative' }}>
+            {audioNeedsGesture && !muted && !keepMuted && <button
+                type="button" className="gateway-audio-unlock" onClick={unlockAudio}
+                style={{ position: 'absolute', top: 16, left: 16, zIndex: 20, padding: '12px 18px', borderRadius: 12, background: '#eef4ff', color: '#17283d', border: '2px solid #91b9f6', fontSize: 16 }}
+            >Activer le son</button>}
             <video
                 ref={videoRef}
                 autoPlay
@@ -1330,7 +1392,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
                 // simplement. Sinon il reste muet en permanence, sans que ça
                 // coûte quoi que ce soit : la piste audio est sur l'élément
                 // voisin.
-                muted={combinedAudioVideo ? muted : true}
+                muted={combinedAudioVideo ? muted || fallbackAudioActive : true}
                 style={{
                     width: "100%",
                     minWidth: "100%",
@@ -1364,7 +1426,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
                     alignSelf: "flex-start",
                 }}
             />
-            {audioRef && <audio ref={audioRef} autoPlay muted={muted} />}
+            {audioRef && <audio ref={audioRef} autoPlay muted={muted || fallbackAudioActive} />}
             {children}
         </div>
     );
