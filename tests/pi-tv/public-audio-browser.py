@@ -10,6 +10,7 @@ with sync_playwright() as p:
   page.add_init_script('localStorage.setItem("retrogaming-users-token",'+json.dumps(token)+');window.TEST_SESSION='+json.dumps(cfg['sessionId'])+';window.TEST_HOST='+json.dumps(base)+';')
   page.add_init_script('window.TEST_PLAYER='+json.dumps('player' in variant)+';window.TEST_PRIMED='+json.dumps(variant=='primed-player')+';localStorage.setItem("gameflex:tv-mode","1");')
   page.add_init_script("""window.__kinds={};const fetchOriginal=window.fetch.bind(window);window.fetch=async(...args)=>{const r=await fetchOriginal(...args);if(String(args[0]).endsWith('/poll'))r.clone().json().then(data=>{for(const f of data.frames||[]){if(f.binary){const k=atob(f.binary).charCodeAt(0);window.__kinds[k]=(window.__kinds[k]||0)+1;}}}).catch(()=>{});return r;};window.__contexts=[];const AC=window.AudioContext;window.AudioContext=class extends AC{constructor(...args){super(...args);window.__contexts.push(this);}};""")
+  if variant=='webrtc':page.add_init_script("""window.__streamNodes=[];const originalSource=AudioContext.prototype.createMediaStreamSource;AudioContext.prototype.createMediaStreamSource=function(stream){const source=originalSource.call(this,stream),analyser=this.createAnalyser(),connect=source.connect.bind(source);source.connect=gain=>{connect(analyser);analyser.connect(gain);__streamNodes.push({analyser,gain,context:this});return gain};return source};const originalPlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this.tagName==='AUDIO'&&!this.muted)return Promise.reject(new DOMException('Independent media autoplay blocked','NotAllowedError'));return originalPlay.call(this)};""")
   if variant!='webrtc':page.add_init_script("const RTC=window.RTCPeerConnection;window.RTCPeerConnection=class extends RTC{constructor(cfg){super({...cfg,iceTransportPolicy:'relay'});}};")
   if variant=='no-video-decoder':page.add_init_script('window.VideoDecoder=undefined;window.AudioDecoder=undefined;')
   page.route(base+'/__audio_probe__',lambda r:r.fulfill(content_type='text/html',body='<html lang="fr"><meta charset="utf-8"><style>body{background:#0b1628;color:white;font:16px sans-serif;margin:12px}button{padding:12px}canvas{max-width:100%}</style><div id="root"></div><script src="'+base+'/__audio_probe__.js"></script></html>'))
@@ -26,7 +27,15 @@ with sync_playwright() as p:
    else:print('RTC without prompt',page.evaluate("({media:[...document.querySelectorAll('audio')].map(a=>({muted:a.muted,paused:a.paused,volume:a.volume,ready:a.readyState,tracks:a.srcObject?.getTracks().length})),activation:navigator.userActivation.hasBeenActive})"),flush=True)
    page.wait_for_timeout(1500)
    live=page.evaluate("""async()=>({media:[...document.querySelectorAll('audio')].map(a=>({muted:a.muted,paused:a.paused,volume:a.volume,ready:a.readyState})),inbound:[...((await audioTest.raw())?.values()||[])].filter(r=>r.type==='inbound-rtp'&&r.kind==='audio').map(r=>({bytes:r.bytesReceived,energy:r.totalAudioEnergy}))})""")
-   assert live['inbound'] and live['inbound'][0]['bytes']>0 and live['inbound'][0]['energy']>0,live;assert live['media'] and not live['media'][0]['muted'] and not live['media'][0]['paused'] and live['media'][0]['volume']>0,live;assert page.evaluate('audioTest.stats()') is None,'Direct WebRTC must not double audio through fallback';page.evaluate('audioTest.close()');reports.append({'variant':variant,'live':live,'singleAudioTransport':True})
+   signal=page.evaluate("""()=>__streamNodes.map(({analyser,gain,context})=>{const data=new Float32Array(analyser.fftSize);analyser.getFloatTimeDomainData(data);return {energy:data.reduce((n,v)=>n+v*v,0)*gain.gain.value**2,state:context.state,gain:gain.gain.value}})""")
+   print('Direct audio output',json.dumps({'rtp':live,'signal':signal}),flush=True)
+   assert live['inbound'] and live['inbound'][0]['bytes']>0,live
+   assert signal and signal[-1]['energy']>0 and signal[-1]['state']=='running',signal
+   page.locator('#mute').tap();page.wait_for_timeout(200);assert page.evaluate('__streamNodes.at(-1).gain.gain.value')==0
+   page.locator('#mute').tap();page.wait_for_timeout(300);assert page.evaluate('__streamNodes.at(-1).gain.gain.value')==1
+   assert page.evaluate('audioTest.stats()') is None,'Direct WebRTC must not double audio through fallback'
+   page.evaluate('audioTest.close()');page.wait_for_timeout(300);assert page.evaluate('__contexts.every(c=>c.state==="closed")')
+   reports.append({'variant':variant,'live':live,'outputSignal':signal,'independentMediaAutoplayBlocked':True,'singleAudioTransport':True,'muteRespected':True})
   else:
    for _ in range(40):
     before=page.evaluate('window.audioTest.stats()')

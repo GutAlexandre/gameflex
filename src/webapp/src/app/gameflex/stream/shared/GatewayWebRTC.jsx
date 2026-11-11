@@ -1,6 +1,7 @@
 import {createPortal} from 'react-dom';
 import {gameAudioContexts} from './game-audio-context.js';
 import {FallbackAudio} from './fallback-audio.js';
+import {StreamAudio} from './stream-audio.js';
 import {mustWaitForAudioGesture} from './audio-autoplay-policy.js';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import {
@@ -205,6 +206,8 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
     const audioRef = useRef(null);
     const fallbackCanvasRef = useRef(null);
     const fallbackAudioRef = useRef(null);
+    const streamAudioRef = useRef(null);
+    const [streamAudioActive, setStreamAudioActive] = useState(false);
     const audioLeaseRef = useRef(null);
     const [audioPortalRoot, setAudioPortalRoot] = useState(() => typeof document === 'undefined' ? null : document.fullscreenElement || document.body);
     const getAudioContext = useCallback(() => {
@@ -401,6 +404,16 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
         try { getAudioContext().resume().catch(() => setAudioNeedsGesture(true)); } catch { setAudioNeedsGesture(true); }
         fallbackAudioRef.current?.resume();
         const target = combinedAudioVideoRef.current ? videoRef.current : audioRef.current;
+        if (streamAudioRef.current) {
+            streamAudioRef.current.resume();
+            // Chromium needs a muted media sink to pull remote WebRTC audio
+            // into WebAudio. It never supplies a second audible output.
+            if (target?.srcObject) {
+                target.muted = true;
+                target.play().catch(() => setAudioNeedsGesture(true));
+            }
+            return;
+        }
         if (target?.srcObject && !fallbackAudioActiveRef.current) {
             target.muted = false;
             target.volume = target.volume > 0 ? target.volume : 1;
@@ -414,6 +427,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
     }, [unlockAudio]);
     useEffect(() => {
         fallbackAudioRef.current?.setMuted(muted || keepMuted);
+        streamAudioRef.current?.setMuted(muted || keepMuted || fallbackAudioActiveRef.current);
         if (!muted && !keepMuted && fallbackAudioActiveRef.current) fallbackAudioRef.current?.resume();
         if (muted || keepMuted) setAudioNeedsGesture(false);
     }, [muted, keepMuted]);
@@ -427,6 +441,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
         fallbackAudioRef.current = null;
         fallbackAudioActiveRef.current = false;
         setFallbackAudioActive(false);
+        streamAudioRef.current?.setMuted(mutedRef.current || keepMutedRef.current);
         // A normal WebRTC "connected" also calls this. Preserve its gesture
         // prompt: "playing" may already have reported blocked autoplay.
         clearTimeout(fallbackTimerRef.current);
@@ -472,6 +487,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
                 if (fallbackAudioRef.current !== audio) return;
                 fallbackAudioActiveRef.current = true;
                 setFallbackAudioActive(true);
+                streamAudioRef.current?.setMuted(true);
                 const target = combinedAudioVideoRef.current ? videoRef.current : audioRef.current;
                 if (target) target.muted = true; // Never play both transports.
             },
@@ -616,6 +632,8 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
 
     const cleanup = useCallback(() => {
         closeFallback();
+        streamAudioRef.current?.close(); streamAudioRef.current = null;
+        setStreamAudioActive(false);
         setAudioNeedsGesture(false);
         detachAudioPlayRetryRef.current?.();
 
@@ -729,6 +747,8 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
 
         closeFallback();
         setAudioNeedsGesture(false);
+        streamAudioRef.current?.close(); streamAudioRef.current = null;
+        setStreamAudioActive(false);
         if (pcRef.current) {
             pcRef.current.close();
             pcRef.current = null;
@@ -1074,6 +1094,31 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
                 return;
             }
 
+            if (!combinedAudioVideoRef.current) {
+                // No second autoplay permission, no fade left at volume zero,
+                // and no unmuted HTML element competing with WebAudio on iOS.
+                const stream = new MediaStream([event.track]);
+                try {
+                    streamAudioRef.current?.close();
+                    const audio = new StreamAudio({
+                        context: getAudioContext(), stream,
+                        muted: mutedRef.current || keepMutedRef.current || fallbackAudioActiveRef.current,
+                        onBlocked: blocked => { if (!fallbackAudioActiveRef.current) setAudioNeedsGesture(blocked); },
+                    });
+                    streamAudioRef.current = audio;
+                    setStreamAudioActive(true);
+                    target.muted = true;
+                    target.srcObject = stream;
+                    target.play().catch(() => setAudioNeedsGesture(true));
+                    audio.resume();
+                    return;
+                } catch {
+                    streamAudioRef.current = null;
+                    // Unsupported WebAudio routing retains the media-element
+                    // path and its explicit play()/gesture error handling.
+                }
+            }
+
             // Mute BEFORE handing the element a stream. autoPlay fires as
             // soon as srcObject lands, and an UNMUTED autoplay with no user
             // activation is blocked outright — the "playing" event never
@@ -1272,7 +1317,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
         });
 
         return true;
-    }, [closeFallback, openFallback, reportFirstPicture]);
+    }, [closeFallback, openFallback, reportFirstPicture, getAudioContext, unlockAudio]);
 
     // label — defaults to "input" (the one channel retro/streamex ever
     // open); a device-streaming platform opening a second channel (e.g.
@@ -1444,7 +1489,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
                     alignSelf: "flex-start",
                 }}
             />
-            {audioRef && <audio ref={audioRef} autoPlay muted={muted || fallbackAudioActive} />}
+            {audioRef && <audio ref={audioRef} autoPlay muted={muted || fallbackAudioActive || streamAudioActive} />}
             {children}
         </div>
     );

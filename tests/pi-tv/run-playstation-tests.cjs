@@ -10,5 +10,6 @@ require(path.join(root,'tests/pi-tv/audio-autoplay-check.cjs'));
 require(path.join(root,'tests/pi-tv/fallback-audio-check.cjs'));
 
 require(path.join(root,'tests/pi-tv/game-audio-context-check.cjs'));
+require(path.join(root,'tests/pi-tv/stream-audio-check.cjs'));
 
 require(path.join(root,'tests/pi-tv/game-socket-lifecycle-check.cjs'));

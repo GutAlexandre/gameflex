@@ -1,25 +1,7 @@
 import { appPath } from '../../libs/appBase.js';
+import { acquirePlaybackSession } from './audio-session.js';
 
 let decoderScript;
-const playbackSessions = new WeakMap();
-function playbackSession(session) {
-    if (!session || typeof session !== 'object') return () => {};
-    try {
-        let entry = playbackSessions.get(session);
-        if (!entry) {
-            entry = { count: 0, previous: session.type };
-            session.type = 'playback';
-            playbackSessions.set(session, entry);
-        }
-        entry.count++;
-        return () => {
-            if (--entry.count === 0) {
-                playbackSessions.delete(session);
-                try { if (session.type === 'playback') session.type = entry.previous; } catch {}
-            }
-        };
-    } catch { return () => {}; }
-}
 function loadDecoder() {
     if (!decoderScript) decoderScript = new Promise((resolve, reject) => {
         const script = document.createElement('script');
@@ -43,7 +25,7 @@ export class FallbackAudio {
     ensureContext() {
         // Match media-element playback on iOS rather than ambient sound effects.
         // This declares the web session only; it never changes device volume.
-        if (!this.closed && !this.muted && !this.releaseSession) this.releaseSession = playbackSession(this.session);
+        if (!this.closed && !this.muted && !this.releaseSession) this.releaseSession = acquirePlaybackSession(this.session);
         if (!this.ctx && !this.closed) {
             this.ctx = this.makeContext(); this.gain = this.ctx.createGain();
             this.gain.gain.value = this.muted ? 0 : 1; this.gain.connect(this.ctx.destination);

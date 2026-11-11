@@ -30,7 +30,7 @@ try:
   time.sleep(.3)
  assert reference,'Original diagnostic cartridge was not listed'
  result=wt/'.local/player-preview/results';result.mkdir(parents=True,exist_ok=True)
- r=subprocess.run(['docker','run','--rm','-i','--name','gameflex-real-player-check','--network','container:'+socket.gethostname(),'--cpus','1','--memory','1024m','--shm-size','128m','-v',str(wt)+':/app:ro','-v',str(result)+':/results','gameflex-experience:pi-local','python3','/app/tests/pi-tv/player-real-game-browser.py'],input=json.dumps({'username':env.get('GAMEFLEX_ROOT_USERNAME','root'),'password':env['GAMEFLEX_ROOT_PASSWORD'],'production':os.environ.get('GAMEFLEX_TEST_PRODUCTION')=='1'}),text=True)
+ r=subprocess.run(['docker','run','--rm','-i','--name','gameflex-real-player-check','--network','container:'+socket.gethostname(),'--cpus','1','--memory','1024m','--shm-size','128m','-v',str(wt)+':/app:ro','-v',str(result)+':/results','gameflex-experience:pi-local','python3','/app/tests/pi-tv/player-real-game-browser.py'],input=json.dumps({'username':env.get('GAMEFLEX_ROOT_USERNAME','root'),'password':env['GAMEFLEX_ROOT_PASSWORD'],'production':os.environ.get('GAMEFLEX_TEST_PRODUCTION')=='1','base':os.environ.get('GAMEFLEX_TEST_BASE','https://loutrenas.myqnapcloud.com/gameflex'),'deployed':os.environ.get('GAMEFLEX_TEST_DEPLOYED')=='1','transport':os.environ.get('GAMEFLEX_TEST_TRANSPORT','fallback')}),text=True)
  if r.returncode:raise RuntimeError('Full-player browser regression failed')
 finally:
  if reference:

@@ -1,11 +1,17 @@
 // Keep the permission granted by the launch gesture across SPA navigation and
 // viewer retries. Media nodes belong to each viewer; the context belongs to play.
+import { acquirePlaybackSession } from './audio-session.js';
 export class GameAudioContextPool {
-    constructor(create = () => new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' })) {
-        this.create = create; this.owners = 0; this.epoch = 0;
+    constructor(create = () => new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' }), session) {
+        this.create = create; this.session = session; this.owners = 0; this.epoch = 0;
     }
     ensure() {
-        if (!this.context || this.context.state === 'closed') this.context = this.create();
+        if (!this.context || this.context.state === 'closed') {
+            this.releaseSession?.();
+            this.releaseSession = acquirePlaybackSession(this.session);
+            try { this.context = this.create(); }
+            catch (error) { this.releaseSession(); this.releaseSession = null; throw error; }
+        }
         return this.context;
     }
     prime() {
@@ -28,6 +34,7 @@ export class GameAudioContextPool {
         if (!this.held && !this.owners && this.context) {
             const context = this.context; this.context = null;
             context.close().catch(() => {});
+            this.releaseSession?.(); this.releaseSession = null;
         }
     }
 }
