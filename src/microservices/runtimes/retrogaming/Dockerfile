@@ -56,7 +56,10 @@ WORKDIR /src
 COPY ./microservices/runtimes/retrogaming/src/ ./
 RUN CGO_ENABLED=1 GOFLAGS=-mod=readonly go build -trimpath -ldflags "-s -w" -o /out/retrogaming ./cmd/retrogaming/
 
-FROM debian:bookworm-slim AS release
+# Current x86-64 and ARM64 Libretro builds such as Dolphin require the C++ ABI
+# shipped by Trixie (GLIBCXX_3.4.31/3.4.32). The Go binary is built on
+# bookworm and remains forward-compatible with this newer glibc runtime.
+FROM debian:trixie-slim AS release
 
 # Même étiquette que l'image de dev : une image de partie n'a pas de conteneur
 # permanent, un élagage la ramasserait (voir plus bas).
@@ -65,6 +68,7 @@ LABEL gameflex.prune=keep
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates tzdata ffmpeg \
     libegl1 libgles2 libgbm1 libegl-mesa0 libgl1-mesa-dri \
+    libcurl4 libusb-1.0-0 libxi6 libxext6 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=release-builder /out/retrogaming /app/retrogaming

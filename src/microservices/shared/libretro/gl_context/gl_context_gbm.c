@@ -1,9 +1,12 @@
 //go:build linux && !android
 
-// LE CONTEXTE DE LINUX — celui du serveur : un affichage EGL sur un
-// périphérique GBM, sans surface. Le FBO et la relecture sont communs aux deux
-// plateformes (gl_context_fbo.c) ; Android a sa propre naissance du contexte
-// (gl_context_android.c).
+// LE CONTEXTE DE LINUX — celui du serveur : un affichage EGL sans surface.
+// Sur un Linux natif, il s'appuie sur le nœud de rendu GBM remis au conteneur.
+// Sous WSL2, le GPU Windows est exposé par /dev/dxg et il n'existe aucun
+// /dev/dri/renderD* : EGL surfaceless reste alors utilisable (Mesa choisit le
+// pilote disponible, y compris son repli logiciel). Le FBO et la relecture
+// sont communs aux deux plateformes (gl_context_fbo.c) ; Android a sa propre
+// naissance du contexte (gl_context_android.c).
 
 #include "gl_context_internal.h"
 
@@ -37,20 +40,25 @@ gl_context *gl_context_create(int context_type, int major, int minor, const char
     // LE NŒUD DE RENDU QUE LE CONTENEUR A REÇU : le kernel ne lui donne que
     // celui du GPU des parties (chantier 39). « renderD128 » écrit ici ne
     // valait que pour le premier GPU de l'hôte.
+    //
+    // WSL2 est l'autre forme officielle de GPU du kernel : /dev/dxg, remis
+    // par une DeviceRequest NVIDIA. GBM ne sait pas ouvrir ce nœud. Ne pas
+    // refuser tout rendu pour autant : EGL_PLATFORM_SURFACELESS_MESA sait
+    // créer un contexte sans GBM et Mesa choisit le meilleur pilote présent.
     glob_t nodes;
     memset(&nodes, 0, sizeof(nodes));
-    if (glob("/dev/dri/renderD*", 0, NULL, &nodes) != 0 || nodes.gl_pathc == 0) {
-        globfree(&nodes);
-        FAIL("no /dev/dri/renderD* node");
+    if (glob("/dev/dri/renderD*", 0, NULL, &nodes) == 0 && nodes.gl_pathc > 0) {
+        ctx->fd = open(nodes.gl_pathv[0], O_RDWR);
     }
-    ctx->fd = open(nodes.gl_pathv[0], O_RDWR);
     globfree(&nodes);
-    if (ctx->fd < 0) FAIL("open /dev/dri/renderD* failed");
-
-    ctx->gbm = gbm_create_device(ctx->fd);
-    if (!ctx->gbm) FAIL("gbm_create_device failed");
-
-    ctx->display = eglGetPlatformDisplay(EGL_PLATFORM_GBM_KHR, ctx->gbm, NULL);
+    if (ctx->fd >= 0) {
+        ctx->gbm = gbm_create_device(ctx->fd);
+        if (!ctx->gbm) FAIL("gbm_create_device failed");
+        ctx->display = eglGetPlatformDisplay(EGL_PLATFORM_GBM_KHR, ctx->gbm, NULL);
+    } else {
+        ctx->display = eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA,
+                                             EGL_DEFAULT_DISPLAY, NULL);
+    }
     if (ctx->display == EGL_NO_DISPLAY) FAIL("eglGetPlatformDisplay failed");
 
     EGLint eglMajor, eglMinor;
@@ -69,6 +77,11 @@ gl_context *gl_context_create(int context_type, int major, int minor, const char
         : EGL_OPENGL_BIT;
     EGLint configAttribs[] = {
         EGL_RENDERABLE_TYPE, renderable,
+        // EGL's implicit default is EGL_WINDOW_BIT. A surfaceless Mesa
+        // display exposes pbuffer-capable configs but no window configs, so
+        // leaving this attribute implicit rejects every otherwise suitable
+        // config. We never create a surface; either kind is acceptable.
+        EGL_SURFACE_TYPE, EGL_DONT_CARE,
         EGL_RED_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_BLUE_SIZE, 8, EGL_ALPHA_SIZE, 8,
         EGL_NONE,
     };
@@ -126,7 +139,7 @@ void gl_context_destroy(gl_context *ctx) {
     eglMakeCurrent(ctx->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     eglDestroyContext(ctx->display, ctx->context);
     eglTerminate(ctx->display);
-    gbm_device_destroy(ctx->gbm);
-    close(ctx->fd);
+    if (ctx->gbm) gbm_device_destroy(ctx->gbm);
+    if (ctx->fd >= 0) close(ctx->fd);
     free(ctx);
 }

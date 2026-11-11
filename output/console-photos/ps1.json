@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:PlayStation-SCPH-1000-with-Controller.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:PlayStation-SCPH-1000-with-Controller.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/PlayStation-SCPH-1000-with-Controller.jpg/960px-PlayStation-SCPH-1000-with-Controller.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "ps1",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "eaf84f40d01729c52a3487af93fff782f5ee6d85e7d83b7039f2ae61f289305a",
+  "url": "/experience-api/v1/media/eaf84f40d01729c52a3487af93fff782f5ee6d85e7d83b7039f2ae61f289305a",
+  "mime": "image/webp",
+  "fetchedAt": 1794142792,
+  "reviewAfter": 1796734792
+}

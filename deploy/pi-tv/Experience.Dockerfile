@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm
+FROM python:3.11-slim-trixie
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
     GAMEFLEX_CHROMIUM_EXECUTABLE=/usr/bin/chromium \
     XDG_CACHE_HOME=/tmp/gameflex-cache XDG_CONFIG_HOME=/tmp/gameflex-config
@@ -6,6 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PLAYWRIGHT_SKIP_BROWSER_DOWNLOA
 # All installation stays inside this image; DietPi itself is not modified.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends chromium xvfb x11vnc ca-certificates fonts-liberation \
+        libcurl4 libegl1 libusb-1.0-0 libxi6 libxext6 \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --uid 1000 --create-home --shell /usr/sbin/nologin gameflex
 RUN pip install --no-cache-dir Pillow==13.0.0 playwright==1.64.1 wsproto==1.3.2

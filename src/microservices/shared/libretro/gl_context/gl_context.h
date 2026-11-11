@@ -1,4 +1,5 @@
-// Headless EGL/GBM OpenGL context — for hardware-rendered libretro cores
+// Headless EGL OpenGL context — GBM on native Linux, surfaceless on WSL2 —
+// for hardware-rendered libretro cores
 // (N64/parallel_n64, PS2/play) which have no software-rendering fallback,
 // unlike every other core this backend runs. Deliberately does NOT link
 // against libGL/libGLESv2 at all: every single GL function used here,
@@ -32,8 +33,10 @@
 typedef struct gl_context gl_context;
 
 // gl_context_create opens the container's render node (/dev/dri/renderD*,
-// the one GPU the kernel hands it — chantier 39), creates a GBM device, an EGL
-// display over it (EGL_PLATFORM_GBM_KHR), and a surfaceless GL context
+// the one GPU the kernel hands it — chantier 39) and creates an EGL display
+// over GBM. Without a render node, as under WSL2 (/dev/dxg), it asks Mesa for
+// an EGL_PLATFORM_SURFACELESS_MESA display instead. Both paths create a
+// surfaceless GL context
 // (EGL_KHR_surfaceless_context — no default framebuffer at all; the core
 // renders into an FBO we create in gl_context_resize instead, matching how
 // every libretro frontend with HW render support actually works). Returns

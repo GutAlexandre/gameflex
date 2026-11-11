@@ -1,3 +1,4 @@
+import {usePhoneGameInput} from '../../../tv/use-phone-game-input.js';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { RETRO_BUTTON_INDEX, RETRO_DIAGONAL_BUTTONS, RETRO_CONTROLLER_PRESET_MAP } from "../../../controllers/Controllers.jsx";
 import { resolveControllerLayout } from "../../shared/controller-layout.js";
@@ -10,6 +11,23 @@ import { triggerRumble } from "../../../libs/rumble.js";
 import { CONTROLLER_PRESETS } from "../../../controllers/presets.js";
 import { useSessionStats } from "../../shared/hooks/use-session-stats.js";
 import { markActivity } from "../../shared/activity-store.js";
+
+// Une Wiimote couchée est tournée d'un quart de tour antihoraire : son
+// « droite » physique pointe alors vers le haut de l'écran. Le dessin, le
+// clavier et une manette standard parlent tous dans les directions de
+// L'ÉCRAN ; on effectue donc la rotation inverse juste avant l'envoi au cœur.
+// Placé ici, après les profils enregistrés, le correctif vaut aussi pour les
+// anciens mappings déjà sauvegardés.
+const WII_SIDEWAYS_DPAD_BITS = {
+	[RETRO_BUTTON_INDEX.DPAD_UP]: RETRO_BUTTON_INDEX.DPAD_RIGHT,
+	[RETRO_BUTTON_INDEX.DPAD_RIGHT]: RETRO_BUTTON_INDEX.DPAD_DOWN,
+	[RETRO_BUTTON_INDEX.DPAD_DOWN]: RETRO_BUTTON_INDEX.DPAD_LEFT,
+	[RETRO_BUTTON_INDEX.DPAD_LEFT]: RETRO_BUTTON_INDEX.DPAD_UP,
+};
+
+export function retrogamingButtonForConsole(consoleId, index) {
+	return consoleId === "wii" ? (WII_SIDEWAYS_DPAD_BITS[index] ?? index) : index;
+}
 // v1 (chantier-3): the client-side input priority gate is gone. It existed
 // because every tab of a player kept its role, so the page had to decide
 // locally which one was driving. Input is now gated where it belongs —
@@ -79,6 +97,13 @@ export function useRetrogamingInput({ screenRef, session, context, t, options = 
 	// porteur. Le sélecteur part donc d'accord avec la console, sans
 	// attendre de réponse. (517, la DualShock, jusqu'à cette date.)
 	const [selectedControllerType, setSelectedControllerType] = useState(1);
+	const selectedControllerTypeRef = useRef(1);
+	const phoneAnalogStateRef = useRef([{ x: 0, y: 0 }, { x: 0, y: 0 }]);
+	const phoneAnalogRetryRef = useRef(null);
+	useEffect(() => {
+		selectedControllerTypeRef.current = selectedControllerType;
+	}, [selectedControllerType]);
+	useEffect(() => () => clearTimeout(phoneAnalogRetryRef.current), []);
 	const consoles = useConsoles();
 	const consoleMeta = consoles.find((c) => c.id === session.consoleId);
 
@@ -195,9 +220,9 @@ export function useRetrogamingInput({ screenRef, session, context, t, options = 
 			// Only the tab holding the priority drives the pad (C2-P4d).
 			// Presses only. A RELEASE always goes through, even from a tab
 			markActivity();
-			sendButton(index, value);
+			sendButton(retrogamingButtonForConsole(session.consoleId, index), value);
 		},
-		[sendButton],
+		[sendButton, session.consoleId],
 	);
 	const sendAnalogWithActivity = useCallback(
 		(index, x, y) => {
@@ -227,6 +252,26 @@ export function useRetrogamingInput({ screenRef, session, context, t, options = 
 
 	useRetroPhysicalGamepadInput(isConnected, sendButtonWithActivity, sendAnalogWithActivity, session.consoleId, token);
 	useRetroKeyboardInput(isConnected, sendButtonWithActivity, session.consoleId, token);
+    usePhoneGameInput(isConnected && !isWatching && connectRole !== 'spectate',
+        (index,down)=>{const bits=[8,0,9,1,10,11,12,13,2,3,14,15,4,5,6,7];if(bits[index]!==undefined)sendButtonWithActivity(bits[index],down?1:0);},
+        (stick,x,y)=>{
+			phoneAnalogStateRef.current[stick]={x,y};
+			// PCSX-ReARMed starts with the original digital PS1 pad because a
+			// few games reject a DualShock at their title screen.  A phone stick
+			// is nevertheless an explicit request for analog control: switch the
+			// port live on its first real deflection, then replay the latest axis
+			// after the signaling command has reached the core.  Replaying the
+			// latest value (rather than the first one) prevents a stale movement
+			// if the finger has already returned to centre.
+			if(session.consoleId==='ps1'&&Math.hypot(x,y)>.05&&selectedControllerTypeRef.current!==517){
+				selectedControllerTypeRef.current=517;
+				setControllerType(0,517);
+				setSelectedControllerType(517);
+				clearTimeout(phoneAnalogRetryRef.current);
+				phoneAnalogRetryRef.current=setTimeout(()=>{const latest=phoneAnalogStateRef.current[stick];sendAnalogWithActivity(stick,latest.x,latest.y);},80);
+			}
+			sendAnalogWithActivity(stick,x,y);
+		});
 
 	// N64's C-buttons have no digital RetroPad bit in mupen64plus_next's
 	// default mapping — the core expects them as RIGHT ANALOG STICK

@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Sony-PlayStation-2-30001-wController-L.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:Sony-PlayStation-2-30001-wController-L.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Sony-PlayStation-2-30001-wController-L.jpg/960px-Sony-PlayStation-2-30001-wController-L.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "ps2",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "2a4e83b9afa16f546bac6a11e264158afcfec3a251370834483b593b26509b41",
+  "url": "/experience-api/v1/media/2a4e83b9afa16f546bac6a11e264158afcfec3a251370834483b593b26509b41",
+  "mime": "image/webp",
+  "fetchedAt": 1794142793,
+  "reviewAfter": 1796734793
+}

@@ -509,7 +509,12 @@ export function SessionStream({
             // endroit qui compte vraiment : la sortie.
             ownRef.current?.cleanup?.();
         };
-    }, [sessionId, hasInput, username, maxAttempts, pictureTimeoutMs]);
+    // `quality`, `preview` et `launch` font partie du corps de l'offre. Les
+    // omettre figeait les valeurs du premier rendu : une page passée en mode
+    // jeu direct pouvait continuer à demander l'intro jusqu'au prochain
+    // rechargement complet (particulièrement visible avec une PWA mise en
+    // cache).
+    }, [sessionId, hasInput, username, maxAttempts, pictureTimeoutMs, quality, preview, launch]);
 
     return (
         <div style={{

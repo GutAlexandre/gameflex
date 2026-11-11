@@ -116,42 +116,8 @@ func librarySection(roots libraryRoots, section string) map[string][]listing.Ite
 		}
 	case listing.Cores:
 		for _, console := range consoles.All() {
-			entries, err := retro_files.ListCoreFiles(roots.Cores, console.ID)
-			if err != nil {
-				continue
-			}
-			for _, entry := range entries {
-				// Rangé sous sa console, comme GameFlex les dépose : un cœur à
-				// plat (`cores/<fichier>`) est l'ancien rangement, qui n'a plus
-				// cours (aucun sur les deux piles, 2026-10-13).
-				if !entry.Scoped && !entry.AndroidInstalled {
-					continue
-				}
-				variants := map[string]int64{}
-				if entry.Scoped {
-					variants["linux"] = entry.SizeBytes
-				}
-				if entry.AndroidInstalled {
-					variants["android"] = entry.AndroidSizeBytes
-				}
-				items[console.ID] = append(items[console.ID], listing.Item{
-					Name: entry.Name, Size: entry.SizeBytes, Variants: variants,
-				})
-			}
-			// LES FICHIERS DES ÉMULATEURS DE BUREAU : un élément par fichier, sous
-			// son nom. Les paquets du téléphone (chantier 28) sous la variante
-			// « bundle » — un téléphone y cherche le nom exact que son APK
-			// attend —, ceux du serveur sous « emulator » (chantier 29) : c'est
-			// par eux qu'un ami prend la dernière version chez nous.
-			for _, file := range retro_files.ListEmulatorFiles(roots.Cores, console.ID) {
-				variant := "emulator"
-				if file.Phone {
-					variant = "bundle"
-				}
-				items[console.ID] = append(items[console.ID], listing.Item{
-					Name: file.File, Size: file.SizeBytes,
-					Variants: map[string]int64{variant: file.SizeBytes},
-				})
+			if found := libraryCoreItems(roots, console.ID); len(found) > 0 {
+				items[console.ID] = found
 			}
 		}
 	case listing.Bios:
@@ -170,6 +136,47 @@ func librarySection(roots libraryRoots, section string) map[string][]listing.Ite
 		items = listing.LocalTree(roots.Patches)
 	case listing.Params:
 		items = paramsItems(emuparams.Store{Root: roots.Params}.Inventory())
+	}
+
+	return items
+}
+
+// libraryCoreItems lit une seule console. Le listing fédéré l'appelle dans
+// une boucle, tandis que la fiche d'un jeu peut l'appeler directement après
+// qu'un installateur externe au kernel a déposé un cœur.
+func libraryCoreItems(roots libraryRoots, consoleID string) []listing.Item {
+	items := []listing.Item{}
+	entries, err := retro_files.ListCoreFiles(roots.Cores, consoleID)
+	if err == nil {
+		for _, entry := range entries {
+			// Rangé sous sa console, comme GameFlex les dépose : un cœur à
+			// plat (`cores/<fichier>`) est l'ancien rangement, qui n'a plus
+			// cours (aucun sur les deux piles, 2026-10-13).
+			if !entry.Scoped && !entry.AndroidInstalled {
+				continue
+			}
+			variants := map[string]int64{}
+			if entry.Scoped {
+				variants["linux"] = entry.SizeBytes
+			}
+			if entry.AndroidInstalled {
+				variants["android"] = entry.AndroidSizeBytes
+			}
+			items = append(items, listing.Item{Name: entry.Name, Size: entry.SizeBytes, Variants: variants})
+		}
+	}
+	// LES FICHIERS DES ÉMULATEURS DE BUREAU : un élément par fichier, sous
+	// son nom. Les paquets du téléphone (chantier 28) sous la variante
+	// « bundle », ceux du serveur sous « emulator » (chantier 29).
+	for _, file := range retro_files.ListEmulatorFiles(roots.Cores, consoleID) {
+		variant := "emulator"
+		if file.Phone {
+			variant = "bundle"
+		}
+		items = append(items, listing.Item{
+			Name: file.File, Size: file.SizeBytes,
+			Variants: map[string]int64{variant: file.SizeBytes},
+		})
 	}
 
 	return items

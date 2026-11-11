@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:SNES-Mod1-Console-Set.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:SNES-Mod1-Console-Set.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/SNES-Mod1-Console-Set.jpg/960px-SNES-Mod1-Console-Set.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "snes",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "73f938971b998b5ff22d7d59002a52d168af3376fbdd1a6a4654fce38b05e8db",
+  "url": "/experience-api/v1/media/73f938971b998b5ff22d7d59002a52d168af3376fbdd1a6a4654fce38b05e8db",
+  "mime": "image/webp",
+  "fetchedAt": 1794142763,
+  "reviewAfter": 1796734763
+}

@@ -229,6 +229,9 @@ type Engine struct {
 	// threadsAtStart — les noms des fils avant le cœur (voir bornSince).
 	threadsAtStart map[string]int
 	frameSeen      bool
+	frameReadSeen  bool
+	visibleFrame   bool
+	framesRead     uint64
 	rejectSeen     bool
 	readFailed     bool
 	frames         int
@@ -1102,6 +1105,33 @@ func (e *Engine) video(data unsafe.Pointer, width, height, pitch uint32) {
 		pixels = frame
 	} else {
 		pixels = ToBGRA(data, w, h, int(pitch), e.pixelFormat)
+	}
+	e.framesRead++
+	if !e.frameReadSeen || !e.visibleFrame {
+		minRGB, maxRGB, nonBlack := byte(255), byte(0), 0
+		for i := 0; i+3 < len(pixels); i += 4 {
+			for _, component := range pixels[i : i+3] {
+				if component < minRGB {
+					minRGB = component
+				}
+				if component > maxRGB {
+					maxRGB = component
+				}
+			}
+			if pixels[i] != 0 || pixels[i+1] != 0 || pixels[i+2] != 0 {
+				nonBlack++
+			}
+		}
+		if !e.frameReadSeen {
+			e.frameReadSeen = true
+			log.Printf("[engine] première image relue : RGB %d..%d, %d/%d pixels non noirs",
+				minRGB, maxRGB, nonBlack, w*h)
+		}
+		if nonBlack > 0 && !e.visibleFrame {
+			e.visibleFrame = true
+			log.Printf("[engine] première image visible après %d lecture(s) : RGB %d..%d, %d/%d pixels non noirs",
+				e.framesRead, minRGB, maxRGB, nonBlack, w*h)
+		}
 	}
 
 	e.frames++

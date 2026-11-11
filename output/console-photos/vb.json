@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Virtual-Boy-Set.jpg",
+  "author": "Evan-Amos",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Virtual-Boy-Set.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Virtual-Boy-Set.jpg/960px-Virtual-Boy-Set.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "vb",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "5114533188b0690c10f170917eb44687a29b59389919771d2fd4fcab844bc3b8",
+  "url": "/experience-api/v1/media/5114533188b0690c10f170917eb44687a29b59389919771d2fd4fcab844bc3b8",
+  "mime": "image/webp",
+  "fetchedAt": 1794142766,
+  "reviewAfter": 1796734766
+}

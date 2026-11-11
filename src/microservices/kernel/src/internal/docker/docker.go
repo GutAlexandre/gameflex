@@ -226,7 +226,7 @@ func (spec SpawnSpec) gamesDir(cfg config.Config, consoleID string) string {
 		return spec.GamesHostDir
 	}
 
-	return gamesHostDir(cfg.StorageHostDir, consoleID)
+	return filepath.Join(cfg.RomsHostDir(), consoleID)
 }
 
 // librarySections — des sections du dossier (`bios`, `patches`…), chacune à
@@ -360,6 +360,14 @@ func (dockerClient *Client) CheckImages(ctx context.Context) {
 // parties — et, quand GAMEFLEX_GPU nomme une carte absente (en OCuLink,
 // éteinte au démarrage), que les parties tournent sur une autre.
 func (dockerClient *Client) CheckGPU() {
+	if requested := strings.TrimSpace(dockerClient.config.NVIDIAGPU); requested != "" {
+		if _, err := os.Stat("/dev/dxg"); err == nil {
+			slog.Info("NVIDIA GPU enabled through Docker/WSL", "device", requested, "node", "/dev/dxg")
+		} else {
+			slog.Warn("NVIDIA GPU requested; /dev/dxg is not visible in the kernel container", "device", requested)
+		}
+		return
+	}
 	wanted := dockerClient.config.GPU
 	gpu, declared, ok := sessionstatus.SessionGPU("/sys", wanted)
 	if !ok {
@@ -374,6 +382,75 @@ func (dockerClient *Client) CheckGPU() {
 		slog.Warn("GAMEFLEX_GPU names no GPU of this host — games run on the first one",
 			"GAMEFLEX_GPU", wanted, "pci", gpu.PCI)
 	}
+}
+
+// sessionGPUDeviceRequests — la forme Docker de `--gpus`. Le runtime NVIDIA
+// injecte /dev/dxg et les bibliothèques du pilote Windows dans le conteneur
+// WSL ; un DeviceMapping /dev/dri ne peut pas représenter ce GPU paravirtualisé.
+func sessionGPUDeviceRequests(requested string) []container.DeviceRequest {
+	requested = strings.TrimSpace(requested)
+	if requested == "" {
+		return nil
+	}
+
+	request := container.DeviceRequest{Driver: "nvidia", Capabilities: [][]string{{"gpu"}}}
+	if strings.EqualFold(requested, "all") {
+		request.Count = -1
+	} else {
+		request.DeviceIDs = []string{requested}
+	}
+
+	return []container.DeviceRequest{request}
+}
+
+func sessionNVIDIAEnvironment(requested string) []string {
+	requested = strings.TrimSpace(requested)
+	if requested == "" {
+		return nil
+	}
+	// Les émulateurs ont besoin de Vulkan/OpenGL et le streamer de NVENC,
+	// pas seulement des capacités compute/utility par défaut.
+	return []string{"NVIDIA_DRIVER_CAPABILITIES=all", "GAMEFLEX_NVIDIA_GPU=" + requested}
+}
+
+// sessionWSLGraphicsEnvironment completes what the NVIDIA container runtime
+// exposes under WSL2. `--gpus` is enough for CUDA/NVENC, but not for Mesa's
+// OpenGL-on-D3D12 driver: without the WSL user-mode D3D12 libraries and an
+// explicit Gallium selection, EGL silently falls back to llvmpipe. Dolphin
+// then renders a Wii frame on the CPU while NVENC encodes it on the GPU — a
+// particularly misleading half-accelerated setup.
+func sessionWSLGraphicsEnvironment(requested string, dxgPresent bool) []string {
+	if strings.TrimSpace(requested) == "" || !dxgPresent {
+		return nil
+	}
+
+	return []string{
+		"GALLIUM_DRIVER=d3d12",
+		"MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA",
+		"LD_LIBRARY_PATH=/usr/lib/wsl/lib:/usr/lib/x86_64-linux-gnu",
+	}
+}
+
+// sessionWSLGraphicsMounts exposes both /usr/lib/wsl/lib and
+// /usr/lib/wsl/drivers. The latter is essential: libdxcore locates the
+// Windows display driver's user-mode DLLs there. Mounting only `lib/` leaves
+// D3D12 unable to create a screen and Mesa falls back to llvmpipe.
+func sessionWSLGraphicsMounts(requested string, dxgPresent bool) []mount.Mount {
+	if strings.TrimSpace(requested) == "" || !dxgPresent {
+		return nil
+	}
+
+	return []mount.Mount{{
+		Type:     mount.TypeBind,
+		Source:   "/usr/lib/wsl",
+		Target:   "/usr/lib/wsl",
+		ReadOnly: true,
+	}}
+}
+
+func wslGPUNodePresent() bool {
+	_, err := os.Stat("/dev/dxg")
+	return err == nil
 }
 
 // sessionGPUDevices — les deux nœuds du GPU des parties (sa carte et son
@@ -403,6 +480,21 @@ func sessionGPUDevices(wanted string) []container.DeviceMapping {
 	}
 
 	return devices
+}
+
+// sessionV3DEnvironment adapte Mesa au V3D du Raspberry Pi. Le pilote sait
+// créer le contexte OpenGL 4.1 utilisé par Dolphin, mais annonce par défaut
+// une version desktop plus basse. Les GPU PCI et le chemin NVIDIA/WSL ne
+// doivent jamais recevoir ces substitutions.
+func sessionV3DEnvironment(gpu sessionstatus.GPU) []string {
+	if gpu.Vendor == "Broadcom" {
+		return []string{
+			"MESA_GL_VERSION_OVERRIDE=4.1",
+			"MESA_GLSL_VERSION_OVERRIDE=410",
+		}
+	}
+
+	return nil
 }
 
 // sessionDmaHeapDevices — LE TAS DE MÉMOIRE DU NOYAU que la mémoire unique de
@@ -843,7 +935,7 @@ func (dockerClient *Client) CreateAndStart(ctx context.Context, spec SpawnSpec) 
 			ReadOnly: true,
 		},
 		{
-			Type:   mount.TypeBind,
+			Type: mount.TypeBind,
 			// Le dossier de la console : la Switch 2 (#644) range ses
 			// sauvegardes à part, sous saves/<compte>/streamex/switch2.
 			Source: streamexSaveDir(cfg.SavesHostDir(), spec.Username, gamesConsole),
@@ -1154,6 +1246,7 @@ func (dockerClient *Client) CreateAndStart(ctx context.Context, spec SpawnSpec) 
 			"GAMEFLEX_KERNEL_URL="+cfg.KernelURL,
 			"GAMEFLEX_PUBLIC_HOST="+cfg.PublicHost,
 		)
+		containerEnv = append(containerEnv, sessionNVIDIAEnvironment(cfg.NVIDIAGPU)...)
 
 		containerConfig := &container.Config{
 			Image: sessionImage(cfg, spec.Console, spec.Core),
@@ -1224,7 +1317,8 @@ func (dockerClient *Client) CreateAndStart(ctx context.Context, spec SpawnSpec) 
 			// d'arrêt à streamex.
 			Init: &runInit,
 			Resources: container.Resources{
-				Devices: devices,
+				Devices:        devices,
+				DeviceRequests: sessionGPUDeviceRequests(cfg.NVIDIAGPU),
 				// 12 Go, PAS 6. C'est un PLAFOND (memory.max du cgroup), rien
 				// n'est réservé tant que l'émulateur ne s'en sert pas.
 				//
@@ -1331,7 +1425,7 @@ func (dockerClient *Client) WaitReadyHostExternal(ctx context.Context, container
 // address on the port the allocator assigned, same as StatusRetro/
 // StatusRemoteplay.
 func (dockerClient *Client) StatusExternal(ctx context.Context, containerName string, port int) (*ContainerStatus, error) {
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("http://%s:%d/status", dockerClient.config.PublicHost, port), nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("http://%s:%d/status", dockerClient.config.ReachableHost(), port), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -1501,6 +1595,7 @@ type RetroSpawnSpec struct {
 // reach the container by DNS name.
 func (dockerClient *Client) CreateAndStartRetro(ctx context.Context, spec RetroSpawnSpec) (port int, containerName string, err error) {
 	cfg := dockerClient.config
+	dxgPresent := wslGPUNodePresent()
 	// These env paths ARE the child's whole world (storageclient.AdoptEnv):
 	// the sections of the storage folder, at their place under /gameflex.
 	section := func(name string) string {
@@ -1543,6 +1638,9 @@ func (dockerClient *Client) CreateAndStartRetro(ctx context.Context, spec RetroS
 
 	return dockerClient.spawn(ctx).run(spec.ContainerBase, spec.ContainerIndex, func(candidatePort int) (*container.Config, *container.HostConfig) {
 		containerEnv := append(environment, "GAMEFLEX_CHILD_PORT="+strconv.Itoa(candidatePort))
+		if gpu, _, ok := sessionstatus.SessionGPU("/sys", cfg.GPU); ok {
+			containerEnv = append(containerEnv, sessionV3DEnvironment(gpu)...)
+		}
 		// The child attaches to gatewaywebrtc over the shared internal
 		// transport (host networking on both sides, 127.0.0.1 is the gateway
 		// itself) — its only media path, it does not start without it. Its
@@ -1561,6 +1659,8 @@ func (dockerClient *Client) CreateAndStartRetro(ctx context.Context, spec RetroS
 			"GAMEFLEX_CONSOLE_ID="+spec.ConsoleID,
 		)
 		containerEnv = append(containerEnv, sessionKeys(cfg, spec.SessionID)...)
+		containerEnv = append(containerEnv, sessionNVIDIAEnvironment(cfg.NVIDIAGPU)...)
+		containerEnv = append(containerEnv, sessionWSLGraphicsEnvironment(cfg.NVIDIAGPU, dxgPresent)...)
 		// #150 — la résolution choisie devient le canevas de l'encodeur.
 		// Absente, le child garde la géométrie d'époque de la console
 		// (`consoles.NativeSize`) : c'est le défaut, et il reste le bon pour
@@ -1617,14 +1717,17 @@ func (dockerClient *Client) CreateAndStartRetro(ctx context.Context, spec RetroS
 		// EVERY subnet Docker has assigned this project so far, custom or
 		// default. network_mode: host sidesteps Docker's NAT/forwarding
 		// entirely, exactly like remoteplay/coturn already do.
+		sessionMounts := append([]mount.Mount{}, mounts...)
+		sessionMounts = append(sessionMounts, sessionWSLGraphicsMounts(cfg.NVIDIAGPU, dxgPresent)...)
 		hostConfig := &container.HostConfig{
 			NetworkMode: "host",
 			Resources: container.Resources{
-				Devices:   sessionGPUDevices(cfg.GPU),
-				Memory:    6 * 1024 * 1024 * 1024,
-				PidsLimit: &sessionPidsLimit,
+				Devices:        sessionGPUDevices(cfg.GPU),
+				DeviceRequests: sessionGPUDeviceRequests(cfg.NVIDIAGPU),
+				Memory:         6 * 1024 * 1024 * 1024,
+				PidsLimit:      &sessionPidsLimit,
 			},
-			Mounts:  mounts,
+			Mounts:  sessionMounts,
 			ShmSize: 1 * 1024 * 1024 * 1024,
 		}
 
@@ -1664,7 +1767,7 @@ type RetroGPUStatus struct {
 // endpoint is the host's own LAN address on the port the allocator
 // assigned, same as StatusRemoteplay.
 func (dockerClient *Client) StatusRetro(ctx context.Context, containerName string, port int) (*RetroContainerStatus, error) {
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("http://%s:%d/status", dockerClient.config.PublicHost, port), nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("http://%s:%d/status", dockerClient.config.ReachableHost(), port), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -1883,7 +1986,7 @@ type RemoteplayContainerStatus struct {
 // runs in host networking, so the endpoint is the host's own LAN address on
 // the port the allocator assigned.
 func (dockerClient *Client) StatusRemoteplay(ctx context.Context, containerName string, port int) (*RemoteplayContainerStatus, error) {
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("http://%s:%d/status", dockerClient.config.PublicHost, port), nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("http://%s:%d/status", dockerClient.config.ReachableHost(), port), nil)
 	if err != nil {
 		return nil, err
 	}

@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	"gameflex/kernel/internal/retro_files"
 	"gameflex/storage"
 	"gameflex/storage/listing"
 )
@@ -52,6 +53,48 @@ func listedRoms(t *testing.T, server *Server, consoleID string) []map[string]any
 	}
 
 	return answer.Data
+}
+
+func listedCores(t *testing.T, server *Server, consoleID string) []retro_files.CoreEntry {
+	t.Helper()
+	router := chi.NewRouter()
+	router.Get("/{consoleId}/cores", server.handleRetroCores)
+	recorder := httptest.NewRecorder()
+	router.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/"+consoleID+"/cores", nil))
+	var answer struct {
+		Data []retro_files.CoreEntry `json:"data"`
+	}
+	if err := json.Unmarshal(recorder.Body.Bytes(), &answer); err != nil || recorder.Code != http.StatusOK {
+		t.Fatalf("cœurs = %d %s", recorder.Code, recorder.Body.String())
+	}
+
+	return answer.Data
+}
+
+// L'assistant d'expérience écrit dans la bibliothèque partagée, pas par une
+// route d'administration du kernel. La fiche doit donc voir le cœur tout de
+// suite, même si le listing fédéré avait été construit avant l'installation.
+func TestCoreRouteSeesAssistantInstallWithoutAdminRescan(t *testing.T) {
+	server, root := listingServer(t)
+	server.ensureSelf()
+	for _, core := range listedCores(t, server, "wii") {
+		if core.Name == "dolphin" && core.Installed {
+			t.Fatal("Dolphin ne doit pas être présent avant le dépôt de test")
+		}
+	}
+	target := filepath.Join(root, "cores", "wii", "dolphin_libretro.so")
+	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(target, []byte("core"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, core := range listedCores(t, server, "wii") {
+		if core.Name == "dolphin" && core.Installed {
+			return
+		}
+	}
+	t.Fatal("Dolphin déposé par l'assistant reste absent de la route de lancement")
 }
 
 // LES ÉCRANS D'ICI LISENT LE LISTING DE CE SERVEUR (chantier 15) : construit à

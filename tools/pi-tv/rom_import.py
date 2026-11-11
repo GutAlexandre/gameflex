@@ -15,7 +15,8 @@ FORMATS={
  'zxspectrum':{'z80','sna','tap','tzx'},'neogeo':{'zip'},'cps1':{'zip'},'cps2':{'zip'},
  'ps1':{'chd','iso','pbp'},'ps2':{'chd','iso'},'psp':{'iso','cso','pbp'},
  'dreamcast':{'chd','cdi'},'saturn':{'chd'},'gc':{'iso','rvz'},'wii':{'iso','wbfs','rvz'},
- 'pcfx':{'chd'},'doom':{'wad'}
+ 'pcfx':{'chd'},'doom':{'wad'},'3ds':{'3ds','cci','cxi'},
+ 'switch':{'xci','nsp'},'wiiu':{'wua','wux','wud','rpx'}
 }
 def validate(console,name):
     if console not in FORMATS:raise LibraryError('Console non prise en charge pour cet import.')

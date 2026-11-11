@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:NEC-PC-FX-wController-R.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:NEC-PC-FX-wController-R.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/NEC-PC-FX-wController-R.jpg/960px-NEC-PC-FX-wController-R.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "pcfx",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "23c239c9466a92f5eb55f5f994f1ac4c6aa253912e20c5cdd53952f8d8a68f5c",
+  "url": "/experience-api/v1/media/23c239c9466a92f5eb55f5f994f1ac4c6aa253912e20c5cdd53952f8d8a68f5c",
+  "mime": "image/webp",
+  "fetchedAt": 1794142781,
+  "reviewAfter": 1796734781
+}

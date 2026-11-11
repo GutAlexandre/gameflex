@@ -1,0 +1,690 @@
+[
+  {
+    "id": "nes",
+    "name": "Nintendo Ent. System (NES)",
+    "publisher": "Nintendo",
+    "method": "retrogaming",
+    "cores": [
+      "fceumm",
+      "nestopia",
+      "quicknes"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "nes",
+      "fds",
+      "unf",
+      "unif"
+    ],
+    "width": 256,
+    "height": 240,
+    "year": 1983,
+    "image": "/experience-api/v1/media/fcfc05ac5126a92b2859686f85104042018bbc37ad33d9996fabb99771cd9fa9",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "snes",
+    "name": "Super Nintendo (SNES)",
+    "publisher": "Nintendo",
+    "method": "retrogaming",
+    "cores": [
+      "snes9x"
+    ],
+    "maxPlayers": 4,
+    "extensions": [
+      "smc",
+      "sfc",
+      "swc",
+      "fig",
+      "bs"
+    ],
+    "width": 256,
+    "height": 224,
+    "year": 1990,
+    "image": "/experience-api/v1/media/73f938971b998b5ff22d7d59002a52d168af3376fbdd1a6a4654fce38b05e8db",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "gbc",
+    "name": "Game Boy / Game Boy Color",
+    "publisher": "Nintendo",
+    "method": "retrogaming",
+    "cores": [
+      "gambatte"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "gb",
+      "gbc",
+      "sgb"
+    ],
+    "width": 160,
+    "height": 144,
+    "year": 1989,
+    "image": "/experience-api/v1/media/df40fc82e1630f02baeb63d7052ab1c89cf8936e17e18574edd6a60cdd765b76",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "gba",
+    "name": "Game Boy Advance",
+    "publisher": "Nintendo",
+    "method": "retrogaming",
+    "cores": [
+      "mgba"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "gba",
+      "agb"
+    ],
+    "width": 240,
+    "height": 160,
+    "year": 2001,
+    "image": "/experience-api/v1/media/134a88d27e3d530592f7175987de923a3c6cd40173e116fd478f9defe3d7ccea",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "vb",
+    "name": "Virtual Boy",
+    "publisher": "Nintendo",
+    "method": "retrogaming",
+    "cores": [
+      "mednafen_vb"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "vb",
+      "vboy"
+    ],
+    "width": 384,
+    "height": 224,
+    "year": 1995,
+    "image": "/experience-api/v1/media/5114533188b0690c10f170917eb44687a29b59389919771d2fd4fcab844bc3b8",
+    "attribution": "Evan-Amos · CC BY-SA 3.0"
+  },
+  {
+    "id": "n64",
+    "name": "Nintendo 64",
+    "publisher": "Nintendo",
+    "method": "retrogaming",
+    "cores": [
+      "parallel_n64"
+    ],
+    "maxPlayers": 4,
+    "extensions": [
+      "n64",
+      "z64",
+      "v64",
+      "u64",
+      "ndd"
+    ],
+    "analog": true,
+    "width": 640,
+    "height": 480,
+    "year": 1996,
+    "image": "/experience-api/v1/media/24d01b47a1f261d661105126cfe9d1b2ddee8ab1e83de4615247d440b8401589",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "nds",
+    "name": "Nintendo DS",
+    "publisher": "Nintendo",
+    "method": "retrogaming",
+    "cores": [
+      "desmume"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "nds",
+      "dsi"
+    ],
+    "biosOptional": [
+      "bios7.bin",
+      "bios9.bin",
+      "firmware.bin"
+    ],
+    "width": 256,
+    "height": 384,
+    "touch": true,
+    "year": 2004,
+    "image": "/experience-api/v1/media/bc5aabd2619f0c78eb15a6974ef08ee9d1f2d6f5b2206a1bf4ea186d6af33525",
+    "attribution": "Evan-Amos · CC BY-SA 3.0"
+  },
+  {
+    "id": "gc",
+    "name": "Nintendo GameCube",
+    "publisher": "Nintendo",
+    "method": "retrogaming",
+    "cores": [
+      "dolphin"
+    ],
+    "maxPlayers": 4,
+    "extensions": [
+      "iso",
+      "gcm",
+      "rvz",
+      "gcz",
+      "ciso",
+      "tgc",
+      "wia",
+      "dol",
+      "elf"
+    ],
+    "analog": true,
+    "year": 2001,
+    "image": "/experience-api/v1/media/630232d6b18938fe51d68929b5308496c7ff5b30405cf37b52bb04527095db79",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "wii",
+    "name": "Nintendo Wii",
+    "publisher": "Nintendo",
+    "method": "retrogaming",
+    "cores": [
+      "dolphin"
+    ],
+    "maxPlayers": 4,
+    "extensions": [
+      "iso",
+      "rvz",
+      "wbfs",
+      "wad",
+      "gcz",
+      "ciso",
+      "wia",
+      "dol",
+      "elf"
+    ],
+    "analog": true,
+    "year": 2006,
+    "image": "/experience-api/v1/media/1cf7a98ade9a4b937c96e24443504a61aaf2da152797db490a911a57ea424cb2",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "sms",
+    "name": "Sega Master System",
+    "publisher": "Sega",
+    "method": "retrogaming",
+    "cores": [
+      "genesis_plus_gx"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "sms",
+      "gg",
+      "sg"
+    ],
+    "width": 256,
+    "height": 192,
+    "year": 1985,
+    "image": "/experience-api/v1/media/5d38a6b0a396845607fe423f6f90a5bccd8a4c28bda498568c14a20c97c9c93b",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "megadrive",
+    "name": "Sega Mega Drive / Genesis",
+    "publisher": "Sega",
+    "method": "retrogaming",
+    "cores": [
+      "genesis_plus_gx",
+      "picodrive"
+    ],
+    "maxPlayers": 4,
+    "extensions": [
+      "md",
+      "gen",
+      "smd",
+      "bin",
+      "32x"
+    ],
+    "width": 320,
+    "height": 240,
+    "year": 1988,
+    "image": "/experience-api/v1/media/e1508e48a56c1af9833ed80d270f8bca84c0e39765b7f3bb1164f9b27b3964c1",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "saturn",
+    "name": "Sega Saturn",
+    "publisher": "Sega",
+    "method": "retrogaming",
+    "cores": [
+      "yabause",
+      "kronos",
+      "mednafen_saturn"
+    ],
+    "maxPlayers": 4,
+    "extensions": [
+      "cue",
+      "chd",
+      "iso",
+      "ccd",
+      "mds"
+    ],
+    "bios": [
+      "sega_101.bin",
+      "mpr-17933.bin",
+      "saturn_bios.bin"
+    ],
+    "year": 1994,
+    "image": "/experience-api/v1/media/3df27126abac6a09558c01e3d5963145be82d8fc9c415d5d3a1260aa62272bb1",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "dreamcast",
+    "name": "Sega Dreamcast",
+    "publisher": "Sega",
+    "method": "retrogaming",
+    "cores": [
+      "flycast"
+    ],
+    "maxPlayers": 4,
+    "extensions": [
+      "cdi",
+      "gdi",
+      "chd",
+      "cue"
+    ],
+    "analog": true,
+    "bios": [
+      "dc_boot.bin",
+      "dc_flash.bin"
+    ],
+    "year": 1998,
+    "image": "/experience-api/v1/media/15673ccdb7273e621914086bb926c8674af6cea5348f9ee0f4fc0b4d13db7d83",
+    "attribution": "Evan-Amos · CC BY-SA 3.0"
+  },
+  {
+    "id": "atari2600",
+    "name": "Atari 2600",
+    "publisher": "Atari",
+    "method": "retrogaming",
+    "cores": [
+      "stella2014"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "a26",
+      "bin"
+    ],
+    "year": 1977,
+    "image": "/experience-api/v1/media/e30587ac0c66062e1e2e89568ce04b1e7e9c906ca60442fc30bddc802ee82deb",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "atari7800",
+    "name": "Atari 7800",
+    "publisher": "Atari",
+    "method": "retrogaming",
+    "cores": [
+      "prosystem"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "a78",
+      "bin"
+    ],
+    "year": 1986,
+    "image": "/experience-api/v1/media/3e5207a88a1f05ae2f377b6929214789c05ad1c3f5c54a9bfa65b3c23ca5c5e5",
+    "attribution": "Evan-Amos · CC BY-SA 3.0"
+  },
+  {
+    "id": "lynx",
+    "name": "Atari Lynx",
+    "publisher": "Atari",
+    "method": "retrogaming",
+    "cores": [
+      "handy"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "lnx",
+      "o"
+    ],
+    "year": 1989,
+    "image": "/experience-api/v1/media/5d04df12404630b1e4b51ed3a93d1caa11dd45e338a4ea46f7269627d39c24e3",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "jaguar",
+    "name": "Atari Jaguar",
+    "publisher": "Atari",
+    "method": "retrogaming",
+    "cores": [
+      "virtualjaguar"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "j64",
+      "jag",
+      "rom",
+      "abs",
+      "cof"
+    ],
+    "year": 1993,
+    "image": "/experience-api/v1/media/e55308a03ef122afd65791fba52f8c245c070cf60ad75a11391f877b71010fdc",
+    "attribution": "Evan-Amos · CC BY-SA 3.0"
+  },
+  {
+    "id": "pce",
+    "name": "PC Engine / TurboGrafx-16",
+    "publisher": "NEC",
+    "method": "retrogaming",
+    "cores": [
+      "mednafen_pce_fast"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "pce",
+      "cue",
+      "chd",
+      "sgx"
+    ],
+    "year": 1987,
+    "image": "/experience-api/v1/media/ef4c7aecbe04cbada071b33feeb270817a4405af22c9f6ad68037b96ac7d9e3f",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "pcfx",
+    "name": "PC-FX",
+    "publisher": "NEC",
+    "method": "retrogaming",
+    "cores": [
+      "mednafen_pcfx"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "cue",
+      "chd",
+      "ccd"
+    ],
+    "bios": [
+      "pcfx.rom"
+    ],
+    "year": 1994,
+    "image": "/experience-api/v1/media/23c239c9466a92f5eb55f5f994f1ac4c6aa253912e20c5cdd53952f8d8a68f5c",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "neogeo",
+    "name": "Neo Geo / Arcade",
+    "publisher": "SNK",
+    "method": "retrogaming",
+    "cores": [
+      "fbalpha2012_neogeo"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "zip",
+      "chd"
+    ],
+    "bios": [
+      "neogeo.zip"
+    ],
+    "year": 1990,
+    "image": "/experience-api/v1/media/d6962bbe62fca0e3752d43dfde62124a92c121463a1fca4664f133327d9575ac",
+    "attribution": "Evan-Amos · CC BY-SA 3.0"
+  },
+  {
+    "id": "ngp",
+    "name": "Neo Geo Pocket",
+    "publisher": "SNK",
+    "method": "retrogaming",
+    "cores": [
+      "mednafen_ngp"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "ngp",
+      "ngc"
+    ],
+    "width": 160,
+    "height": 152,
+    "year": 1998,
+    "image": "/experience-api/v1/media/867c84da36483b4217a6dd9d76474d28e165044d9197cb5231ea4ebe5887a1fc",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "cps1",
+    "name": "Capcom CPS-1",
+    "publisher": "Capcom",
+    "method": "retrogaming",
+    "cores": [
+      "fbalpha2012_cps1"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "zip"
+    ],
+    "year": 1988,
+    "image": "/experience-api/v1/media/ea7bfcd6a7cf5c200936a2845a5c1d1aa557c13280f1b05fdfb68eede91c0e51",
+    "attribution": "Robivy64 at English Wikipedia · Public domain"
+  },
+  {
+    "id": "cps2",
+    "name": "Capcom CPS-2",
+    "publisher": "Capcom",
+    "method": "retrogaming",
+    "cores": [
+      "fbalpha2012_cps2"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "zip"
+    ],
+    "year": 1993,
+    "image": "/experience-api/v1/media/f099c7844436323aa481e6c4116315d4c8d7a24b114cbdf836ba3b6e7d77fded",
+    "attribution": "o_o · CC BY-NC-SA 2.0"
+  },
+  {
+    "id": "wswan",
+    "name": "WonderSwan",
+    "publisher": "Bandai",
+    "method": "retrogaming",
+    "cores": [
+      "mednafen_wswan"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "ws",
+      "wsc"
+    ],
+    "year": 1999,
+    "image": "/experience-api/v1/media/cdfc2334efcc5531839d5938d50dec58455e92695a2f0ff6fe4a32f13278a9a0",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "coleco",
+    "name": "ColecoVision",
+    "publisher": "Coleco",
+    "method": "retrogaming",
+    "cores": [
+      "gearcoleco"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "col",
+      "cv",
+      "rom",
+      "bin"
+    ],
+    "bios": [
+      "colecovision.rom"
+    ],
+    "year": 1982,
+    "image": "/experience-api/v1/media/d962de17f37a82f90108f491d01e3ec20cfafe30cb4b10ab0e3edbf2b7519c7b",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "vectrex",
+    "name": "Vectrex",
+    "publisher": "GCE",
+    "method": "retrogaming",
+    "cores": [
+      "vecx"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "vec",
+      "bin"
+    ],
+    "year": 1982,
+    "image": "/experience-api/v1/media/cdf0645de0eabf24295d50beb04792c949f6096d750e457b8298b3243b6141fb",
+    "attribution": "Evan-Amos · CC BY-SA 3.0"
+  },
+  {
+    "id": "c64",
+    "name": "Commodore 64",
+    "publisher": "Commodore",
+    "method": "retrogaming",
+    "cores": [
+      "vice_x64sc"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "d64",
+      "t64",
+      "prg",
+      "crt",
+      "tap",
+      "g64"
+    ],
+    "year": 1982,
+    "image": "/experience-api/v1/media/bdfcfa2c2ef0f77f27ef1d8217b8416d76d7d1c1058f4809939f7942e79c52b1",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "amstrad",
+    "name": "Amstrad CPC",
+    "publisher": "Amstrad",
+    "method": "retrogaming",
+    "cores": [
+      "cap32"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "dsk",
+      "sna",
+      "cdt",
+      "kcr"
+    ],
+    "year": 1984,
+    "image": "/experience-api/v1/media/55824f784f4d7aca279a04cde11d196d5059e6838127d3636c326175fc05a373",
+    "attribution": "Bill Bertram · CC BY-SA 2.5"
+  },
+  {
+    "id": "zxspectrum",
+    "name": "Sinclair ZX Spectrum",
+    "publisher": "Sinclair",
+    "method": "retrogaming",
+    "cores": [
+      "fuse"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "tzx",
+      "tap",
+      "z80",
+      "sna",
+      "szx"
+    ],
+    "year": 1982,
+    "image": "/experience-api/v1/media/7e0f0aece27fb94a6ecbd03e9b852d4955b12af048a0543e14b84d9d4118def5",
+    "attribution": "Bill Bertram · CC BY-SA 2.5"
+  },
+  {
+    "id": "doom",
+    "name": "Doom",
+    "publisher": "id Software",
+    "method": "retrogaming",
+    "cores": [
+      "prboom"
+    ],
+    "maxPlayers": 2,
+    "extensions": [
+      "wad",
+      "iwad",
+      "pwad"
+    ],
+    "year": 1993,
+    "image": "/experience-api/v1/media/1ce96e951fac5673cba526e91824af8f51c6303c222ab9c732feb1238b2e3d22",
+    "attribution": "DMahalko, Dale Mahalko, Gilman, WI, USA -- Email: dmahalko@gmail.com · CC BY-SA 3.0"
+  },
+  {
+    "id": "ps1",
+    "name": "PlayStation 1",
+    "publisher": "Sony",
+    "method": "retrogaming",
+    "cores": [
+      "pcsx_rearmed"
+    ],
+    "maxPlayers": 4,
+    "extensions": [
+      "cue",
+      "bin",
+      "chd",
+      "pbp",
+      "img",
+      "ecm",
+      "m3u",
+      "iso"
+    ],
+    "analog": true,
+    "biosOptional": [
+      "scph5500.bin",
+      "scph5501.bin",
+      "scph5502.bin",
+      "scph1001.bin",
+      "scph7001.bin",
+      "psxonpsp660.bin"
+    ],
+    "width": 640,
+    "height": 480,
+    "year": 1994,
+    "image": "/experience-api/v1/media/eaf84f40d01729c52a3487af93fff782f5ee6d85e7d83b7039f2ae61f289305a",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "ps2",
+    "name": "PlayStation 2",
+    "publisher": "Sony",
+    "method": "retrogaming",
+    "cores": [
+      "pcsx2"
+    ],
+    "maxPlayers": 4,
+    "extensions": [
+      "iso",
+      "chd",
+      "cso",
+      "bin",
+      "cue"
+    ],
+    "analog": true,
+    "year": 2000,
+    "image": "/experience-api/v1/media/2a4e83b9afa16f546bac6a11e264158afcfec3a251370834483b593b26509b41",
+    "attribution": "Evan-Amos · Public domain"
+  },
+  {
+    "id": "psp",
+    "name": "PlayStation Portable (PSP)",
+    "publisher": "Sony",
+    "method": "retrogaming",
+    "cores": [
+      "ppsspp"
+    ],
+    "maxPlayers": 1,
+    "extensions": [
+      "iso",
+      "cso",
+      "pbp",
+      "chd"
+    ],
+    "analog": true,
+    "width": 480,
+    "height": 272,
+    "year": 2004,
+    "image": "/experience-api/v1/media/f0e3fe0054343b5f14c38c7ef3949b5bb69636f2441e83bdc70ad753c4ccc7f4",
+    "attribution": "Evan-Amos · Public domain"
+  }
+]

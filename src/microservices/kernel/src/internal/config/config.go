@@ -47,6 +47,10 @@ type Config struct {
 	// le démon Docker résout pour monter ses morceaux dans une partie
 	// (jamais lue dans ce conteneur, qui le voit en StorageDir).
 	StorageHostDir string
+	// RomsHostRoot — la source hôte de /gameflex/roms quand elle remplace le
+	// sous-dossier du stockage principal (disque Windows, NAS monté, etc.).
+	// Vide, StorageHostDir/roms reste le comportement historique.
+	RomsHostRoot string
 
 	// ProfilesHostDir — HOST-side folder (daemon-resolved) holding the
 	// console pad profiles (profile.json, see internal/docker/profiles).
@@ -64,11 +68,11 @@ type Config struct {
 	// Switch2Image — Eglantine, l'émulateur de la Nintendo Switch 2 (#644).
 	Switch2Image string
 	PS3Image     string
-	XboxImage       string
-	PS4Image        string
-	PS5Image        string
-	WiiUImage       string
-	Xbox360Image    string
+	XboxImage    string
+	PS4Image     string
+	PS5Image     string
+	WiiUImage    string
+	Xbox360Image string
 	// Les ports PC (chantier 40) : une image par port.
 	PortsZelda64RecompImage string
 	KeyTestImage            string
@@ -103,6 +107,8 @@ type Config struct {
 	// PublicHost is what play/watch URLs are built against — the host the
 	// browser can reach, not a container-internal address.
 	PublicHost string
+	// InternalHost optionally routes child control through an internal relay.
+	InternalHost string
 
 	JWTSecret string
 
@@ -159,6 +165,12 @@ type Config struct {
 	// « 0000:c4:00.0 ») quand le serveur en a plusieurs ; vide, le premier
 	// dans l'ordre PCI. Voir sessionstatus.SessionGPU (chantier 39).
 	GPU string
+
+	// NVIDIAGPU — GPU NVIDIA remis aux conteneurs par le runtime NVIDIA.
+	// Sous WSL2 il n'existe pas de /dev/dri : le pilote Windows expose
+	// /dev/dxg, et Docker doit créer une DeviceRequest (`--gpus`). « all »
+	// remet tous les GPU NVIDIA ; un identifiant Docker/CUDA en cible un.
+	NVIDIAGPU string
 }
 
 func Load() (Config, error) {
@@ -181,6 +193,7 @@ func Load() (Config, error) {
 
 	return Config{
 		StorageHostDir:          getenv("GAMEFLEX_STORAGE_PATH", ""),
+		RomsHostRoot:            getenv("GAMEFLEX_ROMS_PATH", ""),
 		ProfilesHostDir:         getenv("GAMEFLEX_PROFILES_HOST_DIR", ""),
 		SwitchImage:             getenv("GAMEFLEX_SWITCH_IMAGE", "streamex-switch:latest"),
 		SwitchEdenImage:         getenv("GAMEFLEX_SWITCH_EDEN_IMAGE", "streamex-switch-eden:latest"),
@@ -197,6 +210,7 @@ func Load() (Config, error) {
 		KeyTestImage:         getenv("GAMEFLEX_KEYTEST_IMAGE", ""),
 		StackName:            getenv("GAMEFLEX_STACK_NAME", "gameflex"),
 		GPU:                  getenv("GAMEFLEX_GPU", ""),
+		NVIDIAGPU:            getenv("GAMEFLEX_NVIDIA_GPU", ""),
 		RetroImage:           getenv("GAMEFLEX_RETRO_IMAGE", "gameflex-retrogaming:latest"),
 		RemoteplayImage:      getenv("GAMEFLEX_REMOTEPLAY_IMAGE", "gameflex-remoteplay:latest"),
 		RemoteplayControlURL: getenv("GAMEFLEX_REMOTEPLAY_CONTROL_URL", "http://localhost:10205"),
@@ -205,6 +219,7 @@ func Load() (Config, error) {
 		MaxPlayers:           maxPlayers,
 		ConsoleLimits:        parseConsoleLimits(getenv("GAMEFLEX_CONSOLE_LIMITS", "switch:2,ps3:3,xbox:5,keytest:3")),
 		PublicHost:           publicHost,
+		InternalHost:         getenv("GAMEFLEX_INTERNAL_HOST", ""),
 		JWTSecret:            getenv("GAMEFLEX_JWT_SECRET", ""),
 		InternalSecret:       os.Getenv("GAMEFLEX_INTERNAL_SECRET"),
 		GatewayURL:           os.Getenv("GAMEFLEX_GATEWAY_URL"),
@@ -246,8 +261,22 @@ func (config Config) SavesHostDir() string {
 	return filepath.Join(config.StorageHostDir, "saves")
 }
 
+// RomsHostDir — la racine réellement montée sur /gameflex/roms. Elle doit
+// aussi être remise aux conteneurs de partie, sans quoi le catalogue voit les
+// jeux mais l'émulateur reçoit le dossier vide du stockage principal.
+func (config Config) RomsHostDir() string {
+	if config.RomsHostRoot != "" {
+		return config.RomsHostRoot
+	}
+
+	return filepath.Join(config.StorageHostDir, "roms")
+}
+
 // StorageHostSection — une section du dossier (`bios`, `patches`…), côté hôte.
 func (config Config) StorageHostSection(section string) string {
+	if section == "roms" {
+		return config.RomsHostDir()
+	}
 	return filepath.Join(config.StorageHostDir, section)
 }
 
@@ -274,4 +303,12 @@ func parseConsoleLimits(raw string) map[string]int {
 		limits[strings.TrimSpace(console)] = maximum
 	}
 	return limits
+}
+
+// ReachableHost is the route to host-network children, independent of the LAN URL.
+func (config Config) ReachableHost() string {
+	if config.InternalHost != "" {
+		return config.InternalHost
+	}
+	return config.PublicHost
 }

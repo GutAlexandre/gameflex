@@ -45,9 +45,14 @@ class Library:
         try:configured=json.loads((self.data/'library.json').read_text()).get('folder') in (self.host_folder,self.destination)
         except (OSError,ValueError):configured=False
         target=self.mount/'roms' if self.default_roms else self.mount
-        available=bool(self.host_folder) and target.is_dir() and not target.is_symlink() and os.access(target,os.W_OK|os.X_OK)
+        # A pre-existing ROM collection may deliberately be mounted read-only:
+        # GameFlex only needs to traverse and read it to index and launch games.
+        # A user-selected import destination still has to be writable.
+        required=(os.R_OK|os.X_OK) if self.default_roms else (os.W_OK|os.X_OK)
+        available=bool(self.host_folder) and target.is_dir() and not target.is_symlink() and os.access(target,required)
         configured=(configured or self.default_roms) and available
-        return {'configured':configured,'folder':self.destination if configured else '', 'availableFolders':[self.destination] if available else [],'organization':'<console>/<jeu>' if self.default_roms else 'roms/<console>/<jeu>','defaultFolder':self.destination}
+        read_only=available and not os.access(target,os.W_OK|os.X_OK)
+        return {'configured':configured,'folder':self.destination if configured else '', 'availableFolders':[self.destination] if available else [],'organization':'<console>/<jeu>' if self.default_roms else 'roms/<console>/<jeu>','defaultFolder':self.destination,'readOnly':read_only}
     def browse(self,folder=''):
         available=self.status()['availableFolders']
         if not folder:

@@ -1,0 +1,10 @@
+{
+  "version": "0.3.3",
+  "installedApkHashMatches": true,
+  "physicalTv": "50PUS7906/12",
+  "menuKeyOpensControlCentre": true,
+  "directionKeysMoveWithinMenu": true,
+  "backClosesMenu": true,
+  "gameLaunched": false,
+  "okActivatesFocusedMenuCommand": true
+}

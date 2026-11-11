@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Neo-Geo-Pocket-Anthra-Left.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:Neo-Geo-Pocket-Anthra-Left.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Neo-Geo-Pocket-Anthra-Left.jpg/960px-Neo-Geo-Pocket-Anthra-Left.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "ngp",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "867c84da36483b4217a6dd9d76474d28e165044d9197cb5231ea4ebe5887a1fc",
+  "url": "/experience-api/v1/media/867c84da36483b4217a6dd9d76474d28e165044d9197cb5231ea4ebe5887a1fc",
+  "mime": "image/webp",
+  "fetchedAt": 1794142783,
+  "reviewAfter": 1796734783
+}

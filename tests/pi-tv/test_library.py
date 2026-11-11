@@ -74,3 +74,14 @@ class LibraryTests(unittest.TestCase):
             game=APPROVED['palette-libre'];lib.write_game(game,(Path(__file__).resolve().parents[2]/game['sourceFile']).read_bytes())
             self.assertTrue((self.mount/'roms/nes/palette-libre.nes').is_file());self.assertFalse((self.mount/'roms/roms').exists())
         finally:lib.pool.shutdown()
+    def test_default_read_only_roms_folder_is_available_for_indexing(self):
+        (self.mount/'roms').mkdir()
+        lib=Library(self.base/'readonly-data','/chosen/by/user',self.mount,default_roms=True)
+        try:
+            with patch('library.os.access',side_effect=lambda path,mode:mode==(os.R_OK|os.X_OK)):
+                status=lib.status()
+                self.assertTrue(status['configured'])
+                self.assertTrue(status['readOnly'])
+                self.assertEqual(status['folder'],'/chosen/by/user/roms')
+                self.assertEqual(lib.browse()['items'][0]['folder'],'/chosen/by/user/roms')
+        finally:lib.pool.shutdown()

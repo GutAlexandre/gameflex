@@ -43,12 +43,26 @@ func New(services []domains.Service, env func(string) string, page http.Handler)
 		}
 	}
 
-	return &router{routes: routes, page: page}, nil
+	// Le compagnon « experience » est optionnel pour conserver la compatibilité
+	// avec les installations GameFlex qui ne l'utilisent pas encore. Quand il
+	// est configuré, son préfixe public est retiré avant le relais : le service
+	// expose /v1/…, tandis que le navigateur appelle /experience-api/v1/….
+	var experience http.Handler
+	if raw := env("EXPERIENCE_BACKEND_PROXY_TARGET"); raw != "" {
+		target, err := url.Parse(raw)
+		if err != nil || (target.Scheme != "http" && target.Scheme != "https") || target.Host == "" {
+			return nil, fmt.Errorf("EXPERIENCE_BACKEND_PROXY_TARGET=%q n'est pas une adresse http(s)", raw)
+		}
+		experience = proxyTo(domains.Service{Service: "experience", WebSocket: true, ForwardClientAddress: true}, target)
+	}
+
+	return &router{routes: routes, page: page, experience: experience}, nil
 }
 
 type router struct {
-	routes map[string]http.Handler
-	page   http.Handler
+	routes     map[string]http.Handler
+	page       http.Handler
+	experience http.Handler
 }
 
 func (router *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -71,6 +85,18 @@ func (router *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			return
 		}
+	}
+
+	if router.experience != nil && (r.URL.Path == "/experience-api" || strings.HasPrefix(r.URL.Path, "/experience-api/")) {
+		forward := r.Clone(r.Context())
+		forward.URL.Path = strings.TrimPrefix(r.URL.Path, "/experience-api")
+		if forward.URL.Path == "" {
+			forward.URL.Path = "/"
+		}
+		forward.URL.RawPath = ""
+		router.experience.ServeHTTP(w, forward)
+
+		return
 	}
 
 	// Tout le reste est à la page, y compris un domaine inconnu : la page y

@@ -1,0 +1,24 @@
+{
+  "events": [
+    "signal-open",
+    "track:video",
+    "track:audio",
+    "connecting",
+    "connected",
+    "disconnected"
+  ],
+  "stats": [
+    {
+      "kind": "audio",
+      "frames": null,
+      "bytes": 48240
+    },
+    {
+      "kind": "video",
+      "frames": 325,
+      "bytes": 1418241
+    }
+  ],
+  "state": "disconnected",
+  "width": 256
+}

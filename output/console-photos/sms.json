@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Sega-Master-System-Set.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:Sega-Master-System-Set.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Sega-Master-System-Set.jpg/960px-Sega-Master-System-Set.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "sms",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "5d38a6b0a396845607fe423f6f90a5bccd8a4c28bda498568c14a20c97c9c93b",
+  "url": "/experience-api/v1/media/5d38a6b0a396845607fe423f6f90a5bccd8a4c28bda498568c14a20c97c9c93b",
+  "mime": "image/webp",
+  "fetchedAt": 1794142771,
+  "reviewAfter": 1796734771
+}

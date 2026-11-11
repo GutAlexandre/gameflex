@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Wii-console.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:Wii-console.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Wii-console.jpg/960px-Wii-console.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "wii",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "1cf7a98ade9a4b937c96e24443504a61aaf2da152797db490a911a57ea424cb2",
+  "url": "/experience-api/v1/media/1cf7a98ade9a4b937c96e24443504a61aaf2da152797db490a911a57ea424cb2",
+  "mime": "image/webp",
+  "fetchedAt": 1794142770,
+  "reviewAfter": 1796734770
+}

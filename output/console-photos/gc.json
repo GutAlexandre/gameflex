@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:GameCube-Set.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:GameCube-Set.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/GameCube-Set.jpg/960px-GameCube-Set.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "gc",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "630232d6b18938fe51d68929b5308496c7ff5b30405cf37b52bb04527095db79",
+  "url": "/experience-api/v1/media/630232d6b18938fe51d68929b5308496c7ff5b30405cf37b52bb04527095db79",
+  "mime": "image/webp",
+  "fetchedAt": 1794142769,
+  "reviewAfter": 1796734769
+}

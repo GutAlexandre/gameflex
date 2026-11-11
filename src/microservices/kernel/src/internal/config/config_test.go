@@ -47,3 +47,21 @@ func TestThePublicHostIsRequired(t *testing.T) {
 		t.Fatalf("Load() = %q, %v", loaded.PublicHost, err)
 	}
 }
+
+func TestRomsHostDirCanOverrideTheStorageSubfolder(t *testing.T) {
+	regular := Config{StorageHostDir: "/srv/gameflex"}
+	if got := regular.StorageHostSection("roms"); got != "/srv/gameflex/roms" {
+		t.Fatalf("roms ordinaires = %q", got)
+	}
+	if got := regular.StorageHostSection("cores"); got != "/srv/gameflex/cores" {
+		t.Fatalf("cores ordinaires = %q", got)
+	}
+
+	external := Config{StorageHostDir: "/srv/gameflex", RomsHostRoot: "/mnt/windows/roms"}
+	if got := external.StorageHostSection("roms"); got != "/mnt/windows/roms" {
+		t.Fatalf("roms externes = %q", got)
+	}
+	if got := external.StorageHostSection("bios"); got != "/srv/gameflex/bios" {
+		t.Fatalf("bios avec roms externes = %q", got)
+	}
+}

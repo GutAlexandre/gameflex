@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Amstrad CPC464.jpg",
+  "author": "Bill Bertram",
+  "license": "CC BY-SA 2.5",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+  "source": "https://commons.wikimedia.org/wiki/File:Amstrad_CPC464.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Amstrad_CPC464.jpg/960px-Amstrad_CPC464.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Bill Bertram",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "amstrad",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "55824f784f4d7aca279a04cde11d196d5059e6838127d3636c326175fc05a373",
+  "url": "/experience-api/v1/media/55824f784f4d7aca279a04cde11d196d5059e6838127d3636c326175fc05a373",
+  "mime": "image/webp",
+  "fetchedAt": 1794142789,
+  "reviewAfter": 1796734789
+}

@@ -1,0 +1,7 @@
+{
+  "/": 200,
+  "/retrogaming/nes": 200,
+  "/service-worker.js": 200,
+  "/manifest.json": 200,
+  "/api/v1/consoles": 200
+}

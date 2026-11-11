@@ -1,0 +1,15 @@
+{
+  "architecture": "aarch64",
+  "romSha256": "18ea7f7eb5dce8ab18b15d84af42c53e6a021df51dd9e3916fa60b8521896abd",
+  "contentLicense": "CC0-1.0",
+  "content": "Original GameFlex Palette libre — no commercial ROM, BIOS, firmware or external game content",
+  "status": "passed",
+  "frames": 300,
+  "differentFrames": 29,
+  "seconds": 0.077,
+  "resolution": [
+    240,
+    224
+  ],
+  "coreSha256": "c9cc34d118b4ad34fd2d2907888a8482769ffb2a343d1793944be02ad41a6c10"
+}

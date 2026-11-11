@@ -197,7 +197,7 @@ type Console struct {
 // pas encore, et ce champ ne change rien pour lui.
 var registry = []Console{
 	// ── Nintendo ──
-	{ID: "nes", Name: "Nintendo Ent. System (NES)", Publisher: "Nintendo", Year: 1983, Method: MethodRetroGaming, Cores: []string{"fceumm", "nestopia"}, MaxPlayers: 2, Extensions: []string{"nes", "fds", "unf", "unif"}, Width: 256, Height: 240, Enabled: true},
+	{ID: "nes", Name: "Nintendo Ent. System (NES)", Publisher: "Nintendo", Year: 1983, Method: MethodRetroGaming, Cores: []string{"fceumm", "nestopia", "quicknes"}, MaxPlayers: 2, Extensions: []string{"nes", "fds", "unf", "unif"}, Width: 256, Height: 240, Enabled: true},
 	{ID: "snes", Name: "Super Nintendo (SNES)", Publisher: "Nintendo", Year: 1990, Method: MethodRetroGaming, Cores: []string{"snes9x"}, MaxPlayers: 4, Extensions: []string{"smc", "sfc", "swc", "fig", "bs"}, Width: 256, Height: 224, Enabled: true}, // official Super Multitap
 	{ID: "gbc", Name: "Game Boy / Game Boy Color", Publisher: "Nintendo", Year: 1989, Method: MethodRetroGaming, Cores: []string{"gambatte"}, MaxPlayers: 2, Extensions: []string{"gb", "gbc", "sgb"}, Width: 160, Height: 144, Enabled: true},
 	{ID: "gba", Name: "Game Boy Advance", Publisher: "Nintendo", Year: 2001, Method: MethodRetroGaming, Cores: []string{"mgba"}, MaxPlayers: 2, Extensions: []string{"gba", "agb"}, Width: 240, Height: 160, Enabled: true},
@@ -250,6 +250,7 @@ var registry = []Console{
 	// faisons nulle part. Professeur Layton tourne sans, vérifié sur le
 	// téléphone.
 	{ID: "nds", Name: "Nintendo DS", Publisher: "Nintendo", Year: 2004, Method: MethodRetroGaming, Cores: []string{"desmume"}, MaxPlayers: 2, Extensions: []string{"nds", "dsi"}, Touch: true, Width: 256, Height: 384, BiosOptional: []string{"bios7.bin", "bios9.bin", "firmware.bin"}, Enabled: true},
+	{ID: "3ds", Name: "Nintendo 3DS", Publisher: "Nintendo", Year: 2011, Method: MethodRetroGaming, Cores: []string{"azahar"}, MaxPlayers: 1, Extensions: []string{"3ds", "cci", "cxi"}, Touch: true, Width: 800, Height: 480, Analog: true, Experimental: ExperimentalHeavy, Enabled: true},
 	// Les extensions ne sont pas devinées : elles sortent de ce que le cœur
 	// DÉCLARE lui-même — `elf|dol|gcm|iso|tgc|wbfs|ciso|gcz|wad|wia|rvz|m3u`,
 	// lu dans dolphin_libretro.so. On garde les formats de disque de chaque
@@ -298,7 +299,7 @@ var registry = []Console{
 	// atari5200 — no matching core available (would need a5200_libretro.so).
 	{ID: "atari5200", Name: "Atari 5200", Publisher: "Atari", Year: 1982, Method: MethodRetroGaming, Cores: []string{"a5200"}, MaxPlayers: 2, Extensions: []string{"a52", "bin"}, Enabled: false},
 	{ID: "atari7800", Name: "Atari 7800", Publisher: "Atari", Year: 1986, Method: MethodRetroGaming, Cores: []string{"prosystem"}, MaxPlayers: 2, Extensions: []string{"a78", "bin"}, Enabled: true},
-	{ID: "lynx", Name: "Atari Lynx", Publisher: "Atari", Year: 1989, Method: MethodRetroGaming, Cores: []string{"handy"}, MaxPlayers: 2, Extensions: []string{"lnx", "o"}, Enabled: true},
+	{ID: "lynx", Name: "Atari Lynx", Publisher: "Atari", Year: 1989, Method: MethodRetroGaming, Cores: []string{"handy", "mednafen_lynx"}, MaxPlayers: 2, Extensions: []string{"lnx", "o"}, Enabled: true},
 	{ID: "jaguar", Name: "Atari Jaguar", Publisher: "Atari", Year: 1993, Method: MethodRetroGaming, Cores: []string{"virtualjaguar"}, MaxPlayers: 2, Extensions: []string{"j64", "jag", "rom", "abs", "cof"}, Enabled: true},
 
 	// ── NEC ──
@@ -322,6 +323,14 @@ var registry = []Console{
 	{ID: "c64", Name: "Commodore 64", Publisher: "Commodore", Year: 1982, Method: MethodRetroGaming, Cores: []string{"vice_x64sc"}, MaxPlayers: 2, Extensions: []string{"d64", "t64", "prg", "crt", "tap", "g64"}, Enabled: true},
 	{ID: "amstrad", Name: "Amstrad CPC", Publisher: "Amstrad", Year: 1984, Method: MethodRetroGaming, Cores: []string{"cap32"}, MaxPlayers: 2, Extensions: []string{"dsk", "sna", "cdt", "kcr"}, Enabled: true},
 	{ID: "zxspectrum", Name: "Sinclair ZX Spectrum", Publisher: "Sinclair", Year: 1982, Method: MethodRetroGaming, Cores: []string{"fuse"}, MaxPlayers: 2, Extensions: []string{"tzx", "tap", "z80", "sna", "szx"}, Enabled: true},
+	{ID: "3do", Name: "3DO Interactive Multiplayer", Publisher: "The 3DO Company", Year: 1993, Method: MethodRetroGaming, Cores: []string{"opera"}, MaxPlayers: 2, Extensions: []string{"iso", "bin", "cue", "chd"}, Bios: []string{"panafz10.bin"}, Enabled: true},
+	{ID: "channelf", Name: "Fairchild Channel F", Publisher: "Fairchild", Year: 1976, Method: MethodRetroGaming, Cores: []string{"freechaf"}, MaxPlayers: 2, Extensions: []string{"bin", "rom", "chf"}, Bios: []string{"sl31253.bin", "sl31254.bin"}, Enabled: true},
+	{ID: "gamewatch", Name: "Nintendo Game & Watch", Publisher: "Nintendo", Year: 1980, Method: MethodRetroGaming, Cores: []string{"gw"}, MaxPlayers: 1, Extensions: []string{"mgw"}, Enabled: true},
+	{ID: "intellivision", Name: "Mattel Intellivision", Publisher: "Mattel", Year: 1979, Method: MethodRetroGaming, Cores: []string{"freeintv"}, MaxPlayers: 2, Extensions: []string{"int", "bin", "rom"}, Bios: []string{"exec.bin", "grom.bin"}, Enabled: true},
+	{ID: "odyssey2", Name: "Magnavox Odyssey²", Publisher: "Magnavox", Year: 1978, Method: MethodRetroGaming, Cores: []string{"o2em"}, MaxPlayers: 2, Extensions: []string{"bin", "rom"}, Bios: []string{"o2rom.bin"}, Enabled: true},
+	{ID: "sega32x", Name: "Sega 32X", Publisher: "Sega", Year: 1994, Method: MethodRetroGaming, Cores: []string{"picodrive"}, MaxPlayers: 2, Extensions: []string{"32x", "bin", "smd"}, Width: 320, Height: 240, Enabled: true},
+	{ID: "scv", Name: "Super Cassette Vision", Publisher: "Epoch", Year: 1984, Method: MethodRetroGaming, Cores: []string{"emuscv"}, MaxPlayers: 2, Extensions: []string{"cart", "bin", "rom"}, Bios: []string{"upd7801g.s01"}, Enabled: true},
+	{ID: "supervision", Name: "Watara Supervision", Publisher: "Watara", Year: 1992, Method: MethodRetroGaming, Cores: []string{"potator"}, MaxPlayers: 2, Extensions: []string{"sv", "bin"}, Enabled: true},
 	{ID: "doom", Name: "Doom", Publisher: "id Software", Year: 1993, Method: MethodRetroGaming, Cores: []string{"prboom"}, MaxPlayers: 2, Extensions: []string{"wad", "iwad", "pwad"}, Enabled: true},
 	// scummvm — scummvm_libretro.so is 133MB, over GitHub's 100MB hard
 	// per-file push limit (no Git LFS set up here) — can't be committed at

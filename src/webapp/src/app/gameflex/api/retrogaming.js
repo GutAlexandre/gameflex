@@ -120,9 +120,12 @@ export function createSession(
     consoleId, reference, title, core, bios, username, host = null, settings = null,
     { onProgress } = {},
 ) {
+    const platform = settings?.platform === "streamex" ? "streamex" : "retrogaming";
     return kernelRequest(kernelTarget(host, getStoredToken()), "launch", {
-        platform: "retrogaming",
-        consoleId, reference, title, core, bios, username,
+        platform,
+        ...(platform === "streamex"
+            ? { consoleId, console_id: consoleId, game: reference, title, core, username }
+            : { consoleId, reference, title, core, bios, username }),
         // LA LANGUE DE LA PAGE (chantier 21) : la console démarre dans la
         // langue de l'application, et non en anglais. Le kernel ne garde
         // aucune langue : elle voyage avec chaque lancement.

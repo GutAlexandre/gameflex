@@ -1,0 +1,42 @@
+{
+  "viewports": [
+    {
+      "width": 320,
+      "height": 800,
+      "cards": 15,
+      "overlaps": 0,
+      "tapTargetsVerified": 15
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "cards": 15,
+      "overlaps": 0,
+      "tapTargetsVerified": 15
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "cards": 15,
+      "overlaps": 0,
+      "tapTargetsVerified": 15
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "cards": 15,
+      "overlaps": 0,
+      "tapTargetsVerified": 15
+    },
+    {
+      "width": 1600,
+      "height": 900,
+      "cards": 15,
+      "overlaps": 0,
+      "tapTargetsVerified": 15
+    }
+  ],
+  "keyboardNavigation": true,
+  "selectionWorks": true,
+  "javascriptErrors": []
+}

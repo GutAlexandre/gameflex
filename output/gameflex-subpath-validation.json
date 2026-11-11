@@ -1,0 +1,18 @@
+{
+  "title": "GameFlex",
+  "mode": "covers",
+  "api": "authenticated existing account / real consoles and preferences",
+  "requestsInsidePrefix": 147,
+  "websocketPaths": [
+    "/gameflex/api/v1/facade/ws",
+    "/gameflex/api/v1/presence/ws"
+  ],
+  "deepLink": "NES opened",
+  "javascriptErrors": [],
+  "serviceWorkerScopes": [
+    "/gameflex/"
+  ],
+  "validatedUrl": "https://loutrenas.myqnapcloud.com/gameflex/",
+  "publicHttps": true,
+  "nasflixLoginBypassed": true
+}

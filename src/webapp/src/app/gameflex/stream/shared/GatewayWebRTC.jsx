@@ -1,3 +1,4 @@
+import {mustWaitForAudioGesture} from './audio-autoplay-policy.js';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import {
     gatewayViewerOffer,
@@ -1082,8 +1083,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
                     // suite et l'interrupteur de son dit la vérité : le
                     // premier appui du joueur vaudra activation, et le son
                     // suivra à ce moment-là.
-                    if (navigator.userActivation
-                        && navigator.userActivation.hasBeenActive === false) {
+                    if (mustWaitForAudioGesture(navigator.userActivation,window)) {
                         resumeMutedAfterAutoplayBlock();
 
                         return;

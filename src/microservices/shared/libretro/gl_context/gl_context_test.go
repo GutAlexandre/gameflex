@@ -4,9 +4,9 @@ package gl_context
 
 import "testing"
 
-// Requires a real GPU render node (/dev/dri/renderD128) — run manually
-// inside the container, not part of CI (no GPU there). Verifies the whole
-// EGL/GBM/GL pipeline actually works: create a context, clear the FBO to a
+// Uses a real GPU render node (/dev/dri/renderD128) when one exists, otherwise
+// EGL surfaceless (notably under WSL2). Verifies the whole EGL/GL pipeline:
+// create a context, clear the FBO to a
 // known color, read it back, confirm the bytes match. If this test can't
 // even create a context, nothing built on top of this package (the
 // libretro HW-render bridge) has any chance of working either — this is

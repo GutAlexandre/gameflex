@@ -1,0 +1,16 @@
+{
+  "providers": [
+    "planetemu",
+    "freeroms",
+    "romspure"
+  ],
+  "networkPanelOpened": true,
+  "importBytes": 8388625,
+  "acknowledgedChunks": 9,
+  "observedPercentages": [
+    0,
+    48
+  ],
+  "sha256Matches": true,
+  "javascriptErrors": []
+}

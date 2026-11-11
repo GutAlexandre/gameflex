@@ -1,0 +1,9 @@
+{
+  "url": "https://loutrenas.myqnapcloud.com/gameflex/",
+  "remoteCanvasVisible": true,
+  "touchViewport": true,
+  "httpFallbackResponses": 34,
+  "transportAllSuccessful": true,
+  "javascriptErrors": [],
+  "manualCloudflareAndCookie": "untouched"
+}

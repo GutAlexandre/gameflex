@@ -1,0 +1,8 @@
+{
+  "publicHttps": true,
+  "importBytes": 68157457,
+  "acknowledgedChunks": 66,
+  "sha256Matches": true,
+  "percentConfirmed": 100,
+  "testContent": "Original CC0 demo padded for transfer test; removed afterwards"
+}

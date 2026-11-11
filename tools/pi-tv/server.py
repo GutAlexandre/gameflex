@@ -13,6 +13,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = Path(__file__).resolve().parents[2]
 MODES = ['minimal', 'covers', 'consoles', 'favorites', 'resume', 'collections', 'detail', 'archives', 'multiplayer', 'dashboard', 'station', 'crt', 'shelf', 'orbit', 'arcade']
+MODES += ['hub-canape', 'ligne-cinema', 'mosaique-joy', 'roue-retro', 'terminal-poche',
+          'cartouches', 'carte-epoques', 'double-ecran', 'club-local', 'quai-systemes',
+          'magazine-retro', 'bureau-collectionneur', 'grand-ecran-accessible']
+MODES += ['ps-home']
 LOCK = threading.Lock()
 UPLOAD_SLOT = threading.BoundedSemaphore(1)
 from upload_sessions import UploadSessions
@@ -22,6 +26,9 @@ def validate_preferences(p):
     if not isinstance(p, dict) or p.get('interface') not in MODES:
         raise ValueError('interface invalide')
     result = {'interface': p['interface']}
+    if 'archivedInterface' in p:
+        if p['archivedInterface'] not in MODES or p['archivedInterface']=='ps-home': raise ValueError('archive interface invalide')
+        result['archivedInterface']=p['archivedInterface']
     if 'interfaceUpdatedAt' in p:
         stamp=p['interfaceUpdatedAt']
         if isinstance(stamp,bool) or not isinstance(stamp,int) or not 0 <= stamp <= 9007199254740991: raise ValueError('révision interface invalide')
@@ -100,6 +107,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200); self.send_header('Content-Type', info['mime']); self.send_header('Content-Length', str(len(body)))
         self.send_header('Cache-Control', 'public, max-age=86400'); self.send_header('X-Content-Type-Options', 'nosniff'); self.end_headers(); self.wfile.write(body); return
     def do_GET(self):
+        phone=re.fullmatch(r'/v1/phone-pad/([a-f0-9]{32})/ws',self.path)
+        if phone:
+            from phone_pad import websocket
+            return websocket(self,verified_identity,phone[1])
         path = self.path.split('?')[0]
         if path.startswith('/v1/emugen/'):
             return self.reply(410,{'error':'EmuGen a été retiré.','status':'removed'})
@@ -146,11 +157,15 @@ class Handler(BaseHTTPRequestHandler):
             from urllib.parse import urlsplit,parse_qs
             console=parse_qs(urlsplit(self.path).query).get('console',[''])[0]
             return self.reply(200,{'items':self.server.library.catalogue(console) if source_enabled(self.server.data,'gameflex-free') else []})
-        if path == '/v1/emulators':
+        if path in ('/v1/emulators','/v1/emulators/catalog'):
             identity=verified_identity(self.headers.get('Authorization'),self.server.auth_base)
             if not identity:return self.reply(401,{'error':'Connexion requise.'})
-            from emulator_assistant import inventory
-            return self.reply(200,{**inventory(self.server.library),'canInstall':identity.get('role_level')==0})
+            from emulator_assistant import inventory,CATALOG
+            if path.endswith('/catalog'):return self.reply(200,CATALOG)
+            # Downloads are restricted to the reviewed allowlist and cannot
+            # overwrite an existing emulator, so every signed-in player may
+            # prepare the shared server when a game needs its declared core.
+            return self.reply(200,{**inventory(self.server.library),'canInstall':True})
         if path == '/v1/imports':
             if not verified_username(self.headers.get('Authorization'),self.server.auth_base):return self.reply(401,{'error':'authentification requise'})
             from rom_import import metadata,FORMATS
@@ -340,6 +355,9 @@ class Handler(BaseHTTPRequestHandler):
         except PermissionError:return self.reply(403,{'error':'Import non autorisé.'})
         except (ValueError,OSError) as e:return self.reply(409,{'error':str(e) if isinstance(e,ValueError) else 'Écriture impossible.'})
     def do_POST(self):
+        if self.path.startswith('/v1/phone-pad/'):
+            from phone_pad import http
+            return http(self,verified_identity)
         bridge=re.fullmatch(r'/v1/socket-bridge/([a-f0-9]{32})/(poll|send|close)',self.path)
         if self.path=='/v1/socket-bridge' or bridge:
             from socket_bridge import serve
@@ -355,7 +373,6 @@ class Handler(BaseHTTPRequestHandler):
         if emulator:
             identity=verified_identity(self.headers.get('Authorization'),self.server.auth_base)
             if not identity:return self.reply(401,{'error':'Connexion requise.'})
-            if identity.get('role_level')!=0:return self.reply(403,{'error':'Installation réservée à l’administrateur.'})
             from emulator_assistant import start,EmulatorError
             try:return self.reply(202,{'item':start(self.server.library,emulator[1])})
             except EmulatorError as e:return self.reply(409,{'error':str(e)})

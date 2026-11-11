@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=GameFlex TV Personal, OU=GameFlex
+Signer #1 certificate SHA-256 digest: 03f42f652fada2133d8195ce626ea738cbd169b4425f78ab1b08eaf7173d1f28
+Signer #1 certificate SHA-1 digest: 9aeb0e7d9667180290db5c9f1409555d6f2b429e
+Signer #1 certificate MD5 digest: cc695519be1604038fa7b6ecc4c1908a
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 3072
+Signer #1 public key SHA-256 digest: a38fe3b90a43bc03c0ee2030cb0e3613ffba86cb64befb521e4c685a8ca786f7
+Signer #1 public key SHA-1 digest: 3781a2c1577b1f1f02ea599d6a116d0ff23c8721
+Signer #1 public key MD5 digest: 64796862d9a11226988f29445246fdbc

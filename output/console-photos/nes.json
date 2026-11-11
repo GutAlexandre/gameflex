@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:NES-Console-Set.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:NES-Console-Set.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/NES-Console-Set.jpg/960px-NES-Console-Set.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "nes",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "fcfc05ac5126a92b2859686f85104042018bbc37ad33d9996fabb99771cd9fa9",
+  "url": "/experience-api/v1/media/fcfc05ac5126a92b2859686f85104042018bbc37ad33d9996fabb99771cd9fa9",
+  "mime": "image/webp",
+  "fetchedAt": 1794142762,
+  "reviewAfter": 1796734762
+}

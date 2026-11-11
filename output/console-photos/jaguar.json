@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Atari-Jaguar-Console-Set.jpg",
+  "author": "Evan-Amos",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Atari-Jaguar-Console-Set.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Atari-Jaguar-Console-Set.jpg/960px-Atari-Jaguar-Console-Set.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "jaguar",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "e55308a03ef122afd65791fba52f8c245c070cf60ad75a11391f877b71010fdc",
+  "url": "/experience-api/v1/media/e55308a03ef122afd65791fba52f8c245c070cf60ad75a11391f877b71010fdc",
+  "mime": "image/webp",
+  "fetchedAt": 1794142778,
+  "reviewAfter": 1796734778
+}

@@ -90,8 +90,8 @@ export default function Settings() {
         <Page
             label={t("profile.settingsMenu")}
             helpText={t("profile.settingsDescription")}
+            props={{ className: "py-2 gf-settings-hub" }}
         >
-            <InterfaceSettings advanced />
             <SectionPanel
                 label={t("settings.generalTitle")}
                 helpText={t("settings.generalHelp")}>
@@ -220,6 +220,9 @@ export default function Settings() {
                     }}
                 />
             </SectionPanel>
+            <div className="gf-settings-experience">
+                <InterfaceSettings advanced />
+            </div>
             {isAdmin && (
                 <>
                     <SectionPanel

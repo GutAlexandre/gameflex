@@ -1,0 +1,26 @@
+[
+  {
+    "variant": "after",
+    "beforeGesture": {
+      "samples": 360000,
+      "energy": 2801.244416983042,
+      "scheduled": 0,
+      "errors": 0,
+      "state": "suspended",
+      "muted": false,
+      "pending": 0
+    },
+    "live": {
+      "samples": 456000,
+      "energy": 3547.833076295777,
+      "scheduled": 74880,
+      "errors": 0,
+      "state": "running",
+      "muted": false,
+      "pending": 0
+    },
+    "muteRespected": true,
+    "resumed": true,
+    "closed": true
+  }
+]

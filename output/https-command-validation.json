@@ -1,0 +1,11 @@
+{
+  "url": "http://192.168.1.63:2000/streaming",
+  "videos": [
+    {
+      "width": 256,
+      "height": 240,
+      "frames": 261
+    }
+  ],
+  "errors": []
+}

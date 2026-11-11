@@ -28,3 +28,10 @@
 
 .gx-app .gx-cartridges .gx-art>b{display:none}.gx-cartridges .gx-art img{object-fit:contain;background:#1c1d23}.gx-cartridges .gx-credit{font-size:8px}
 .gx-picker .gx-search{display:grid;gap:8px;max-width:26rem}.gx-picker .gx-search input{width:100%;min-height:44px;padding:12px 14px;color:var(--ink);background:var(--panel);border:1px solid #8885;border-radius:10px;font:inherit}
+
+/* Directional/gamepad focus must be unmistakable. `:focus-visible` alone is
+   browser-dependent for programmatic focus (phone pad, TV remote, Gamepad
+   API), so useDirectionalFocus marks the active surface explicitly. */
+.gf-controller-navigation :where(button,a[href],input,select,summary):focus{position:relative;z-index:30;outline:4px solid #fff!important;outline-offset:5px!important;box-shadow:0 0 0 9px #2e8cffcc,0 0 30px 10px #54a8ff99!important;filter:brightness(1.22)}
+.gf-controller-location{position:fixed;z-index:30000;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));max-width:min(74vw,620px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:10px 16px;border:2px solid #fff;border-radius:22px;background:#0a1d36ed;color:#fff;box-shadow:0 0 0 5px #2e8cff99,0 8px 28px #000a;font:700 12px/1.2 system-ui,sans-serif;letter-spacing:.08em;pointer-events:none}.gf-controller-location[hidden]{display:none!important}
+@media(max-width:600px){.gf-controller-location{right:12px;bottom:max(10px,env(safe-area-inset-bottom));max-width:calc(100vw - 24px);font-size:10px;padding:8px 12px}}

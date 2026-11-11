@@ -1,0 +1,33 @@
+{
+  "installedVersion": "0.4.0",
+  "localModeNavigatedOnPhilips": true,
+  "serverAddressPreserved": true,
+  "serverLoginPreserved": true,
+  "runtimeAudio": {
+    "videoPresent": true,
+    "ready": 0,
+    "width": 0,
+    "height": 0,
+    "time": 0,
+    "decoded": 0,
+    "paused": false,
+    "muted": false,
+    "volume": 1,
+    "inputMessages": 0,
+    "audioBytes": 10240,
+    "videoBytes": 117390,
+    "audioTrack": true,
+    "gamepadApi": true,
+    "secureContext": false,
+    "audioElements": [
+      {
+        "muted": false,
+        "paused": false,
+        "ready": 4
+      }
+    ],
+    "physicalGamepads": 0
+  },
+  "videoBlocker": "WebRTC H264: No PPS with id 0 received; no decoded video. LAN HTTP does not enable WebCodecs fallback.",
+  "audibleSoundConfirmedByUser": false
+}

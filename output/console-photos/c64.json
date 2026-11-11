@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Commodore-64-Computer-FL.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:Commodore-64-Computer-FL.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Commodore-64-Computer-FL.jpg/960px-Commodore-64-Computer-FL.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "c64",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "bdfcfa2c2ef0f77f27ef1d8217b8416d76d7d1c1058f4809939f7942e79c52b1",
+  "url": "/experience-api/v1/media/bdfcfa2c2ef0f77f27ef1d8217b8416d76d7d1c1058f4809939f7942e79c52b1",
+  "mime": "image/webp",
+  "fetchedAt": 1794142788,
+  "reviewAfter": 1796734788
+}

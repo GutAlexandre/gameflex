@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Nintendo-Game-Boy-Advance-Purple-FL.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:Nintendo-Game-Boy-Advance-Purple-FL.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Nintendo-Game-Boy-Advance-Purple-FL.jpg/960px-Nintendo-Game-Boy-Advance-Purple-FL.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "gba",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "134a88d27e3d530592f7175987de923a3c6cd40173e116fd478f9defe3d7ccea",
+  "url": "/experience-api/v1/media/134a88d27e3d530592f7175987de923a3c6cd40173e116fd478f9defe3d7ccea",
+  "mime": "image/webp",
+  "fetchedAt": 1794142765,
+  "reviewAfter": 1796734765
+}

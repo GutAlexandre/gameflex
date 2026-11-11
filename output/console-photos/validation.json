@@ -1,0 +1,12 @@
+{
+  "consoles": 33,
+  "photos": 33,
+  "verifiedHTTP": 33,
+  "format": "WebP",
+  "largestBytes": 170294,
+  "display": "contain; no crop",
+  "credits": "docs/console-photos.md",
+  "noncommercialAsset": "cps2: CC BY-NC-SA 2.0",
+  "deployedUrl": "http://192.168.1.63:2000",
+  "tvTouched": false
+}

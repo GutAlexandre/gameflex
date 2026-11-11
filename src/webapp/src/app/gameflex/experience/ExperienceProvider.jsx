@@ -1,9 +1,12 @@
+import TVPhoneHost,{TVPhoneSettings} from '../tv/TVPhoneHost.jsx';
+import GameOptionsDialog,{readGameOptions} from './GameOptionsDialog.jsx';
+import {PlayStationNavigation} from './PlayStationHome.jsx';
 import {AppearanceSurface} from './Appearance.jsx';
 import SectionErrorBoundary from './SectionErrorBoundary.jsx';
 import {EmulatorNavigation} from './EmulatorUI.jsx';
 import {I18nextProvider} from 'react-i18next';
 import i18n from '../../i18n/index.js';
-import {retroModes} from './RetroLibrary.jsx';
+const retroModes=[];
 import EmulatorAssistant from './EmulatorAssistant.jsx';
 import LibrarySources from './LibrarySources.jsx';
 import { appPath } from "../libs/appBase.js";
@@ -24,9 +27,10 @@ import { useConsoles, useConsolesLoaded } from '../contexts/ConsolesContext.jsx'
 import { apiUrl } from '../libs/serverBase.js';
 import { useSessionPool } from '../libs/SessionPool.js';
 import { buildStreamingUrl } from '../libs/sessionLinks.js';
+import { loadStreamingSettings } from '../libs/streamingSettingsStorage.js';
 import { listRoms, listCores, createSession } from '../api/retrogaming.js';
 import ExperienceView, { InterfacePicker, useDirectionalFocus } from './ExperienceView.jsx';
-import { interfaces, preferenceKey, readChoice, selectableInterfaces, migratePreference, legacyDestination, readLocalChoice, acceptRemoteChoice } from './interfaces.js';
+import { interfaces, archivedAppearances, preferenceKey, readChoice, selectableInterfaces, migratePreference, legacyDestination, readLocalChoice, acceptRemoteChoice } from './interfaces.js';
 
 const Context = createContext(null);
 const gameKey = g => `${g.consoleId}:${g.reference}`;
@@ -67,7 +71,7 @@ export function ExperienceProvider({ children }) {
     useEffect(() => {
         if (!mode || loadedKey!==key) return undefined;
         try {
-            if (mode) localStorage.setItem(key, mode);
+            if (mode) { const old=localStorage.getItem(key); if(old&&old!=='ps-home'&&!localStorage.getItem(`${key}:archived-interface`))localStorage.setItem(`${key}:archived-interface`,old); localStorage.setItem(key, mode); }
             localStorage.setItem(`${key}:library`, JSON.stringify(data));
         } catch { setNotice('Le stockage du navigateur est indisponible.'); }
         if(!syncReady) return undefined;
@@ -111,12 +115,28 @@ export function ExperienceProvider({ children }) {
         finally{clearTimeout(timer);refreshLock.current=false;setRefreshing(false);}
     }
     const value = { downloads, libraryRevision, refreshLibrary, refreshing, refreshMessage, mode, choose, choosing, setChoosing, data, setData, favorite, notice, syncReady };
-    return <SourceSettingsProvider><Context.Provider value={value}>{children}{downloads.ui}</Context.Provider></SourceSettingsProvider>;
+    return <SourceSettingsProvider><TVPhoneHost><Context.Provider value={value}>{children}{downloads.ui}</Context.Provider></TVPhoneHost></SourceSettingsProvider>;
 }
 export function InterfaceSettings({advanced = false}) {
     const ctx = useContext(Context);
     if (!ctx) return null;
-    return <section className="gx-settings"><h2>Votre interface</h2><p>{interfaces.find(x => x.id === ctx.mode)?.name || 'Aucune interface choisie'}</p><button onClick={() => ctx.setChoosing(true)}>Changer d’interface</button>{ctx.notice && <p role="status">{ctx.notice}</p>}{!advanced&&<p><a href={appPath("/settings?advanced=1")}>Compte et bibliothèque ↗</a></p>}<section className="gf-free-library"><h3>Dossier de jeux</h3><p>{ctx.downloads.library?.folder || "Aucun dossier choisi."}</p><button onClick={ctx.downloads.openSetup}>Choisir le dossier</button></section><LibrarySources onImported={async item=>{await ctx.refreshLibrary();ctx.downloads.notify('success',item.title,'Jeu importé.');}}/><EmulatorAssistant/><GameSources/><ArtworkCredits /></section>;
+    const interfaceName = interfaces.find(x => x.id === ctx.mode)?.name || 'Aucune interface choisie';
+    return <section className="gx-settings">
+        <header className="gf-settings-experience-heading">
+            <span>CONFIGURATION DE L’HÔTE</span>
+            <h2>Console et bibliothèque</h2>
+            <p>Interface active <strong>{interfaceName}</strong></p>
+        </header>
+        {ctx.notice && <p className="gf-settings-notice" role="status">{ctx.notice}</p>}
+        {!advanced&&<p className="gf-settings-open-all"><a href={appPath("/settings?advanced=1")}>Ouvrir tous les paramètres ↗</a></p>}
+        <section className="gf-free-library"><h3>Dossier de jeux</h3><p>{ctx.downloads.library?.folder || "Aucun dossier choisi."}</p><button onClick={ctx.downloads.openSetup}>Choisir le dossier</button></section>
+        <LibrarySources onImported={async item=>{await ctx.refreshLibrary();ctx.downloads.notify('success',item.title,'Jeu importé.');}}/>
+        <EmulatorAssistant/>
+        <GameSources/>
+        <TVPhoneSettings/>
+        <details className="ps-archive-info"><summary>Interfaces archivées · {archivedAppearances.length}</summary><p>Les anciennes interfaces sont conservées et retirées du sélecteur.</p><ul>{archivedAppearances.map(item=><li key={item.id}>{item.name}</li>)}</ul></details>
+        <ArtworkCredits />
+    </section>;
 }
 
 function ArtworkCredits() {
@@ -135,8 +155,8 @@ function AdvancedAppearance({children,ctx}) {
     // The experience's labels are French; scope translations to this screen,
     // without changing the application's stored language preference.
     const language=useMemo(()=>i18n.cloneInstance({lng:'fr',fallbackLng:'fr'}),[]);
-    return <I18nextProvider i18n={language}><div ref={root} className="gx-app em-app gf-advanced-settings" data-interface={ctx.mode}>
-        <EmulatorNavigation mode={ctx.mode} active="settings" onNavigate={id=>navigate(`/?section=${id}`)} onSettings={()=>navigate('/settings')} onAppearance={()=>ctx.setChoosing(true)}/>
+    return <I18nextProvider i18n={language}><div ref={root} className="gx-app em-app gf-advanced-settings ps-console" data-interface={ctx.mode}>
+        <PlayStationNavigation active="settings" onNavigate={id=>navigate(`/?section=${id}`)} onSettings={()=>navigate('/settings')}/>
         <main className="gf-advanced-content"><SectionErrorBoundary resetKey={ctx.mode}>{children}</SectionErrorBoundary></main>
     </div></I18nextProvider>;
 }
@@ -147,8 +167,13 @@ export function ExperienceGate({ children, enabled }) {
     if (!ctx.mode) return <InterfacePicker onChoose={ctx.choose}/>;
     const libraryRoute = /^\/retrogaming\/([a-z0-9_-]+)$/.exec(location.pathname);
     let page=children;
-    if(location.pathname==='/settings'&&new URLSearchParams(location.search).get('advanced')==='1')page=<AdvancedAppearance ctx={ctx}>{children}</AdvancedAppearance>;
-    else if(location.pathname==='/'||location.pathname==='/settings'||libraryRoute)page=<LibraryExperience consoleId={libraryRoute?.[1]||''}/>;
+    // The settings button always opens the complete historical Settings page.
+    // The compact experience settings used to hide profile, controllers,
+    // storage, TURN and federation behind an easy-to-miss "advanced" link.
+    // Keep the shared console appearance, but expose every capability-gated
+    // base setting directly; the old ?advanced=1 URL remains compatible.
+    if(location.pathname==='/settings')page=<AdvancedAppearance ctx={ctx}>{children}</AdvancedAppearance>;
+    else if(location.pathname==='/'||libraryRoute)page=<LibraryExperience consoleId={libraryRoute?.[1]||''}/>;
     return <AppearanceSurface mode={ctx.mode}><div inert={ctx.choosing?'':undefined} aria-hidden={ctx.choosing||undefined}>{page}</div>{ctx.choosing&&<InterfacePicker selected={ctx.mode} onChoose={ctx.choose} onCancel={()=>ctx.setChoosing(false)}/>}</AppearanceSurface>;
 }
 function LibraryExperience({ consoleId = '' }) {
@@ -171,6 +196,9 @@ function LibraryExperience({ consoleId = '' }) {
     },[verificationGame,consoleId,token]);
     const closeVerification=()=>{const query=new URLSearchParams(location.search);query.delete('emugenVerification');navigate(location.pathname+'?'+query.toString(),{replace:true});};
 
+    const [optionsGame,setOptionsGame]=useState(null),[launchingKey,setLaunchingKey]=useState(''),[directError,setDirectError]=useState(null);
+    const launchBusy=useRef(false);
+    const gameSettingsScope=preferenceKey(user?.username,apiUrl('/'));
     const [launchGame, setLaunchGame] = useState(null), [launchError, setLaunchError] = useState(''), [launching, setLaunching] = useState(false);
     const live = useSessionPool();
     useEffect(() => {
@@ -238,8 +266,9 @@ function LibraryExperience({ consoleId = '' }) {
         const m = media.find(x => x.target === target);
         return m ? prioritizeMetadata({...item,manualMetadata:{...manualMetadata(item),image:m.url,coverFront:m.url,attribution:`${m.author} · ${m.license}`}},item.emugen) : item;
     };
-    const playable = consoles.filter(c => c.method === 'retrogaming' && c.enabled !== false);
-    // Explicit filter prevents querying remote-play devices as ROM consoles.
+    const playable = consoles.filter(c => ['retrogaming','streamex'].includes(c.method) && c.enabled !== false && c.id !== 'ports');
+    // Remote-play devices have no ROM library. Retrogaming and streamex
+    // consoles do, and empty systems are hidden later by PlayStationHome.
     const ids = playable.map(c => c.id).join(',');
     useEffect(() => {
         if(!consolesReady) {setLoading(true);return undefined;}
@@ -256,7 +285,7 @@ function LibraryExperience({ consoleId = '' }) {
                 try {
                     const result = await listRoms(c.id);
                     if (!result.ok || !Array.isArray(result.data)) { failed++; continue; }
-                    for (const g of result.data || []) found.push({ ...g, consoleId: c.id, consoleName: c.name });
+                    for (const g of result.data || []) found.push({ ...g, consoleId: c.id, consoleName: c.name, consoleMethod: c.method });
                 } catch { failed++; }
             }
         };
@@ -297,22 +326,43 @@ function LibraryExperience({ consoleId = '' }) {
         navigate('/?' + query.toString(), { replace: true });
     }, [location.pathname, location.search, loading, ctx.data.interfaceDestination, games, consoleId]);
 
-    async function launch() {
-        setLaunching(true); setLaunchError('');
+    async function startGame(game,direct=false) {
+        if(launchBusy.current)return;
+        launchBusy.current=true;setLaunching(true);setLaunchError('');setDirectError(null);setLaunchingKey(gameKey(game));
         try {
-            const result = await listCores(launchGame.consoleId);
-            const core = (result.data || []).find(c => c.installed);
-            if (!result.ok || !core) throw new Error('Aucun émulateur installé pour cette console.');
-            const reply = await createSession(launchGame.consoleId, launchGame.reference, launchGame.title, core.name, '', user?.username, null, { resolution: 'sd' });
-            if (!reply.ok || !reply.data?.sessionId) throw new Error(reply.errorMessage || 'Le lancement a échoué.');
-            navigate(buildStreamingUrl({ sessionId: reply.data.sessionId, play: true }));
-        } catch (e) { setLaunchError(e.message); }
-        finally { setLaunching(false); }
+            const result=await listCores(game.consoleId);
+            const available=(result.data||[]).filter(core=>core.installed);
+            if(!result.ok||!available.length)throw new Error('Aucun émulateur installé pour cette console. Utilisez la bannière au-dessus de la liste.');
+            const preferred=readGameOptions(gameSettingsScope,game).core;
+            const core=preferred?available.find(item=>item.name===preferred):available[0];
+            if(!core)throw new Error('L’émulateur choisi est indisponible. Modifiez les paramètres du jeu avec le bouton « … ».');
+            const platform=game.consoleMethod==='streamex'?'streamex':'retrogaming';
+            // Cette interface lançait toujours avec `resolution: "sd"`, une
+            // valeur que le kernel ne reconnaît pas. Dolphin retombait alors
+            // sur 640×528 même avec une RTX et l'image devenait floue en
+            // course. On reprend le même réglage persistant que la fiche de
+            // jeu ; sans préférence, Wii/GameCube démarrent en 720p60. Le
+            // 1080p60 dépasse le niveau H.264 4.0 de la piste d'introduction
+            // sur iOS ; 720p garde les 60 images/s et l'accélération GPU.
+            const streamSettings=loadStreamingSettings(game.consoleId)||{
+                resolution:['wii','gc'].includes(game.consoleId)?'720p':'540p',
+                frameRate:'60',
+                bitrate:'auto',
+            };
+            const reply=await createSession(game.consoleId,game.reference,game.title,core.name,'',user?.username,null,{...streamSettings,platform});
+            const sessionId=reply.data?.sessionId||reply.data?.session_id;
+            if(!reply.ok||!sessionId)throw new Error(reply.errorMessage||'Le lancement a échoué.');
+            ctx.setData(data=>({...data,history:[gameKey(game),...data.history.filter(id=>id!==gameKey(game))].slice(0,40)}));
+            navigate(buildStreamingUrl({sessionId,play:true}));
+        } catch(error) {
+            if(direct)setDirectError({key:gameKey(game),message:error.message});else setLaunchError(error.message);
+        } finally {launchBusy.current=false;setLaunching(false);setLaunchingKey('');}
     }
-    function createCollection() {
-        const name = window.prompt('Nom de votre collection');
+    const launch=()=>startGame(launchGame);
+    function createCollection(name) {
+        if(typeof name!=='string')return;
         if (name?.trim()) ctx.setData(d => ({ ...d, collections: [...d.collections, { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name: name.trim().slice(0, 80), games: [] }] }));
     }
     const presentedGames=games.map(game=>withImage(!game.image&&coverImages[gameKey(game)]?{...game,...coverImages[gameKey(game)]}:game,gameKey(game)));
-    return <><ExperienceView libraryQuery={libraryQuery} onLibraryQuery={setLibraryQuery} onRefreshMetadata={undefined} metadataProgress={metadataProgress} onImportRom={ctx.downloads.library?.canConfigure?()=>setImportOpen(true):undefined} onRefreshLibrary={ctx.refreshLibrary} refreshing={ctx.refreshing} refreshMessage={ctx.refreshMessage} onAppearance={() => ctx.setChoosing(true)} section={section} onNavigate={id => navigate(`/?section=${id}`)} settingsContent={<InterfaceSettings />} planet={planet} downloadJobs={ctx.downloads.jobs} onSearchQuery={setCatalogueQuery} downloadable={downloadable.filter(item=>!games.some(g=>g.consoleId===item.consoleId&&g.title.toLowerCase().replace(/[^a-z0-9]/g,'')===item.title.toLowerCase().replace(/[^a-z0-9]/g,'')))} planetLetter={planetLetter} onPlanetLetter={setPlanetLetter} selectedConsole={section === 'home' || section === 'consoles' ? playable.find(c => c.id === consoleId) : undefined} onHome={() => navigate('/?section=consoles')} live={live} onWatch={s => navigate(buildStreamingUrl({ sessionId: s.id }))} mode={ctx.mode} games={presentedGames} consoles={playable.map(c => withImage(c, c.id))} {...ctx.data} onFavorite={ctx.favorite} onOpen={open} onConsole={c => navigate(`/retrogaming/${encodeURIComponent(c.id)}`)} onSettings={() => navigate('/settings')} loading={loading} error={error} onRetry={() => {setLoading(true);retry(x => x + 1);}} user={user?.display_name || user?.username} onCreateCollection={createCollection} onAddToCollection={(id, g) => ctx.setData(d => ({ ...d, collections: d.collections.map(c => c.id === id ? { ...c, games: c.games.includes(gameKey(g)) ? c.games.filter(x => x !== gameKey(g)) : [...c.games, gameKey(g)] } : c) }))} />{importOpen&&<RomImportDialog token={token} consoles={playable} initialConsole={consoleId||''} onClose={()=>setImportOpen(false)} onImported={async item=>{await ctx.refreshLibrary();ctx.downloads.notify('success',item.title,'Jeu importé.');}}/>}{catalogGame&&<CatalogGameDialog history={ctx.data.history} mode={ctx.mode} favorites={ctx.data.favorites} onFavorite={ctx.favorite} collections={ctx.data.collections} onAddToCollection={(id,g)=>ctx.setData(d=>({...d,collections:d.collections.map(c=>c.id===id?{...c,games:c.games.includes(gameKey(g))?c.games.filter(x=>x!==gameKey(g)):[...c.games,gameKey(g)]}:c)}))} canEditMetadata={user?.role_level===0} token={token} onMetadata={updated=>{setCatalogGame(updated);retry(x=>x+1);}} game={{...catalogGame,...(verificationResult?.slug===catalogGame.emugenSlug?{manualVerificationResult:verificationResult}:{})}} onClose={()=>setCatalogGame(null)} onInstall={game=>{setCatalogGame(null);ctx.downloads.start(game);}} onPlay={game=>{setCatalogGame(null);openOwned(game);}}/>}{sources.enabledIds.includes('emugen')&&verificationId&&<InteractiveVerification token={token} sessionId={verificationId} gameSlug={verificationGame} consoleId={consoleId} onClose={closeVerification} onResolved={setVerificationResult}/>}{launchGame && <LaunchDialog onEmulatorReady={()=>setLaunchError('')} game={launchGame} mode={ctx.mode} error={launchError} launching={launching} onPlay={launch} onClose={() => setLaunchGame(null)}/>}{ctx.notice && <p className="gx-sync-notice" role="status">{ctx.notice}</p>}</>;
+    return <><ExperienceView onDirectLaunch={game=>startGame(game,true)} onGameOptions={setOptionsGame} launchingKey={launchingKey} directError={directError} libraryQuery={libraryQuery} onLibraryQuery={setLibraryQuery} onRefreshMetadata={undefined} metadataProgress={metadataProgress} onImportRom={ctx.downloads.library?.canConfigure?()=>setImportOpen(true):undefined} onRefreshLibrary={ctx.refreshLibrary} refreshing={ctx.refreshing} refreshMessage={ctx.refreshMessage} onAppearance={() => ctx.setChoosing(true)} section={section} onNavigate={id => navigate(`/?section=${id}`)} settingsContent={<InterfaceSettings />} planet={planet} downloadJobs={ctx.downloads.jobs} onSearchQuery={setCatalogueQuery} downloadable={downloadable.filter(item=>!games.some(g=>g.consoleId===item.consoleId&&g.title.toLowerCase().replace(/[^a-z0-9]/g,'')===item.title.toLowerCase().replace(/[^a-z0-9]/g,'')))} planetLetter={planetLetter} onPlanetLetter={setPlanetLetter} selectedConsole={section === 'home' || section === 'consoles' ? playable.find(c => c.id === consoleId) : undefined} onHome={() => navigate('/?section=consoles')} live={live} onWatch={s => navigate(buildStreamingUrl({ sessionId: s.id }))} mode={ctx.mode} games={presentedGames} consoles={playable.map(c => withImage(c, c.id))} {...ctx.data} onFavorite={ctx.favorite} onOpen={open} onConsole={c => navigate(`/retrogaming/${encodeURIComponent(c.id)}`)} onSettings={() => navigate('/settings')} loading={loading} error={error} onRetry={() => {setLoading(true);retry(x => x + 1);}} user={user?.display_name || user?.username} onCreateCollection={createCollection} onAddToCollection={(id, g) => ctx.setData(d => ({ ...d, collections: d.collections.map(c => c.id === id ? { ...c, games: c.games.includes(gameKey(g)) ? c.games.filter(x => x !== gameKey(g)) : [...c.games, gameKey(g)] } : c) }))} />{importOpen&&<RomImportDialog token={token} consoles={playable} initialConsole={consoleId||''} onClose={()=>setImportOpen(false)} onImported={async item=>{await ctx.refreshLibrary();ctx.downloads.notify('success',item.title,'Jeu importé.');}}/>}{optionsGame&&<GameOptionsDialog key={gameKey(optionsGame)} game={optionsGame} scope={gameSettingsScope} onClose={()=>setOptionsGame(null)} onDetails={setCatalogGame}/>}{catalogGame&&<CatalogGameDialog history={ctx.data.history} mode={ctx.mode} favorites={ctx.data.favorites} onFavorite={ctx.favorite} collections={ctx.data.collections} onAddToCollection={(id,g)=>ctx.setData(d=>({...d,collections:d.collections.map(c=>c.id===id?{...c,games:c.games.includes(gameKey(g))?c.games.filter(x=>x!==gameKey(g)):[...c.games,gameKey(g)]}:c)}))} canEditMetadata={user?.role_level===0} token={token} onMetadata={updated=>{setCatalogGame(updated);retry(x=>x+1);}} game={{...catalogGame,...(verificationResult?.slug===catalogGame.emugenSlug?{manualVerificationResult:verificationResult}:{})}} onClose={()=>setCatalogGame(null)} onInstall={game=>{setCatalogGame(null);ctx.downloads.start(game);}} onPlay={game=>{setCatalogGame(null);openOwned(game);}}/>}{sources.enabledIds.includes('emugen')&&verificationId&&<InteractiveVerification token={token} sessionId={verificationId} gameSlug={verificationGame} consoleId={consoleId} onClose={closeVerification} onResolved={setVerificationResult}/>}{launchGame && <LaunchDialog onEmulatorReady={()=>setLaunchError('')} game={launchGame} mode={ctx.mode} error={launchError} launching={launching} onPlay={launch} onClose={() => setLaunchGame(null)}/>}{ctx.notice && <p className="gx-sync-notice" role="status">{ctx.notice}</p>}</>;
 }

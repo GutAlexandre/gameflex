@@ -1,0 +1,10 @@
+{
+  "content": "Original CC0 GBA red display program",
+  "proprietaryBios": false,
+  "frames": 90,
+  "resolution": [
+    240,
+    160
+  ],
+  "nonBlackFrame": true
+}

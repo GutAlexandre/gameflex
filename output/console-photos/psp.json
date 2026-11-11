@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Psp-1000.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:Psp-1000.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Psp-1000.jpg/960px-Psp-1000.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "psp",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "f0e3fe0054343b5f14c38c7ef3949b5bb69636f2441e83bdc70ad753c4ccc7f4",
+  "url": "/experience-api/v1/media/f0e3fe0054343b5f14c38c7ef3949b5bb69636f2441e83bdc70ad753c4ccc7f4",
+  "mime": "image/webp",
+  "fetchedAt": 1794142794,
+  "reviewAfter": 1796734794
+}

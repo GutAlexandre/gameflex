@@ -1,0 +1,22 @@
+{
+  "hardware": {
+    "os": "Linux",
+    "architecture": "aarch64",
+    "platform": "linux/aarch64",
+    "ramGiB": 8,
+    "execution": "server"
+  },
+  "nativeLibraryCheck": {
+    "gba": [
+      "mgba"
+    ],
+    "gbc": [
+      "gambatte"
+    ],
+    "nes": [
+      "quicknes"
+    ]
+  },
+  "gbaOriginalDemoFrames": 90,
+  "tvPhysicalTest": false
+}

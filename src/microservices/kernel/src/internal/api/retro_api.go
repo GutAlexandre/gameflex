@@ -153,8 +153,12 @@ func (server *Server) handleRetroBios(w http.ResponseWriter, r *http.Request) {
 // sur le disque.
 func (server *Server) handleRetroCores(w http.ResponseWriter, r *http.Request) {
 	consoleID := chi.URLParam(r, "consoleId")
+	// L'assistant d'expérience installe les cœurs dans la bibliothèque
+	// partagée sans passer par une route d'écriture du kernel. Lire ce petit
+	// dossier en direct évite qu'un membre voie « installé » dans la bannière
+	// mais « absent » au lancement jusqu'au prochain rescan administrateur.
 	writeJSON(w, http.StatusOK, append(
-		coreEntriesFrom(consoleID, server.selfItems(listing.Cores, consoleID)),
+		coreEntriesFrom(consoleID, libraryCoreItems(server.selfRoots(), consoleID)),
 		server.streamexCoreEntries(r.Context(), consoleID)...))
 }
 

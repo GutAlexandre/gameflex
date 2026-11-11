@@ -12,7 +12,7 @@ func TestStreamSize(t *testing.T) {
 		{" 720p ", 1280, 720, true},
 		{"1080p", 1920, 1080, true},
 		{"360p", 640, 360, true}, // revenu le 2026-11-06 (#636)
-		{"480p", 0, 0, false}, // retiré le 2026-09-20
+		{"480p", 0, 0, false},    // retiré le 2026-09-20
 		{"", 0, 0, false},
 	}
 	for _, c := range cases {
@@ -54,7 +54,7 @@ func TestLanguage(t *testing.T) {
 func TestExperimentalConsolesSayWhy(t *testing.T) {
 	want := map[string]string{
 		"ps4": ExperimentalGeneral, "ps5": ExperimentalGeneral, "xbox360": ExperimentalGeneral,
-		"switch": ExperimentalHeavy, "wiiu": ExperimentalFirmware, "switch2": ExperimentalGeneral,
+		"3ds": ExperimentalHeavy, "switch": ExperimentalHeavy, "wiiu": ExperimentalFirmware, "switch2": ExperimentalGeneral,
 	}
 	for _, console := range List() {
 		if console.Experimental != want[console.ID] {

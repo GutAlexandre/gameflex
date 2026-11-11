@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"os/exec"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -69,8 +71,8 @@ type VideoEncoder struct {
 	wg            sync.WaitGroup
 	Output        chan []byte
 	stopCh        chan struct{}
-	// Dropped counts NALs discarded because Output was full (see readOutput).
-	// Any single dropped NAL breaks x264's reference chain for every
+	// Dropped counts complete access units discarded because Output was full
+	// (see readOutput). Any single dropped frame breaks x264's reference chain for every
 	// subsequent P-frame that depends on it — the browser decoder can't
 	// resync until the next keyframe, which at keyint=60/60fps is up to a
 	// full second away. A non-zero count here is the direct explanation for
@@ -136,6 +138,24 @@ func NewVideoEncoder(width, height int, fps float64, bitrate int) *VideoEncoder 
 		Output: make(chan []byte, 64),
 		stopCh: make(chan struct{}),
 	}
+}
+
+// Level40Canvas keeps the game stream inside the H.264 level negotiated by
+// the gateway's intro track. The gateway switches from that intro to the game
+// without replacing the WebRTC track, so raising only the game's SPS to level
+// 4.2 would make Safari reject the switch. At 60 fps, 1080p exceeds level
+// 4.0's macroblock rate; 720p does not. Thirty-frame 1080p remains valid.
+func Level40Canvas(width, height int, fps float64) (int, int, bool) {
+	const maxMacroblocksPerSecond = 245760
+	if width <= 0 || height <= 0 || fps <= 0 {
+		return width, height, false
+	}
+	macroblocks := ((width + 15) / 16) * ((height + 15) / 16)
+	if float64(macroblocks)*fps <= maxMacroblocksPerSecond {
+		return width, height, false
+	}
+
+	return 1280, 720, true
 }
 
 func (e *VideoEncoder) Start() error {
@@ -225,24 +245,21 @@ func (e *VideoEncoder) Start() error {
 		"-vcodec", "libx264", "-preset", "ultrafast", "-tune", "zerolatency",
 		"-crf", "23", "-bf", "0", "-g", "15",
 		"-x264-params", "keyint=15:min-keyint=15:scenecut=0:rc-lookahead=0:sync-lookahead=0:sliced-threads=0:threads=1",
-		// PROFIL `high`, PLUS `baseline` — décidé le 2026-09-05.
+		// PROFIL `baseline` : il doit correspondre au profil H.264 négocié par
+		// la piste WebRTC, pas seulement à ce que le matériel sait décoder.
 		//
-		// `baseline` était là pour un vieux Chromecast qui ne décodait
-		// rien d'autre. Il n'est plus dans le parc, et ce profil coûtait
-		// cher : pas de CABAC (l'entropie arithmétique, ~10 à 15 % de
-		// mieux à qualité égale), pas de transformée 8×8. C'est le plus
-		// gros écart de qualité avec le téléphone, qui encode en matériel
-		// sans cette contrainte.
+		// La passerelle commence par une introduction en constrained-baseline,
+		// puis conserve la même piste quand elle bascule vers le jeu. Envoyer
+		// alors un SPS High Profile viole le profil annoncé dans le SDP. Safari
+		// iOS reçoit bien le débit mais ne remet aucune image au <video>
+		// (framesDecoded reste à zéro), tandis que des décodeurs plus tolérants
+		// acceptent parfois ce changement illégal sans renégociation.
 		//
-		// Ce que `high` NE change PAS, et c'est voulu : les trames B
-		// restent interdites (`-bf 0`), parce que c'est la LATENCE qui
-		// les interdit, pas le profil — une trame B se code d'après une
-		// image future, donc il faut l'attendre.
-		//
-		// Niveau 4.0 comme le chemin matériel : de la marge pour du
-		// 640×480@60, et un décodeur qui refuse un niveau trop bas rend
-		// une image NOIRE sans le dire (vécu le 2026-08-13).
-		"-profile:v", "high", "-level", "4.0", "-pix_fmt", "yuv420p",
+		// Niveau 4.0 comme l'introduction et le chemin matériel. Le canevas est
+		// borné par Level40Canvas avant d'arriver ici : 1080p60 devient 720p60,
+		// tandis que 1080p30 reste valide. YUV 4:2:0 et aucune trame B restent
+		// obligatoires pour le décodage matériel mobile et la faible latence.
+		"-profile:v", "baseline", "-level", "4.0", "-pix_fmt", "yuv420p",
 		"-b:v", fmt.Sprintf("%dk", e.bitrate),
 		// -maxrate/-bufsize (VBV) — without these, -crf leaves x264 free to
 		// produce a frame of ANY size regardless of -b:v (that flag alone
@@ -273,6 +290,31 @@ func (e *VideoEncoder) Start() error {
 		"-bufsize", fmt.Sprintf("%dk", e.bitrate*2),
 		"pipe:1",
 	)
+	encoderMode := "software (libx264)"
+	if strings.TrimSpace(os.Getenv("GAMEFLEX_NVIDIA_GPU")) != "" {
+		// Sous WSL2, le runtime NVIDIA injecte NVENC dans le conteneur de
+		// partie. Le flux reste Annex-B H.264, sans trames B et avec la même
+		// cadence de keyframes que le chemin logiciel : le navigateur et la
+		// passerelle reçoivent donc exactement le contrat qu'ils connaissent.
+		args = append(append([]string{}, inputArgs...),
+			"-i", "pipe:0", "-an", "-f", "h264",
+			"-vcodec", "h264_nvenc", "-preset", "p1", "-tune", "ull",
+			"-rc", "cbr", "-bf", "0", "-g", "15",
+			// Même contrat que le SDP de la piste d'introduction. `cavlc` est
+			// imposé explicitement : CABAC n'appartient pas au profil Baseline.
+			"-profile:v", "baseline", "-coder", "cavlc", "-level", "4.0", "-pix_fmt", "yuv420p",
+			// Une unité d'accès clairement délimitée et des IDR prévisibles : la
+			// passerelle peut remplacer l'introduction sans laisser Safari dans
+			// une chaîne de références commencée avant le jeu.
+			"-aud", "1", "-forced-idr", "1", "-zerolatency", "1",
+			"-rc-lookahead", "0", "-no-scenecut", "1", "-delay", "0",
+			"-b:v", fmt.Sprintf("%dk", e.bitrate),
+			"-maxrate", fmt.Sprintf("%dk", e.bitrate),
+			"-bufsize", fmt.Sprintf("%dk", e.bitrate*2),
+			"pipe:1",
+		)
+		encoderMode = "NVIDIA NVENC (h264_nvenc)"
+	}
 	e.cmd = exec.Command("ffmpeg", args...)
 	var err error
 	e.stdin, _ = e.cmd.StdinPipe()
@@ -294,7 +336,7 @@ func (e *VideoEncoder) Start() error {
 	}()
 	e.wg.Add(1)
 	go e.readOutput()
-	log.Printf("Video encoder started: %dx%d @ %.1ffps, software (libx264)", e.width, e.height, e.fps)
+	log.Printf("Video encoder started: %dx%d @ %.1ffps, %s", e.width, e.height, e.fps, encoderMode)
 	return nil
 }
 
@@ -303,6 +345,14 @@ func (e *VideoEncoder) readOutput() {
 	startCode := []byte{0x00, 0x00, 0x00, 0x01}
 	startCode3 := []byte{0x00, 0x00, 0x01}
 	var buf bytes.Buffer
+	// ffmpeg writes an Annex-B elementary stream as individual NAL units, but
+	// the gateway's PushVideo call represents one WebRTC sample. Sending AUD,
+	// SPS, PPS, SEI and the coded slice as five samples makes Chromium/WebKit
+	// feed an AUD-only "frame" to their decoder and immediately raise
+	// MEDIA_ERR_DECODE. Accumulate all prefix NALs and emit once the single
+	// VCL slice for this frame arrives. Both encoder paths are deliberately
+	// configured without sliced frames, so one VCL NAL closes one access unit.
+	var accessUnit []byte
 	tmp := make([]byte, 65536)
 	for {
 		select {
@@ -347,17 +397,22 @@ func (e *VideoEncoder) readOutput() {
 
 			nal := make([]byte, nextIdx-startIdx)
 			copy(nal, data[startIdx:nextIdx])
+			var frame []byte
+			accessUnit, frame = appendNALToAccessUnit(accessUnit, nal)
+			buf.Next(nextIdx)
+			if frame == nil {
+				continue
+			}
 			select {
-			case e.Output <- nal:
+			case e.Output <- frame:
 			case <-e.stopCh:
 				return
 			default:
 				n := e.Dropped.Add(1)
 				if n <= 5 || n%50 == 0 {
-					log.Printf("[video-out] DROPPED NAL #%d (Output channel full, consumer falling behind) — decode chain broken until next keyframe", n)
+					log.Printf("[video-out] DROPPED FRAME #%d (Output channel full, consumer falling behind) — decode chain broken until next keyframe", n)
 				}
 			}
-			buf.Next(nextIdx)
 		}
 	}
 }

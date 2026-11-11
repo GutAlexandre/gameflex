@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:ColecoVision-wController-L.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:ColecoVision-wController-L.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/ColecoVision-wController-L.jpg/960px-ColecoVision-wController-L.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "coleco",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "d962de17f37a82f90108f491d01e3ec20cfafe30cb4b10ab0e3edbf2b7519c7b",
+  "url": "/experience-api/v1/media/d962de17f37a82f90108f491d01e3ec20cfafe30cb4b10ab0e3edbf2b7519c7b",
+  "mime": "image/webp",
+  "fetchedAt": 1794142786,
+  "reviewAfter": 1796734786
+}

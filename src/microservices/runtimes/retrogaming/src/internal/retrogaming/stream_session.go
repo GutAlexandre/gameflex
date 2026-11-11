@@ -593,6 +593,7 @@ type emulationSession struct {
 	broadcastTargetsMu sync.Mutex
 
 	videoEncStarted bool
+	blackStartSeen  bool
 	encoderReady    chan struct{}
 	encW, encH      int
 
@@ -1392,6 +1393,16 @@ func (s *emulationSession) startVideoEncoderOnce(w, h int) bool {
 		w, h = nativeW, nativeH
 	}
 
+	// L'introduction et le jeu partagent la même piste WebRTC. Son SDP annonce
+	// H.264 niveau 4.0 : 1920×1080 à 60 i/s le dépasse et NVENC refuse alors
+	// de produire la moindre image (`Invalid Level`), laissant l'iPhone sur
+	// l'intro. Garder 60 i/s est prioritaire pour le jeu ; on borne donc ce cas
+	// à 720p, encore parfaitement valide au niveau 4.0.
+	if safeW, safeH, capped := encoder.Level40Canvas(w, h, s.fps); capped {
+		log.Printf("[retrogaming-stream] canevas H.264 niveau 4.0 : %dx%d@%.2f ramené à %dx%d", w, h, s.fps, safeW, safeH)
+		w, h = safeW, safeH
+	}
+
 	// 0 = AUTOMATIQUE : le débit se déduit de la taille et de la cadence
 	// (voir encoder.AutoBitrate). La valeur fixe de 2000 ne pouvait être
 	// juste que pour une seule taille d'image, et ce n'était pas celle des
@@ -1449,12 +1460,43 @@ func launchSetting(name string) int {
 }
 
 // onFrame — une image neuve du moteur (Config.OnFrame), déjà en BGRA : l'encodeur
-// naît à la taille de la première, puis chaque image part vers son canevas.
+// naît à la taille de la première image visible, puis chaque image part vers
+// son canevas. Certains cœurs matériels (notamment Dolphin) émettent une
+// première texture entièrement noire pendant l'amorçage de leur contexte GL.
+// Si NVENC produit son premier IDR à partir de cette texture, certains
+// décodeurs WebRTC mobiles restent noirs alors que les images suivantes sont
+// valides et que le son continue. Attendre quelques millisecondes de plus
+// donne au décodeur une première image clé réellement exploitable.
 func (s *emulationSession) onFrame(frame engine.Frame) {
+	s.mu.Lock()
+	encoderStarted := s.videoEncStarted
+	s.mu.Unlock()
+
+	if !encoderStarted && !frameHasVisibleRGB(frame.Pixels) {
+		s.mu.Lock()
+		if !s.blackStartSeen {
+			s.blackStartSeen = true
+			log.Printf("[retrogaming-stream] image noire d'amorçage ignorée avant le démarrage de l'encodeur")
+		}
+		s.mu.Unlock()
+		return
+	}
+
 	if !s.startVideoEncoderOnce(frame.Width, frame.Height) {
 		return
 	}
 	s.emitFrame(frame.Pixels, frame.Width, frame.Height, frame.Aspect)
+}
+
+// frameHasVisibleRGB ignore le canal alpha : une image BGRA noire peut avoir
+// un alpha à 255, mais elle reste noire pour le joueur.
+func frameHasVisibleRGB(frame []byte) bool {
+	for i := 0; i+3 < len(frame); i += 4 {
+		if frame[i] != 0 || frame[i+1] != 0 || frame[i+2] != 0 {
+			return true
+		}
+	}
+	return false
 }
 
 // emitFrame pads/scales to the encoder's fixed canvas if the core's
@@ -1646,15 +1688,13 @@ func (s *emulationSession) consumeVideoOutput() {
 		select {
 		case <-s.stopping:
 			return
-		case nal := <-s.videoEnc.Output:
-			dur := time.Duration(0)
-			if encoder.IsVCLNal(nal) {
-				dur = frameDur
-			}
+		case frame := <-s.videoEnc.Output:
+			// Output contains one complete H.264 access unit (prefix parameter
+			// sets plus its coded slice), therefore exactly one frame duration.
 			// ONE push to the shared transport — gatewaywebrtc fans the same
-			// NAL out to every viewer, owner, joiners and spectators alike.
+			// frame out to every viewer, owner, joiners and spectators alike.
 			if s.gatewayClient != nil {
-				_ = s.gatewayClient.PushVideo(nal, dur)
+				_ = s.gatewayClient.PushVideo(frame, frameDur)
 			}
 		}
 	}

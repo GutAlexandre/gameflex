@@ -1,0 +1,34 @@
+{
+  "buildInfo": {
+    "version": "0.4.1",
+    "commit": "24d5e0c281cf77e5f363930abbe1db648c9f7fef",
+    "builtAt": "2026-11-11 00:34"
+  },
+  "home": {
+    "status": 200,
+    "sha256": "25f02e367dff21895d8e961de5e974fb02dd54bb305ce2ef11277bb10908e2ec"
+  },
+  "settings?advanced=1": {
+    "status": 200,
+    "sha256": "25f02e367dff21895d8e961de5e974fb02dd54bb305ce2ef11277bb10908e2ec"
+  },
+  "?section=management": {
+    "status": 200,
+    "sha256": "25f02e367dff21895d8e961de5e974fb02dd54bb305ce2ef11277bb10908e2ec"
+  },
+  "bundle.js": {
+    "status": 200,
+    "sha256": "57f26d1f0b97446c930af89a3fe83a77a059a2fd59099a2d0166e17b59744fe3"
+  },
+  "service-worker.js": {
+    "status": 200,
+    "sha256": "a92d51a1359ac552351072df0f4be43dfd899ad36d2b12a3e99abff230785bd2"
+  },
+  "kernelCredentialGatewayPreserved": true,
+  "apiIdentifiers": 29,
+  "apiPreserved": true,
+  "publicIconsVerified": 74,
+  "audioAssetsVerified": 5,
+  "audioCacheVersion": 50,
+  "containerImage": "sha256:9b9525a9c7d6d00c8a8e15b3b60d0a1b0ecb95ea18a617fe25be76058766d76e"
+}

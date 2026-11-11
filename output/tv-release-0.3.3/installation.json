@@ -1,0 +1,18 @@
+{
+  "installed": true,
+  "package": "org.gameflex.tv",
+  "version": "0.3.3",
+  "sha256": "c91478b4c9c679c33562fb3528b6d55088a3b1e26986c935e6504f78fa54a10e",
+  "identity": {
+    "model": "50PUS7906/12",
+    "serialHashMatches": true,
+    "target": "192.168.1.175:5555",
+    "android": "11",
+    "firmware": "RTM2.210929.098 release-keys",
+    "wifiReadable": false,
+    "wifiMatches": null
+  },
+  "launcherEntry": "1 activities found:\n  Activity #0:\n    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false\n    org.gameflex.tv/.MainActivity",
+  "rollback": "/home/config/GameFlex/.local/playstation-ui/.local/android-tv/rollback/1794347487",
+  "previouslyInstalled": true
+}

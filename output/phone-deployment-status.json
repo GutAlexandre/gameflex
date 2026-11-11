@@ -1,0 +1,21 @@
+{
+  "requestedPort": 2000,
+  "url": "http://192.168.1.63:2000",
+  "username": "unknow",
+  "accountAlreadyExisted": true,
+  "roleLevel": 0,
+  "authenticationVerified": true,
+  "deployed": true,
+  "libraryMode": "generated-free-demo-only",
+  "personalLibraryConfigured": false,
+  "interfacePreference": null,
+  "demoListed": true,
+  "launchStatus": 200,
+  "stopStatus": 200,
+  "passwordStoredInProject": false,
+  "tvAccess": "none",
+  "systemPackagesInstalled": false,
+  "firewallModified": false,
+  "gateway": "official amd64 binary under explicit QEMU, no binfmt changes",
+  "phoneVideoLatency": "not verified on actual phone"
+}

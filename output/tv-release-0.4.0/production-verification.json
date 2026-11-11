@@ -1,0 +1,32 @@
+{
+  "buildInfo": {
+    "version": "0.4.0",
+    "commit": "5f52b2348333be38da0769c89772c500d0d1e3c4",
+    "builtAt": "2026-11-10 23:53"
+  },
+  "home": {
+    "status": 200,
+    "sha256": "25f02e367dff21895d8e961de5e974fb02dd54bb305ce2ef11277bb10908e2ec"
+  },
+  "settings?advanced=1": {
+    "status": 200,
+    "sha256": "25f02e367dff21895d8e961de5e974fb02dd54bb305ce2ef11277bb10908e2ec"
+  },
+  "?section=management": {
+    "status": 200,
+    "sha256": "25f02e367dff21895d8e961de5e974fb02dd54bb305ce2ef11277bb10908e2ec"
+  },
+  "bundle.js": {
+    "status": 200,
+    "sha256": "84a658402ac1788981e6fde4f39bea99ebd8ec7b703e0195f7b2ea87cc75d222"
+  },
+  "service-worker.js": {
+    "status": 200,
+    "sha256": "2b0d77b4512e356f4d6f6f4cfe7db139b0505117857d7aaca81cd6fb8770fd9d"
+  },
+  "kernelCredentialGatewayPreserved": true,
+  "apiIdentifiers": 29,
+  "apiPreserved": true,
+  "publicIconsVerified": 74,
+  "containerImage": "sha256:86ca4e968fd040a0b0b9c24eb4868db8ad740af95f541851648b87187ac1712c"
+}

@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "realEmulatorCores": true,
+  "testPrograms": "original synthetic NES/GB/GBC programs, not shipped as games",
+  "remoteRequests": false,
+  "systems": [
+    {
+      "system": "nes",
+      "frames": 41,
+      "audioSamples": 30086,
+      "audioEnergy": 733.5038281837478,
+      "saveRestored": true,
+      "heldButtonsReleased": true
+    },
+    {
+      "system": "gb",
+      "frames": 51,
+      "audioSamples": 39168,
+      "audioEnergy": 613.8608535179393,
+      "saveRestored": true,
+      "heldButtonsReleased": true
+    },
+    {
+      "system": "gbc",
+      "frames": 56,
+      "audioSamples": 43520,
+      "audioEnergy": 613.8608535179393,
+      "saveRestored": true,
+      "heldButtonsReleased": true
+    }
+  ]
+}

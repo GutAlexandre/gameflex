@@ -33,10 +33,10 @@ var errCoreIncompatible = errors.New("ce cœur ne se chargerait pas sur cette ma
 // écrite dans le binaire lui-même, en clair, et `debug/elf` la lit sans aucune
 // dépendance externe.
 //
-// LE PLAFOND EST MESURÉ, PAS SUPPOSÉ. Le 2026-09-17, sur les DEUX images de
-// session — `gameflex-retrogaming:latest` (dev) et
-// `gameflex-release/gameflex-retrogaming:test` (release) — qui portent toutes
-// deux `libstdc++.so.6 -> libstdc++.so.6.0.30`, soit GLIBCXX_3.4.30 :
+// LE PLAFOND EST MESURÉ, PAS SUPPOSÉ. Le runtime de session release est
+// désormais Debian Trixie pour charger le Dolphin actuel. Mesuré le
+// 2026-11-11 dans `zinosaure/gameflex-retrogaming:latest` : sa libstdc++
+// fournit GLIBCXX_3.4.33 :
 //
 //	strings …/libstdc++.so.6 | grep -oE 'GLIBCXX_3\.4\.[0-9]+' | sort -uV | tail -1
 //
@@ -49,7 +49,7 @@ var errCoreIncompatible = errors.New("ce cœur ne se chargerait pas sur cette ma
 // À refaire après toute reconstruction de l'image de session qui changerait sa
 // libstdc++ : c'est ELLE qui charge le cœur, pas le noyau. Relever le plafond
 // sans avoir reconstruit l'image rouvrirait exactement le trou de #143.
-const maxCoreGlibcxx = "3.4.30"
+const maxCoreGlibcxx = "3.4.33"
 
 // verifyCoreABI refuse un cœur que l'image de session ne saura pas charger.
 //

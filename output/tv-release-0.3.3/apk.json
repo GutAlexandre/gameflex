@@ -1,0 +1,14 @@
+{
+  "apk": "/home/config/GameFlex/.local/playstation-ui/output/android-tv/GameFlex-TV-0.3.3.apk",
+  "package": "org.gameflex.tv",
+  "activity": "org.gameflex.tv.MainActivity",
+  "versionName": "0.3.3",
+  "versionCode": 6,
+  "minSdk": 26,
+  "targetSdk": 35,
+  "sha256": "c91478b4c9c679c33562fb3528b6d55088a3b1e26986c935e6504f78fa54a10e",
+  "bytes": 54113,
+  "gitHead": "467c9f759d66dd55dcdc387decedf2da99fbc62e",
+  "commitCreated": false,
+  "certificateSha256": "03f42f652fada2133d8195ce626ea738cbd169b4425f78ab1b08eaf7173d1f28"
+}

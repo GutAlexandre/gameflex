@@ -1,0 +1,22 @@
+(node:1) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/config/GameFlex/.local/playstation-ui/src/webapp/src/webpack.config.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/config/GameFlex/.local/playstation-ui/src/webapp/src/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+WARNING in asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+This can impact web performance.
+Assets: 
+  bundle.js (1.8 MiB)
+    Largest modules: ../../../../merge-main/src/webapp/src/node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf (416 KiB), ../../../../merge-main/src/webapp/src/node_modules/jquery/dist/jquery.js (279 KiB), ../../../../merge-main/src/webapp/src/node_modules/css-loader/dist/cjs.js!../../../../merge-main/src/webapp/src/node_modules/bootstrap/dist/css/bootstrap.min.css (231 KiB)
+  fonts/fa-solid-900.ttf (416 KiB)
+
+WARNING in entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+Entrypoints:
+  main (1.8 MiB)
+      bundle.js
+
+WARNING in webpack performance recommendations: 
+The runtime is part of the initial chunk of main. It describes every other chunk, so a change anywhere in the build rewrites these assets and clients download them again.
+Set 'optimization.runtimeChunk' to emit the runtime as its own chunk.
+For more info visit https://webpack.js.org/configuration/optimization/#optimizationruntimechunk
+
+webpack compiled in 274792 ms

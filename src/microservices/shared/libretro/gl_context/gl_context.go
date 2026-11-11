@@ -1,4 +1,4 @@
-// Package gl_context provides a headless EGL/GBM OpenGL context — the
+// Package gl_context provides a headless EGL OpenGL context — the
 // hardware-rendering path hardware-only libretro cores (N64/parallel_n64,
 // PS2/play) require, since unlike every other core this backend runs, they
 // have no software renderer to fall back to. See gl_context.h's own doc for
@@ -57,6 +57,11 @@ type Context struct {
 // exec.Command re-exec), so permanently dedicating one thread within that
 // process to the session's emulation loop (the only place this is called
 // from) costs nothing meaningful.
+//
+// Sur Linux natif, le contexte utilise GBM. Sous WSL2, où le GPU Windows est
+// exposé par /dev/dxg sans nœud GBM, il utilise EGL surfaceless ; Mesa peut
+// alors employer le pilote disponible ou son repli logiciel. Le GPU NVIDIA
+// reste indépendamment disponible à l'encodeur par NVENC.
 //
 // Sur le téléphone, les parties se succèdent dans LE MÊME processus,
 // l'application. Le fil verrouillé n'y fuit pas pour autant : quand la

@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Atari-Lynx-Handheld-Angled.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:Atari-Lynx-Handheld-Angled.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Atari-Lynx-Handheld-Angled.jpg/960px-Atari-Lynx-Handheld-Angled.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "lynx",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "5d04df12404630b1e4b51ed3a93d1caa11dd45e338a4ea46f7269627d39c24e3",
+  "url": "/experience-api/v1/media/5d04df12404630b1e4b51ed3a93d1caa11dd45e338a4ea46f7269627d39c24e3",
+  "mime": "image/webp",
+  "fetchedAt": 1794142778,
+  "reviewAfter": 1796734778
+}

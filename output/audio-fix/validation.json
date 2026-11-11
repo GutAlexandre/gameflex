@@ -1,0 +1,76 @@
+[
+  {
+    "variant": "before",
+    "receivedAudioPackets": 696,
+    "audioContexts": 0,
+    "regressionReproduced": true
+  },
+  {
+    "variant": "after",
+    "beforeGesture": {
+      "samples": 343200,
+      "energy": 2655.9594830028727,
+      "scheduled": 0,
+      "errors": 0,
+      "state": "suspended",
+      "muted": false,
+      "pending": 0
+    },
+    "live": {
+      "samples": 570240,
+      "energy": 4424.161071647227,
+      "scheduled": 109920,
+      "errors": 0,
+      "state": "running",
+      "muted": false,
+      "pending": 0
+    },
+    "muteRespected": true,
+    "resumed": true,
+    "closed": true
+  },
+  {
+    "variant": "no-video-decoder",
+    "beforeGesture": {
+      "samples": 291840,
+      "energy": 2259.077006176814,
+      "scheduled": 0,
+      "errors": 0,
+      "state": "suspended",
+      "muted": false,
+      "pending": 0
+    },
+    "live": {
+      "samples": 410400,
+      "energy": 3182.6025046413633,
+      "scheduled": 81600,
+      "errors": 0,
+      "state": "running",
+      "muted": false,
+      "pending": 0
+    },
+    "muteRespected": true,
+    "resumed": true,
+    "closed": true
+  },
+  {
+    "variant": "webrtc",
+    "live": {
+      "media": [
+        {
+          "muted": false,
+          "paused": false,
+          "volume": 1,
+          "ready": 4
+        }
+      ],
+      "inbound": [
+        {
+          "bytes": 259541,
+          "energy": 0.08327129637301685
+        }
+      ]
+    },
+    "singleAudioTransport": true
+  }
+]

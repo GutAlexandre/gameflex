@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Sega-Saturn-JP-Mk1-Console-Set.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:Sega-Saturn-JP-Mk1-Console-Set.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Sega-Saturn-JP-Mk1-Console-Set.jpg/960px-Sega-Saturn-JP-Mk1-Console-Set.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "saturn",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "3df27126abac6a09558c01e3d5963145be82d8fc9c415d5d3a1260aa62272bb1",
+  "url": "/experience-api/v1/media/3df27126abac6a09558c01e3d5963145be82d8fc9c415d5d3a1260aa62272bb1",
+  "mime": "image/webp",
+  "fetchedAt": 1794142773,
+  "reviewAfter": 1796734773
+}

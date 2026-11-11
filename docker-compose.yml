@@ -40,6 +40,8 @@ services:
             - GAMEFLEX_STACK_NAME=${GAMEFLEX_NAME:-gameflex}
             # The same folders as the volumes below, seen from this machine.
             - GAMEFLEX_STORAGE_PATH=${GAMEFLEX_LIBRARY:?set GAMEFLEX_LIBRARY in .env}
+            # Optional host-side override when /gameflex/roms is a separate bind mount.
+            - GAMEFLEX_ROMS_PATH=${GAMEFLEX_ROMS_PATH:-}
             - GAMEFLEX_PROFILES_HOST_DIR=${GAMEFLEX_LIBRARY:?set GAMEFLEX_LIBRARY in .env}/cache/profiles
             - GAMEFLEX_CREDENTIAL_URL=http://gameflex-credential:8080
             - GAMEFLEX_KERNEL_URL=http://127.0.0.1:10201

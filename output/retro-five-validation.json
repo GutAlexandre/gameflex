@@ -1,0 +1,62 @@
+[
+  {
+    "mode": "station",
+    "systems": 3,
+    "installedGames": 430,
+    "viewports": [
+      "1600x900",
+      "390x844"
+    ],
+    "focusRestored": true,
+    "remoteCatalogueRequests": 0,
+    "javascriptErrors": []
+  },
+  {
+    "mode": "crt",
+    "systems": 3,
+    "installedGames": 430,
+    "viewports": [
+      "1600x900",
+      "390x844"
+    ],
+    "focusRestored": true,
+    "remoteCatalogueRequests": 0,
+    "javascriptErrors": []
+  },
+  {
+    "mode": "shelf",
+    "systems": 3,
+    "installedGames": 430,
+    "viewports": [
+      "1600x900",
+      "390x844"
+    ],
+    "focusRestored": true,
+    "remoteCatalogueRequests": 0,
+    "javascriptErrors": []
+  },
+  {
+    "mode": "orbit",
+    "systems": 3,
+    "installedGames": 430,
+    "viewports": [
+      "1600x900",
+      "390x844"
+    ],
+    "focusRestored": true,
+    "remoteCatalogueRequests": 0,
+    "javascriptErrors": []
+  },
+  {
+    "mode": "arcade",
+    "systems": 3,
+    "installedGames": 430,
+    "viewports": [
+      "1600x900",
+      "390x844"
+    ],
+    "focusRestored": true,
+    "remoteCatalogueRequests": 0,
+    "javascriptErrors": []
+  }
+]

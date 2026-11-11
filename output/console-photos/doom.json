@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:IBM PS2 MCA Model 70, front view.jpg",
+  "author": "DMahalko, Dale Mahalko, Gilman, WI, USA -- Email: dmahalko@gmail.com",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:IBM_PS2_MCA_Model_70,_front_view.jpg",
+  "sourceImage": "https://upload.wikimedia.org/wikipedia/commons/6/6a/IBM_PS2_MCA_Model_70%2C_front_view.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "attribution": "DMahalko, Dale Mahalko, Gilman, WI, USA -- Email: dmahalko@gmail.com",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "doom",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "1ce96e951fac5673cba526e91824af8f51c6303c222ab9c732feb1238b2e3d22",
+  "url": "/experience-api/v1/media/1ce96e951fac5673cba526e91824af8f51c6303c222ab9c732feb1238b2e3d22",
+  "mime": "image/webp",
+  "fetchedAt": 1794142791,
+  "reviewAfter": 1796734791
+}

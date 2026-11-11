@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:Atari-7800-Console-Set.jpg",
+  "author": "Evan-Amos",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Atari-7800-Console-Set.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Atari-7800-Console-Set.jpg/960px-Atari-7800-Console-Set.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "atari7800",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "3e5207a88a1f05ae2f377b6929214789c05ad1c3f5c54a9bfa65b3c23ca5c5e5",
+  "url": "/experience-api/v1/media/3e5207a88a1f05ae2f377b6929214789c05ad1c3f5c54a9bfa65b3c23ca5c5e5",
+  "mime": "image/webp",
+  "fetchedAt": 1794142776,
+  "reviewAfter": 1796734776
+}

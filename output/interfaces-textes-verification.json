@@ -1,0 +1,125 @@
+{
+  "views": [
+    {
+      "mode": "minimal",
+      "name": "Minimal",
+      "1280": {
+        "bodyWidth": 1280,
+        "viewport": 1280
+      },
+      "390": {
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "mode": "covers",
+      "name": "Jaquettes",
+      "1280": {
+        "bodyWidth": 1280,
+        "viewport": 1280
+      },
+      "390": {
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "mode": "consoles",
+      "name": "Consoles",
+      "1280": {
+        "bodyWidth": 1280,
+        "viewport": 1280
+      },
+      "390": {
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "mode": "favorites",
+      "name": "Favoris",
+      "1280": {
+        "bodyWidth": 1280,
+        "viewport": 1280
+      },
+      "390": {
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "mode": "resume",
+      "name": "Reprise rapide",
+      "1280": {
+        "bodyWidth": 1280,
+        "viewport": 1280
+      },
+      "390": {
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "mode": "collections",
+      "name": "Collections",
+      "1280": {
+        "bodyWidth": 1280,
+        "viewport": 1280
+      },
+      "390": {
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "mode": "detail",
+      "name": "Fiche de jeu",
+      "1280": {
+        "bodyWidth": 1280,
+        "viewport": 1280
+      },
+      "390": {
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "mode": "archives",
+      "name": "Archives",
+      "1280": {
+        "bodyWidth": 1280,
+        "viewport": 1280
+      },
+      "390": {
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "mode": "multiplayer",
+      "name": "Multijoueur",
+      "1280": {
+        "bodyWidth": 1280,
+        "viewport": 1280
+      },
+      "390": {
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "mode": "dashboard",
+      "name": "Tableau de bord",
+      "1280": {
+        "bodyWidth": 1280,
+        "viewport": 1280
+      },
+      "390": {
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    }
+  ],
+  "javascriptErrors": []
+}

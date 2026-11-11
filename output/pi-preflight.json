@@ -1,0 +1,11 @@
+{
+  "architecture": "aarch64",
+  "model": "Raspberry Pi 5 Model B Rev 1.0",
+  "python": "3.11.2",
+  "dockerCli": true,
+  "driVisible": false,
+  "uinputVisible": false,
+  "upstreamArmSupport": "non validé ; ne pas lancer launch.sh comme une installation ARM officielle",
+  "deviceVisibility": "Les périphériques absents du conteneur peuvent exister sur l’hôte ; aucun module chargé.",
+  "tv": "aucun accès effectué"
+}

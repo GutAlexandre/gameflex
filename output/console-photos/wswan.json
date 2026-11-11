@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:WonderSwan-Black-Left.jpg",
+  "author": "Evan-Amos",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "source": "https://commons.wikimedia.org/wiki/File:WonderSwan-Black-Left.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/WonderSwan-Black-Left.jpg/960px-WonderSwan-Black-Left.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Evan-Amos",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "wswan",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "cdfc2334efcc5531839d5938d50dec58455e92695a2f0ff6fe4a32f13278a9a0",
+  "url": "/experience-api/v1/media/cdfc2334efcc5531839d5938d50dec58455e92695a2f0ff6fe4a32f13278a9a0",
+  "mime": "image/webp",
+  "fetchedAt": 1794142785,
+  "reviewAfter": 1796734785
+}

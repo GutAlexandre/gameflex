@@ -41,12 +41,26 @@ func TestNewNamesWhatIsMissing(t *testing.T) {
 	if err == nil || !strings.Contains(err.Error(), "n'est pas une adresse http(s)") {
 		t.Errorf("adresse sans schéma : %v", err)
 	}
+
+	_, err = New(services, func(name string) string {
+		if name == "KERNEL_TARGET" {
+			return "http://kernel:8080"
+		}
+		if name == "EXPERIENCE_BACKEND_PROXY_TARGET" {
+			return "experience:10211"
+		}
+		return ""
+	}, page)
+	if err == nil || !strings.Contains(err.Error(), "EXPERIENCE_BACKEND_PROXY_TARGET") {
+		t.Errorf("adresse experience sans schéma : %v", err)
+	}
 }
 
 func TestRouting(t *testing.T) {
 	kernel := backend(t, "kernel")
 	credential := backend(t, "credential")
-	env := map[string]string{"KERNEL": kernel.URL, "CREDENTIAL": credential.URL}
+	experience := backend(t, "experience")
+	env := map[string]string{"KERNEL": kernel.URL, "CREDENTIAL": credential.URL, "EXPERIENCE_BACKEND_PROXY_TARGET": experience.URL}
 	handler, err := New([]domains.Service{
 		{Service: "kernel", Target: "KERNEL", Domains: []string{"health", "sessions"}},
 		{Service: "credential", Target: "CREDENTIAL", ForwardClientAddress: true, Domains: []string{"users"}},
@@ -69,6 +83,8 @@ func TestRouting(t *testing.T) {
 		{path: "/api/v1/healthz", status: 200, want: []string{"page"}},
 		{path: "/api/v1/inconnu/x", status: 200, want: []string{"page"}},
 		{path: "/retrogaming/nes", status: 200, want: []string{"page"}},
+		{path: "/experience-api/v1/emulators?all=1", status: 200, want: []string{"experience /v1/emulators?all=1", "host=" + strings.TrimPrefix(experience.URL, "http://")}},
+		{path: "/experience-api", status: 200, want: []string{"experience /"}},
 		{path: "/api/v1/sessions/", status: 200, want: []string{"kernel /api/v1/sessions/"}},
 	}
 	client := &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}

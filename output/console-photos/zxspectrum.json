@@ -1,0 +1,19 @@
+{
+  "provider": "Wikimedia Commons",
+  "title": "File:ZXSpectrum48k.jpg",
+  "author": "Bill Bertram",
+  "license": "CC BY-SA 2.5",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+  "source": "https://commons.wikimedia.org/wiki/File:ZXSpectrum48k.jpg",
+  "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/ZXSpectrum48k.jpg/960px-ZXSpectrum48k.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "attribution": "Bill Bertram",
+  "kind": "console-photo",
+  "approved": true,
+  "target": "zxspectrum",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "7e0f0aece27fb94a6ecbd03e9b852d4955b12af048a0543e14b84d9d4118def5",
+  "url": "/experience-api/v1/media/7e0f0aece27fb94a6ecbd03e9b852d4955b12af048a0543e14b84d9d4118def5",
+  "mime": "image/webp",
+  "fetchedAt": 1794142790,
+  "reviewAfter": 1796734790
+}

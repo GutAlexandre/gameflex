@@ -1,0 +1,21 @@
+{
+  "target": "cps2",
+  "provider": "Flickr",
+  "title": "cps2 marsmatrix",
+  "author": "o_o",
+  "source": "https://www.flickr.com/photos/19081668@N00/10481320",
+  "sourceImage": "https://live.staticflickr.com/5/10481320_953eb3be06_b.jpg",
+  "license": "CC BY-NC-SA 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/2.0/",
+  "usage": "non-commercial-only",
+  "discovery": "Openverse; license rechecked on the original Flickr page",
+  "approved": true,
+  "kind": "console-photo",
+  "attribution": "o_o",
+  "modifications": "Redimensionnement et conversion WebP ; aucun recadrage.",
+  "id": "f099c7844436323aa481e6c4116315d4c8d7a24b114cbdf836ba3b6e7d77fded",
+  "url": "/experience-api/v1/media/f099c7844436323aa481e6c4116315d4c8d7a24b114cbdf836ba3b6e7d77fded",
+  "mime": "image/webp",
+  "fetchedAt": 1794143065,
+  "reviewAfter": 1796735065
+}
