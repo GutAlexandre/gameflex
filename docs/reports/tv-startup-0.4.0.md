@@ -54,3 +54,30 @@ sonore physique doivent être vérifiés une fois la TV libre. Les tests Chromiu
 valident les moteurs et les signaux logiciels, pas les haut-parleurs physiques.
 Le correctif web de streaming doit également être déployé pour bénéficier du
 nouveau comportement GatewayWebRTC. La production reste sur la version précédente.
+
+
+## Mise en service après confirmation de disponibilité
+
+L’utilisateur a confirmé que la TV était disponible. L’autre lecteur était en
+pause (aucune lecture active) ; retour à l’accueil puis installation de la 0.4.0
+par `pm install -r`, signature contrôlée et ancienne APK sauvegardée. Le contrôle
+d’occupation reconnaît désormais les activités d’un même paquet déclaré HOME,
+ce qui prend en compte l’accueil LoutreTV ; huit tests passent.
+
+Sur la Philips : lancement à froid, fenêtre de configuration, navigation par la
+croix et OK, choix local, retour au serveur avec son adresse conservée. Session
+existante conservée lors de la connexion au serveur. Pas de fichier personnel
+importé et pas de modification du volume.
+
+Le web 0.4.0, révision 5f52b2348333be38da0769c89772c500d0d1e3c4, a été reconstruit
+avec les métadonnées correctes, vérifié sur un conteneur de contrôle puis déployé.
+Vérification publique : accueil, paramètres avancés, Archives, bundle et service
+worker ; 74 icônes vérifiées. Kernel, credential, gateway et experience : mêmes
+conteneurs et mêmes démarrages. Ancien web conservé pour retour arrière.
+
+Essai de lancement sur TV : piste audio reçue, compteur d’octets audio croissant,
+élément audio prêt et actif sans mute, sortie AudioTrack démarrée par Android.
+L’audibilité physique reste à confirmer par l’utilisateur. Le test révèle aussi
+un blocage vidéo H264 distinct : paquets reçus mais « No PPS with id 0 received »
+et aucune image décodée. Le serveur LAN HTTP n’active pas le secours WebCodecs.
+Ce blocage n’est pas déclaré résolu. Retour à la bibliothèque après l’essai.
