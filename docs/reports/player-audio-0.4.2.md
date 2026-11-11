@@ -20,6 +20,14 @@ Document pagehide releases relay sockets with authenticated keepalive requests; 
 
 These are software audio measurements, not a physical iPhone/TV speaker listening test. The diagnostic screenshot still contains the stream connection overlay; it is not evidence of successful video rendering. Physical TV playback was not interrupted: the final read-only audit found another foreground application actively playing media. No deployment while occupied, as requested. Production remains 0.4.1 until a safe deployment window.
 
+## Optimized release verification
+
+Production webpack build passed (189.7 seconds). Version 0.4.2, source commit `fad6a4381c2c7b3f81be3a539a4ed9d605a5b294`, service-worker cache 51. All five pinned audio resource hashes match the vendor manifest after minimization.
+
+The same full-application test passed again using this production bundle: first Launch 38,880 samples / post-gain energy 945.63 without a sound tap; hard reload and sound activation 32,640 samples / energy 789.75. No page errors, phone banner absent, preferences preserved, own fixture/session cleaned. Set `GAMEFLEX_TEST_PRODUCTION=1` on the real-game runner to select the production bundle.
+
+Images built and held without replacing running services: `gameflex-web:player-audio-fad6a43` and `gameflex-experience:player-audio-fad6a43`. The backend image passes its isolated capacity test. Public health checks still return 0.4.1 and 29 registered interface identifiers. Existing 416 source-file hashes, 20 native-TV file hashes and 68 archived-interface hashes remain unchanged.
+
 ## Reproduce
 
 Use the existing webapp Node dependencies: `node tests/pi-tv/run-playstation-tests.cjs`. Run `tests/pi-tv/test_socket_bridge_capacity.py` in the existing experience image (wsproto dependency). `tests/pi-tv/check-player-real-game.py` requires the managed local stack and preview web build; it refuses an active game, creates only its own original diagnostic cartridge and checksums it before deletion. `tests/pi-tv/run-public-audio-check.py --live --variant player --variant primed-player` opens only a temporary synthetic gateway stream. Never use personal games as disposable test fixtures.

@@ -3,7 +3,7 @@ import sys,json,re,mimetypes
 from pathlib import Path
 from urllib.parse import urlsplit
 from playwright.sync_api import sync_playwright
-cfg=json.load(sys.stdin);base='https://loutrenas.myqnapcloud.com/gameflex';web=Path('/app/.local/player-preview/web');out=Path('/results');out.mkdir(exist_ok=True)
+cfg=json.load(sys.stdin);base='https://loutrenas.myqnapcloud.com/gameflex';web=Path('/app/.local/console-release/web' if cfg.get('production') else '/app/.local/player-preview/web');out=Path('/results');out.mkdir(exist_ok=True)
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage']);ctx=browser.new_context(viewport={'width':390,'height':844},has_touch=True,service_workers='block');login=ctx.request.post(base+'/api/v1/auth/login',data={'username':cfg['username'],'password':cfg['password']});assert login.ok;token=login.json()['item']['access_token'];page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));launchActors=[]
  def request_seen(r):

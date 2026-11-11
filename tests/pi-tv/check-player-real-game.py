@@ -1,5 +1,5 @@
 """Controlled original ROM, real app flow, checksum-guarded cleanup. No game downloads."""
-import subprocess,json,urllib.request,ast,hashlib,secrets,time,socket
+import subprocess,json,urllib.request,ast,hashlib,secrets,time,socket,os
 from pathlib import Path
 wt=Path(__file__).resolve().parents[2];root=Path(subprocess.check_output(['git','rev-parse','--git-common-dir'],cwd=wt,text=True).strip()).resolve().parent
 x=json.loads(subprocess.check_output(['docker','inspect','gameflex-credential']))[0];env=dict(v.split('=',1) for v in x['Config']['Env'] if '=' in v);base='http://192.168.1.63:2000'
@@ -30,7 +30,7 @@ try:
   time.sleep(.3)
  assert reference,'Original diagnostic cartridge was not listed'
  result=wt/'.local/player-preview/results';result.mkdir(parents=True,exist_ok=True)
- r=subprocess.run(['docker','run','--rm','-i','--name','gameflex-real-player-check','--network','container:'+socket.gethostname(),'--cpus','1','--memory','1024m','--shm-size','128m','-v',str(wt)+':/app:ro','-v',str(result)+':/results','gameflex-experience:pi-local','python3','/app/tests/pi-tv/player-real-game-browser.py'],input=json.dumps({'username':env.get('GAMEFLEX_ROOT_USERNAME','root'),'password':env['GAMEFLEX_ROOT_PASSWORD']}),text=True)
+ r=subprocess.run(['docker','run','--rm','-i','--name','gameflex-real-player-check','--network','container:'+socket.gethostname(),'--cpus','1','--memory','1024m','--shm-size','128m','-v',str(wt)+':/app:ro','-v',str(result)+':/results','gameflex-experience:pi-local','python3','/app/tests/pi-tv/player-real-game-browser.py'],input=json.dumps({'username':env.get('GAMEFLEX_ROOT_USERNAME','root'),'password':env['GAMEFLEX_ROOT_PASSWORD'],'production':os.environ.get('GAMEFLEX_TEST_PRODUCTION')=='1'}),text=True)
  if r.returncode:raise RuntimeError('Full-player browser regression failed')
 finally:
  if reference:

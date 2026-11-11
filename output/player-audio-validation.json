@@ -1,0 +1,22 @@
+{
+  "sourceCommit": "fad6a4381c2c7b3f81be3a539a4ed9d605a5b294",
+  "build": "production 0.4.2",
+  "browser": "Chromium mobile viewport, not a physical device",
+  "firstLaunch": {
+    "samples": 38880,
+    "energy": 945.6265875170562,
+    "contexts": [
+      "running"
+    ]
+  },
+  "afterReloadAndTap": {
+    "samples": 32640,
+    "energy": 789.7450299550162,
+    "contexts": [
+      "running"
+    ]
+  },
+  "noFloatingPhoneButton": true,
+  "preferenceWritesIsolated": true,
+  "productionDeployment": "deferred: physical TV actively playing another application"
+}
