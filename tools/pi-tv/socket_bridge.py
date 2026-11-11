@@ -98,7 +98,7 @@ class Bridges:
  def open(self,owner,token,path):
   path=safe_path(path)
   with self.lock:
-   if len(self.channels)>=16 or sum(c.owner==owner for c in self.channels.values())>=6:raise BridgeError('Trop de canaux ouverts. Fermez les anciens onglets.',429)
+   if len(self.channels)>=16 or sum(c.owner==owner for c in self.channels.values())>=12:raise BridgeError('Trop de canaux ouverts. Fermez les anciens onglets.',429)
    # Reserve while connecting; a failed handshake never exposes a channel.
    channel=Channel(owner,token,path);key=secrets.token_hex(16);self.channels[key]=channel
    return {'id':key}

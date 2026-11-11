@@ -35,8 +35,8 @@ function loadDecoder() {
 // Same raw Opus packets as WebRTC, decoded locally also on Safari versions
 // without AudioDecoder. No extra server, transcoding or third-party request.
 export class FallbackAudio {
-    constructor({ load = loadDecoder, context = () => new (window.AudioContext || window.webkitAudioContext)(), session = globalThis.navigator?.audioSession, onBlocked = () => {}, onActive = () => {} } = {}) {
-        Object.assign(this, { load, makeContext: context, session, onBlocked, onActive });
+    constructor({ load = loadDecoder, context = () => new (window.AudioContext || window.webkitAudioContext)(), ownsContext = true, session = globalThis.navigator?.audioSession, onBlocked = () => {}, onActive = () => {} } = {}) {
+        Object.assign(this, { load, makeContext: context, ownsContext, session, onBlocked, onActive });
         this.closed = false; this.muted = false; this.pending = []; this.sources = new Set();
         this.samples = 0; this.energy = 0; this.scheduled = 0; this.errors = 0; this.next = 0;
     }
@@ -110,6 +110,6 @@ export class FallbackAudio {
         if (this.closed) return;
         this.closed = true; this.pending = []; this.clearSources(); this.decoder?.free(); this.decoder = null;
         this.releaseSession?.(); this.releaseSession = null;
-        if (this.ctx) { this.ctx.onstatechange = null; this.ctx.close().catch(() => {}); }
+        if (this.ctx) { this.ctx.onstatechange = null; this.gain?.disconnect(); if (this.ownsContext) this.ctx.close().catch(() => {}); }
     }
 }

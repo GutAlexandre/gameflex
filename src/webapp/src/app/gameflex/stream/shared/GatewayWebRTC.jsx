@@ -1,3 +1,5 @@
+import {createPortal} from 'react-dom';
+import {gameAudioContexts} from './game-audio-context.js';
 import {FallbackAudio} from './fallback-audio.js';
 import {mustWaitForAudioGesture} from './audio-autoplay-policy.js';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
@@ -203,6 +205,17 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
     const audioRef = useRef(null);
     const fallbackCanvasRef = useRef(null);
     const fallbackAudioRef = useRef(null);
+    const audioLeaseRef = useRef(null);
+    const [audioPortalRoot, setAudioPortalRoot] = useState(() => typeof document === 'undefined' ? null : document.fullscreenElement || document.body);
+    const getAudioContext = useCallback(() => {
+        if (!audioLeaseRef.current) audioLeaseRef.current = gameAudioContexts.acquire();
+        return audioLeaseRef.current.context;
+    }, []);
+    useEffect(() => {
+        const change = () => setAudioPortalRoot(document.fullscreenElement || document.webkitFullscreenElement || document.body);
+        document.addEventListener('fullscreenchange', change); document.addEventListener('webkitfullscreenchange', change);
+        return () => { document.removeEventListener('fullscreenchange', change); document.removeEventListener('webkitfullscreenchange', change); audioLeaseRef.current?.release(); audioLeaseRef.current = null; };
+    }, []);
     const fallbackAudioActiveRef = useRef(false);
     const [fallbackAudioActive, setFallbackAudioActive] = useState(false);
     const [audioNeedsGesture, setAudioNeedsGesture] = useState(false);
@@ -383,6 +396,9 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
 
     const unlockAudio = useCallback(() => {
         if (keepMutedRef.current || mutedRef.current) return;
+        // Prime even before fallback exists: the gesture must not be lost
+        // while negotiation or decoder loading is still in progress.
+        try { getAudioContext().resume().catch(() => setAudioNeedsGesture(true)); } catch { setAudioNeedsGesture(true); }
         fallbackAudioRef.current?.resume();
         const target = combinedAudioVideoRef.current ? videoRef.current : audioRef.current;
         if (target?.srcObject && !fallbackAudioActiveRef.current) {
@@ -390,7 +406,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
             target.volume = target.volume > 0 ? target.volume : 1;
             target.play().then(() => setAudioNeedsGesture(false)).catch(() => setAudioNeedsGesture(true));
         }
-    }, []);
+    }, [getAudioContext]);
     useEffect(() => {
         const unlock = event => { if (event.isTrusted) unlockAudio(); };
         for (const event of ['pointerup', 'touchend', 'keydown']) window.addEventListener(event, unlock, true);
@@ -449,6 +465,8 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
         }
 
         const audio = new FallbackAudio({
+            context: getAudioContext,
+            ownsContext: false,
             onBlocked: blocked => { if (fallbackAudioRef.current === audio) setAudioNeedsGesture(blocked); },
             onActive: () => {
                 if (fallbackAudioRef.current !== audio) return;
@@ -1187,7 +1205,7 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
             // A muted audio element can itself remain paused on mobile. Do
             // not wait for "playing" to offer the gesture that starts it.
             if (!keepMutedRef.current && !mutedRef.current && !fallbackAudioActiveRef.current) {
-                setAudioNeedsGesture(true);
+                setAudioNeedsGesture(gameAudioContexts.context?.state !== 'running');
                 if (!mustWaitForAudioGesture(navigator.userActivation, window)) unlockAudio();
             }
             attemptPlay();
@@ -1367,10 +1385,10 @@ const GatewayWebRTC = forwardRef(function GatewayWebRTC(
 
     return (
         <div style={{ position: 'relative' }}>
-            {audioNeedsGesture && !muted && !keepMuted && <button
+            {audioNeedsGesture && !muted && !keepMuted && audioPortalRoot && createPortal(<button
                 type="button" className="gateway-audio-unlock" onClick={unlockAudio}
-                style={{ position: 'absolute', top: 16, left: 16, zIndex: 20, padding: '12px 18px', borderRadius: 12, background: '#eef4ff', color: '#17283d', border: '2px solid #91b9f6', fontSize: 16 }}
-            >Activer le son</button>}
+                style={{ position: 'fixed', top: 'max(16px, env(safe-area-inset-top))', left: 'max(16px, env(safe-area-inset-left))', zIndex: 10400, padding: '12px 18px', borderRadius: 12, background: '#eef4ff', color: '#17283d', border: '2px solid #91b9f6', fontSize: 16 }}
+            >Activer le son</button>, audioPortalRoot)}
             <video
                 ref={videoRef}
                 autoPlay

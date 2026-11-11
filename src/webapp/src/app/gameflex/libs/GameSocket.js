@@ -1,10 +1,18 @@
+// A document navigation must release its authenticated HTTP relay channels.
+// Otherwise each reload holds the old command/media sockets until their TTL,
+// exhausting the per-account quota before the new player can reconnect.
+const liveGameSockets=new Set();
+if(typeof window!=='undefined'){
+ window.addEventListener('pagehide',()=>{for(const socket of [...liveGameSockets])socket.releaseDocument();});
+ window.addEventListener('pageshow',event=>{if(event.persisted)window.location.reload();});
+}
 import {getStoredToken} from '../profile/auth/AuthContext.jsx';
 import {streamAuthToken} from './serverBase.js';
 // Keep native WebSockets on working networks. Fall back only before the first open:
 // commands already sent are NEVER replayed after a lost connection.
 export class GameSocket extends EventTarget {
  constructor(address,token=''){
-  super();this.url=String(address);this.readyState=0;this.binaryType='blob';this.protocol='';this.bufferedAmount=0;
+  super();liveGameSockets.add(this);this.url=String(address);this.readyState=0;this.binaryType='blob';this.protocol='';this.bufferedAmount=0;
   this.onopen=null;this.onmessage=null;this.onclose=null;this.onerror=null;this.id=null;this.writes=Promise.resolve();this.abort=new AbortController();this.usedFallback=false;this.everOpened=false;
   const u=new URL(this.url,window.location.href);this.token=token||u.searchParams.get('token')||streamAuthToken()||getStoredToken()||'';u.searchParams.delete('token');
   const prefix=u.pathname.startsWith('/gameflex/')?'/gameflex':'';
@@ -64,9 +72,15 @@ export class GameSocket extends EventTarget {
   this.writes=this.writes.then(()=>this.readyState!==3?this.request('send',body):null).catch(()=>{if(this.readyState!==3){this.emit('error');this.finish(1006,'send_failed',false);}});
  }
  finish(code=1000,reason='',clean=true){
-  if(this.readyState===3)return;this.readyState=3;clearTimeout(this.timer);this.abort.abort();
+  if(this.readyState===3)return;liveGameSockets.delete(this);this.readyState=3;clearTimeout(this.timer);this.abort.abort();
   if(this.id)this.request('close',{},null).catch(()=>{});
   const event=new CloseEvent('close',{code,reason,wasClean:clean});this.onclose?.(event);this.dispatchEvent(event);
+ }
+ releaseDocument(){
+  if(this.readyState===3)return;
+  liveGameSockets.delete(this);this.readyState=3;clearTimeout(this.timer);this.abort.abort();
+  if(this.native){this.native.onopen=this.native.onmessage=this.native.onerror=this.native.onclose=null;this.native.close();}
+  if(this.id)fetch(this.endpoint+'/'+this.id+'/close',{method:'POST',headers:{Authorization:'Bearer '+this.token,'Content-Type':'application/json'},body:'{}',keepalive:true,cache:'no-store'}).catch(()=>{});
  }
  close(code=1000,reason=''){
   if(this.usedFallback&&this.readyState===1){this.readyState=2;this.writes.finally(()=>this.finish(code,reason,true));return;}

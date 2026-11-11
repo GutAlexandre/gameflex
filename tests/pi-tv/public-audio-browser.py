@@ -8,13 +8,16 @@ with sync_playwright() as p:
  for variant in cfg.get('variants',['before','after','no-video-decoder','webrtc']):
   context=browser.new_context(viewport={'width':390,'height':844},has_touch=True);login=context.request.post(base+'/api/v1/auth/login',data={'username':cfg['username'],'password':cfg['password']});assert login.ok,'API login refused';token=login.json()['item']['access_token'];page=context.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.add_init_script('localStorage.setItem("retrogaming-users-token",'+json.dumps(token)+');window.TEST_SESSION='+json.dumps(cfg['sessionId'])+';window.TEST_HOST='+json.dumps(base)+';')
+  page.add_init_script('window.TEST_PLAYER='+json.dumps('player' in variant)+';window.TEST_PRIMED='+json.dumps(variant=='primed-player')+';localStorage.setItem("gameflex:tv-mode","1");')
   page.add_init_script("""window.__kinds={};const fetchOriginal=window.fetch.bind(window);window.fetch=async(...args)=>{const r=await fetchOriginal(...args);if(String(args[0]).endsWith('/poll'))r.clone().json().then(data=>{for(const f of data.frames||[]){if(f.binary){const k=atob(f.binary).charCodeAt(0);window.__kinds[k]=(window.__kinds[k]||0)+1;}}}).catch(()=>{});return r;};window.__contexts=[];const AC=window.AudioContext;window.AudioContext=class extends AC{constructor(...args){super(...args);window.__contexts.push(this);}};""")
   if variant!='webrtc':page.add_init_script("const RTC=window.RTCPeerConnection;window.RTCPeerConnection=class extends RTC{constructor(cfg){super({...cfg,iceTransportPolicy:'relay'});}};")
   if variant=='no-video-decoder':page.add_init_script('window.VideoDecoder=undefined;window.AudioDecoder=undefined;')
   page.route(base+'/__audio_probe__',lambda r:r.fulfill(content_type='text/html',body='<html lang="fr"><meta charset="utf-8"><style>body{background:#0b1628;color:white;font:16px sans-serif;margin:12px}button{padding:12px}canvas{max-width:100%}</style><div id="root"></div><script src="'+base+'/__audio_probe__.js"></script></html>'))
   page.route(base+'/__audio_probe__.js',lambda r:r.fulfill(content_type='application/javascript',path=str(work/'harness'/('before.js' if variant=='before' else 'after.js'))))
   if not cfg.get('publishedAssets'):page.route(base+'/audio/*',lambda r:r.fulfill(path=str(root/'src/webapp/src/public/audio'/r.request.url.rsplit('/',1)[1]),content_type='application/javascript' if r.request.url.endswith('.js') else 'text/plain'))
-  page.goto(base+'/__audio_probe__');page.wait_for_timeout(11000)
+  page.goto(base+'/__audio_probe__');
+  if variant=='primed-player':page.locator('#start').tap()
+  page.wait_for_timeout(11000)
   before=page.evaluate('window.audioTest.stats()');kinds=page.evaluate('window.__kinds');canvas=page.evaluate("[...document.querySelectorAll('canvas')].map(c=>({w:c.width,h:c.height,shown:getComputedStyle(c).display!=='none'}))")
   if variant=='before':
    assert not before;assert page.evaluate('window.__contexts.length')==0;assert kinds.get('1',0)>100,(canvas,kinds,errors);reports.append({'variant':variant,'receivedAudioPackets':kinds['1'],'audioContexts':0,'regressionReproduced':True})
@@ -30,11 +33,27 @@ with sync_playwright() as p:
     if before and before['samples']>0:break
     page.wait_for_timeout(250)
    assert before and before['energy']>0,before
+   if 'player' in variant:
+    assert page.locator('.gf-tv-stream-phone').count()==0,'No phone-controller banner over a game'
+    assert page.evaluate('audioTest.viewers')>=2,'Actual SessionStream must have retried'
+    assert page.evaluate('window.__contexts.length')==1,'Negotiation retries must preserve the gesture/context'
+    if variant=='primed-player':assert before['state']=='running' and before['scheduled']>0,before
+    else:
+     page.evaluate('window.__contexts[0].suspend()');page.wait_for_timeout(300)
+     assert page.locator('.gateway-audio-unlock').is_visible()
+     assert page.locator('.gateway-audio-unlock').evaluate('(b)=>{const r=b.getBoundingClientRect();return b.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}'),'Launch overlay must not intercept the sound button'
+
    if page.locator('.gateway-audio-unlock').is_visible():page.locator('.gateway-audio-unlock').tap()
    else:page.locator('#mute').tap();page.locator('#mute').tap()
    page.wait_for_timeout(1500);live=page.evaluate('window.audioTest.stats()');assert live['state']=='running' and live['scheduled']>0,live
    page.locator('#mute').tap();page.wait_for_timeout(400);quiet=page.evaluate('window.audioTest.stats()');assert quiet['muted'];page.wait_for_timeout(400);assert page.evaluate('window.audioTest.stats().scheduled')==quiet['scheduled']
    page.locator('#mute').tap();page.wait_for_timeout(700);assert not page.evaluate('window.audioTest.stats().muted');assert page.evaluate('window.audioTest.stats().scheduled')>quiet['scheduled']
+   if 'player' in variant:
+    page.locator('#fullscreen').tap();page.wait_for_timeout(300);assert page.evaluate('!!document.fullscreenElement')
+    page.evaluate('window.__contexts[0].suspend()');page.wait_for_timeout(300)
+    assert page.locator('.gateway-audio-unlock').is_visible();assert page.locator('.gateway-audio-unlock').evaluate('(b)=>document.fullscreenElement.contains(b)')
+    page.locator('.gateway-audio-unlock').tap();page.wait_for_timeout(300);assert page.evaluate('window.__contexts[0].state')=='running'
+    page.evaluate('document.exitFullscreen()')
    page.evaluate('window.audioTest.close()');page.wait_for_timeout(500);assert page.evaluate('window.__contexts.every(c=>c.state==="closed")');reports.append({'variant':variant,'beforeGesture':before,'live':live,'muteRespected':True,'resumed':True,'closed':True})
   assert not errors,errors;print('Passed '+variant,flush=True);context.close()
  browser.close()

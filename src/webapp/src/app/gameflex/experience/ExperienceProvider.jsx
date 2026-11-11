@@ -1,3 +1,4 @@
+import {primeGameAudio} from '../stream/shared/game-audio-context.js';
 import TVPhoneHost,{TVPhoneSettings} from '../tv/TVPhoneHost.jsx';
 import GameOptionsDialog,{readGameOptions} from './GameOptionsDialog.jsx';
 import {PlayStationNavigation} from './PlayStationHome.jsx';
@@ -305,6 +306,7 @@ function LibraryExperience({ consoleId = '' }) {
 
     async function startGame(game,direct=false) {
         if(launchBusy.current)return;
+        const cancelAudioPrime=primeGameAudio();
         launchBusy.current=true;setLaunching(true);setLaunchError('');setDirectError(null);setLaunchingKey(gameKey(game));
         try {
             const result=await listCores(game.consoleId);
@@ -318,6 +320,7 @@ function LibraryExperience({ consoleId = '' }) {
             ctx.setData(data=>({...data,history:[gameKey(game),...data.history.filter(id=>id!==gameKey(game))].slice(0,40)}));
             navigate(buildStreamingUrl({sessionId:reply.data.sessionId,play:true}));
         } catch(error) {
+            cancelAudioPrime();
             if(direct)setDirectError({key:gameKey(game),message:error.message});else setLaunchError(error.message);
         } finally {launchBusy.current=false;setLaunching(false);setLaunchingKey('');}
     }

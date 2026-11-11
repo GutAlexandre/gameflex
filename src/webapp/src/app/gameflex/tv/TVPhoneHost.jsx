@@ -63,5 +63,5 @@ export default function TVPhoneHost({children}){
  useEffect(()=>()=>{const current=pairRef.current;if(current&&token)phoneRequest(`/${current.id}/revoke`,{hostToken:current.hostToken},token).catch(()=>{});clearPhonePad();},[token]);
  useEffect(()=>{if(!tvDisplay||streaming)return;const focus=()=>{const tile=document.querySelector('.ps-console-tile[aria-pressed="true"]');if(tile){if(document.activeElement===document.body||document.activeElement?.matches('.ps-brand'))tile.focus({preventScroll:true});observer.disconnect();}};const observer=new MutationObserver(focus);observer.observe(document.body,{childList:true,subtree:true});const timer=setTimeout(focus,200);return()=>{clearTimeout(timer);observer.disconnect();};},[tvDisplay,streaming,route.pathname]);
  const ctx={tv,setTV,pair,status,error,busy,remaining,create,approve,revoke,open:()=>{setOpen(true);setError('');},close:()=>setOpen(false)};
- return <TVContext.Provider value={ctx}>{children}{token&&streaming&&(tv||pair)&&<button className="gf-tv-stream-phone" onClick={()=>setOpen(true)}>Manette téléphone{status.phoneConnected?' · connectée':''}</button>}{open&&<PairDialog ctx={ctx}/>}</TVContext.Provider>;
+ return <TVContext.Provider value={ctx}>{children}{open&&<PairDialog ctx={ctx}/>}</TVContext.Provider>;
 }
