@@ -156,6 +156,9 @@ export default function TouchpadSurface({ button, callback, isLandscape = false,
 
 	return (
 		<div
+			className="gf-touch-controller"
+			onContextMenu={(event) => event.preventDefault()}
+			onDragStart={(event) => event.preventDefault()}
 			title={button.text || button.name}
 			style={{
 				position: "absolute",
@@ -188,3 +191,4 @@ export default function TouchpadSurface({ button, callback, isLandscape = false,
 		/>
 	);
 }
+import "../../controllers/touch-controller.css";

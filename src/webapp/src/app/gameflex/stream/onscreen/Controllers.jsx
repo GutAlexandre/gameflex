@@ -6,6 +6,7 @@ import { getHapticFeedback } from "../../libs/gamepadPreferences.js";
 import { logThrottled } from "../../shared/utils/log-store.js";
 import { CONTROLLER_PRESETS } from "../../controllers/presets.js";
 import TouchpadSurface from "./TouchpadSurface.jsx";
+import "../../controllers/touch-controller.css";
 
 // Haptic feedback on virtual button press — navigator.vibrate is Android
 // Chrome only (iOS Safari has never implemented the Vibration API at all,
@@ -714,7 +715,9 @@ export default function ControllerLayout({
 
 	return (
 		<div
-			className="position-absolute"
+			className="position-absolute gf-touch-controller"
+			onContextMenu={(event) => event.preventDefault()}
+			onDragStart={(event) => event.preventDefault()}
 			// LA BANDE DE LA MANETTE LAISSE PASSER LES DOIGTS.
 			//
 			// 300 px de haut sur toute la largeur : sur un téléphone tenu à

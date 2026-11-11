@@ -1,0 +1,8 @@
+/* Explicit descendants are needed for button labels and icons on iOS. */
+.gf-touch-controller,
+.gf-touch-controller * {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+}
