@@ -19,7 +19,7 @@ with sync_playwright() as p:
   if variant=='before':
    assert not before;assert page.evaluate('window.__contexts.length')==0;assert kinds.get('1',0)>100,(canvas,kinds,errors);reports.append({'variant':variant,'receivedAudioPackets':kinds['1'],'audioContexts':0,'regressionReproduced':True})
   elif variant=='webrtc':
-   if page.locator('.gateway-audio-unlock').is_visible():page.locator('.gateway-audio-unlock').click()
+   if page.locator('.gateway-audio-unlock').is_visible():page.locator('.gateway-audio-unlock').tap()
    else:print('RTC without prompt',page.evaluate("({media:[...document.querySelectorAll('audio')].map(a=>({muted:a.muted,paused:a.paused,volume:a.volume,ready:a.readyState,tracks:a.srcObject?.getTracks().length})),activation:navigator.userActivation.hasBeenActive})"),flush=True)
    page.wait_for_timeout(1500)
    live=page.evaluate("""async()=>({media:[...document.querySelectorAll('audio')].map(a=>({muted:a.muted,paused:a.paused,volume:a.volume,ready:a.readyState})),inbound:[...((await audioTest.raw())?.values()||[])].filter(r=>r.type==='inbound-rtp'&&r.kind==='audio').map(r=>({bytes:r.bytesReceived,energy:r.totalAudioEnergy}))})""")
@@ -30,11 +30,11 @@ with sync_playwright() as p:
     if before and before['samples']>0:break
     page.wait_for_timeout(250)
    assert before and before['energy']>0,before
-   if page.locator('.gateway-audio-unlock').is_visible():page.locator('.gateway-audio-unlock').click()
-   else:page.locator('#mute').click();page.locator('#mute').click()
+   if page.locator('.gateway-audio-unlock').is_visible():page.locator('.gateway-audio-unlock').tap()
+   else:page.locator('#mute').tap();page.locator('#mute').tap()
    page.wait_for_timeout(1500);live=page.evaluate('window.audioTest.stats()');assert live['state']=='running' and live['scheduled']>0,live
-   page.locator('#mute').click();page.wait_for_timeout(400);quiet=page.evaluate('window.audioTest.stats()');assert quiet['muted'];page.wait_for_timeout(400);assert page.evaluate('window.audioTest.stats().scheduled')==quiet['scheduled']
-   page.locator('#mute').click();page.wait_for_timeout(700);assert not page.evaluate('window.audioTest.stats().muted');assert page.evaluate('window.audioTest.stats().scheduled')>quiet['scheduled']
+   page.locator('#mute').tap();page.wait_for_timeout(400);quiet=page.evaluate('window.audioTest.stats()');assert quiet['muted'];page.wait_for_timeout(400);assert page.evaluate('window.audioTest.stats().scheduled')==quiet['scheduled']
+   page.locator('#mute').tap();page.wait_for_timeout(700);assert not page.evaluate('window.audioTest.stats().muted');assert page.evaluate('window.audioTest.stats().scheduled')>quiet['scheduled']
    page.evaluate('window.audioTest.close()');page.wait_for_timeout(500);assert page.evaluate('window.__contexts.every(c=>c.state==="closed")');reports.append({'variant':variant,'beforeGesture':before,'live':live,'muteRespected':True,'resumed':True,'closed':True})
   assert not errors,errors;print('Passed '+variant,flush=True);context.close()
  browser.close()

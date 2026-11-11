@@ -90,3 +90,22 @@ reconstruction ; le contrôle compare désormais source, build et URL publique.
 
 Le cache est à nouveau renouvelé après la publication annulée, pour éviter de
 conserver un artefact de cette tentative.
+
+
+## Publication vérifiée
+
+Le web 0.4.1 est publié à la révision
+`24d5e0c281cf77e5f363930abbe1db648c9f7fef`. Build de production réussi
+en 188 secondes, avec les avertissements de taille des bundles déjà présents.
+Les cinq ressources audio et leurs crédits sont identiques entre source, build,
+conteneur de contrôle et URL publique. Cache de l’application : version 50.
+Les 74 icônes et les routes accueil, paramètres avancés et Archives sont vérifiées.
+Kernel, credential, gateway et experience n’ont pas été redémarrés.
+
+Le dernier essai utilise de vrais événements tactiles émulés et le décodeur
+réellement téléchargé depuis le site publié : 74 880 échantillons programmés,
+énergie non nulle, aucune erreur de décodage, coupure, reprise et libération du
+lecteur vérifiées. Les essais ne valent toujours pas une confirmation sonore sur
+le téléphone physique de l’utilisateur. La TV est restée sur la bibliothèque
+laissée lors de l’essai précédent, sans activité nouvelle ni lecture active ;
+aucune action n’a été envoyée à la télécommande pendant ce correctif web.
