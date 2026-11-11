@@ -40,7 +40,7 @@ seuls le point d’entrée du harnais et ses fichiers sont fournis par Playwrigh
 Le mode de reproduction force ICE en relais sans TURN pour empêcher WebRTC.
 Ce test ne vaut pas un essai sur un iPhone physique.
 
-L’ancien lecteur reçoit plus de 700 paquets audio sans créer de sortie Web Audio.
+L’ancien lecteur reçoit plus de 600 paquets audio sans créer de sortie Web Audio.
 Le nouveau décode des échantillons d’énergie non nulle, reste suspendu avant le
 geste, puis programme effectivement le son après toucher. Les contrôles couvrent
 la coupure volontaire, la reprise et la fermeture des AudioContext. Le même
@@ -70,3 +70,12 @@ volume 1, paquets reçus et énergie audio décodée non nulle. Aucun lecteur PC
 secours n’est actif en parallèle. Un premier essai a permis de reproduire le
 blocage supplémentaire de l’élément audio avant son premier événement `playing` ;
 le bouton proposé dès la piste corrige ce cas.
+
+
+Validation finale : quatre variantes passent (ancien lecteur reproduit, nouveau
+lecteur HTTPS, sans décodeurs WebCodecs, puis WebRTC direct). Le cas HTTPS a
+programmé 109 920 échantillons après le geste, sans erreur de décodage ; le cas
+sans WebCodecs, 81 600. WebRTC a décodé une énergie audio non nulle, avec élément
+actif, volume 1 et sans second transport audio. Les tests unitaires et la suite
+console passent. Les essais utilisent Chromium ; aucun résultat sur iPhone
+physique n’est affirmé.

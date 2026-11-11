@@ -5,7 +5,8 @@ if not args.live:parser.error('--live is required; the check opens a temporary t
 wt=Path(__file__).resolve().parents[2];root=Path(subprocess.check_output(['git','rev-parse','--git-common-dir'],cwd=wt,text=True).strip()).resolve().parent
 result=wt/'.local/audio-fix/results';result.mkdir(parents=True,exist_ok=True);source_name='gameflex-audio-probe-'+secrets.token_hex(4)
 
-x=json.loads(subprocess.check_output(['docker','inspect','gameflex-credential']))[0];assert x['Config'].get('Labels',{}).get('org.gameflex.project')==str(root),'Unmanaged credential service';env=dict(v.split('=',1) for v in x['Config']['Env'] if '=' in v);sid=secrets.token_hex(16);key=base64.urlsafe_b64encode(hmac.new(env['GAMEFLEX_INTERNAL_SECRET'].encode(),b'gameflex/auth: session secret v1\x00'+sid.encode(),hashlib.sha256).digest()).decode().rstrip('=')
+managed=json.loads(subprocess.check_output(['docker','inspect','gameflex-web']))[0];assert managed['Config'].get('Labels',{}).get('org.gameflex.project')==str(root),'Unmanaged GameFlex deployment'
+x=json.loads(subprocess.check_output(['docker','inspect','gameflex-credential']))[0];assert 'gameflex-local' in x['NetworkSettings']['Networks'],'Credential service is outside the GameFlex network';env=dict(v.split('=',1) for v in x['Config']['Env'] if '=' in v);sid=secrets.token_hex(16);key=base64.urlsafe_b64encode(hmac.new(env['GAMEFLEX_INTERNAL_SECRET'].encode(),b'gameflex/auth: session secret v1\x00'+sid.encode(),hashlib.sha256).digest()).decode().rstrip('=')
 source=subprocess.Popen(['docker','run','--rm','-i','--name',source_name,'--network','host','--cpus','.25','--memory','128m','-v',str(root)+':'+str(root)+':ro','-v',str(wt)+':/app:ro','node:20-bookworm-slim','node','/app/tests/pi-tv/publish-audio-probe.cjs'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
 source.stdin.write(json.dumps({'sessionId':sid,'key':key}));source.stdin.close()
 try:
