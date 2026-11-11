@@ -562,7 +562,8 @@ export default (env = {}) => ({
         }),
         new CopyWebpackPlugin({
             patterns: [
-                { from: 'public/audio', to: 'audio' },
+                // Preserve the vendored decoder bytes, attribution and pinned hash.
+                { from: 'public/audio', to: 'audio', info: { minimized: true } },
                 // À LA RACINE, comme le serveur de dev : index.html, le
                 // manifeste et le service worker demandent `/images/…`. Copiées
                 // sous `public/images`, les icônes répondaient 404 en

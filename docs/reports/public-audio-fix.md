@@ -24,7 +24,7 @@ Voir le [suivi WebKit](https://bugs.webkit.org/show_bug.cgi?id=237322).
 Le son WebRTC est coupé dès que le transport PCM prend le relais. Les sources et
 le décodeur sont libérés au retour à WebRTC et à la fermeture. Les tampons de
 chargement et de lecture sont bornés pour éviter l’accumulation de vieux sons.
-Le service worker passe à la version 49 et met aussi le décodeur en cache.
+Le service worker passe à la version 50 et met aussi le décodeur en cache.
 
 ## Reproduction et tests
 
@@ -79,3 +79,14 @@ sans WebCodecs, 81 600. WebRTC a décodé une énergie audio non nulle, avec él
 actif, volume 1 et sans second transport audio. Les tests unitaires et la suite
 console passent. Les essais utilisent Chromium ; aucun résultat sur iPhone
 physique n’est affirmé.
+
+
+La première publication a été annulée automatiquement par la vérification des
+empreintes : le minimiseur Webpack retraitait le fichier tiers déjà minifié. Le
+test sonore passait, mais l’artefact différait du manifeste épinglé. Le fichier
+est maintenant marqué `minimized` dans CopyWebpackPlugin pour conserver les
+octets et le crédit amont. La version précédente a été restaurée pendant la
+reconstruction ; le contrôle compare désormais source, build et URL publique.
+
+Le cache est à nouveau renouvelé après la publication annulée, pour éviter de
+conserver un artefact de cette tentative.

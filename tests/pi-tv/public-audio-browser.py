@@ -13,7 +13,7 @@ with sync_playwright() as p:
   if variant=='no-video-decoder':page.add_init_script('window.VideoDecoder=undefined;window.AudioDecoder=undefined;')
   page.route(base+'/__audio_probe__',lambda r:r.fulfill(content_type='text/html',body='<html lang="fr"><meta charset="utf-8"><style>body{background:#0b1628;color:white;font:16px sans-serif;margin:12px}button{padding:12px}canvas{max-width:100%}</style><div id="root"></div><script src="'+base+'/__audio_probe__.js"></script></html>'))
   page.route(base+'/__audio_probe__.js',lambda r:r.fulfill(content_type='application/javascript',path=str(work/'harness'/('before.js' if variant=='before' else 'after.js'))))
-  page.route(base+'/audio/*',lambda r:r.fulfill(path=str(root/'src/webapp/src/public/audio'/r.request.url.rsplit('/',1)[1]),content_type='application/javascript' if r.request.url.endswith('.js') else 'text/plain'))
+  if not cfg.get('publishedAssets'):page.route(base+'/audio/*',lambda r:r.fulfill(path=str(root/'src/webapp/src/public/audio'/r.request.url.rsplit('/',1)[1]),content_type='application/javascript' if r.request.url.endswith('.js') else 'text/plain'))
   page.goto(base+'/__audio_probe__');page.wait_for_timeout(11000)
   before=page.evaluate('window.audioTest.stats()');kinds=page.evaluate('window.__kinds');canvas=page.evaluate("[...document.querySelectorAll('canvas')].map(c=>({w:c.width,h:c.height,shown:getComputedStyle(c).display!=='none'}))")
   if variant=='before':
